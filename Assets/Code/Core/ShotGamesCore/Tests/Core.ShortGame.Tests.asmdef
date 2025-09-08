@@ -1,0 +1,27 @@
+{
+  "name": "Core.ShortGame.Tests",
+  "rootNamespace": "Code.Core.ShotGamesCore.Tests",
+  "references": [
+    "Core.ShortGame",
+    "Core.ShortGame.Tests.Mocks",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner",
+    "Logger",
+    "ResourceLoader"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

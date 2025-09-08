@@ -1,5 +1,74 @@
 {
   "dependencies": {
+    "com.azzazello.config": {
+      "version": "https://github.com/Azzazelloqq/Config.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "18ab10dca3d31cbc19528227f5af9b659e6c2a66"
+    },
+    "com.azzazello.lightdi": {
+      "version": "https://github.com/Azzazelloqq/LightDI.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "66c92702949ccdf53b39c05b2bb1857ec3cca36d"
+    },
+    "com.azzazello.localsavesystem": {
+      "version": "https://github.com/Azzazelloqq/LocalSave.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "7e8123e31fbc09f9058904d6b3180131d6182e7a"
+    },
+    "com.azzazello.logger": {
+      "version": "https://github.com/Azzazelloqq/InGameLogger.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2d4dbfd7512b1b29d3ca7c3e43298a3f236a0489"
+    },
+    "com.azzazello.resourceloader": {
+      "version": "https://github.com/Azzazelloqq/ResourceLoader.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.addressables": "1.21.20"
+      },
+      "hash": "8100bd189b6a5617dc6c2a2840129f7abf39f360"
+    },
+    "com.azzazello.tickhandler": {
+      "version": "https://github.com/Azzazelloqq/TickHandler.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "a9baf356016accb677741977ce0ae3ea399de2e6"
+    },
+    "com.boxqkrtm.ide.cursor": {
+      "version": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.9"
+      },
+      "hash": "38fecf55e4fd94ccfe58a92ed8ad1a529ba1694e"
+    },
+    "com.unity.addressables": {
+      "version": "2.5.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.profiling.core": "1.0.2",
+        "com.unity.test-framework": "1.4.5",
+        "com.unity.modules.assetbundle": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.imageconversion": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.scriptablebuildpipeline": "2.4.0",
+        "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.8",
       "depth": 0,
@@ -93,6 +162,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.profiling.core": {
+      "version": "1.0.2",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.render-pipelines.core": {
       "version": "17.0.4",
       "depth": 1,
@@ -135,6 +211,16 @@
         "com.unity.mathematics": "1.2.4",
         "com.unity.modules.terrain": "1.0.0"
       }
+    },
+    "com.unity.scriptablebuildpipeline": {
+      "version": "2.4.0",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.4.5",
+        "com.unity.modules.assetbundle": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.searcher": {
       "version": "4.9.3",
