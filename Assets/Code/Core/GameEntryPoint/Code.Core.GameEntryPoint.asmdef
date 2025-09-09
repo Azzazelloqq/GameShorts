@@ -1,0 +1,20 @@
+{
+    "name": "Code.Core.GameEntryPoint",
+    "rootNamespace": "Code.Core.GameEntryPoint",
+    "references": [
+        "Core.ShortGame",
+        "Logger",
+        "Code.Core.GamesLoader",
+        "ResourceLoader",
+        "LightDI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
