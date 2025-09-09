@@ -24,21 +24,11 @@ namespace Code.Core.GameEntryPoint
         [SerializeField] private Transform _gamesParent;
         [SerializeField] private int _preloadDepth = 2;
         
-        private QueueShortGamesLoader _queueLoader;
+        private IGamesLoader _queueLoader;
         private IShortGameLifeCycleService _lifeCycleService;
         private CancellationTokenSource _cancellationTokenSource;
         private IDiContainer _globalGameDiContainer;
 
-        /// <summary>
-        /// Gets the queue loader
-        /// </summary>
-        public QueueShortGamesLoader QueueLoader => _queueLoader;
-        
-        /// <summary>
-        /// Gets the current game
-        /// </summary>
-        public IShortGame CurrentGame => _queueLoader?.CurrentGame;
-        
         private async void Start()
         {
             _cancellationTokenSource = new CancellationTokenSource();
@@ -79,7 +69,7 @@ namespace Code.Core.GameEntryPoint
 
             var games = GetGameTypes();
             await _queueLoader.InitializeAsync(games, cancellationToken);
-            _globalGameDiContainer.RegisterAsSingleton<IGamesLoader>(_queueLoader);
+            _globalGameDiContainer.RegisterAsSingleton(_queueLoader);
         }
 
         private IReadOnlyList<Type> GetGameTypes()
