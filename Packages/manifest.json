@@ -7,6 +7,7 @@
     "com.azzazello.resourceloader": "https://github.com/Azzazelloqq/ResourceLoader.git",
     "com.azzazello.tickhandler": "https://github.com/Azzazelloqq/TickHandler.git",
     "com.boxqkrtm.ide.cursor": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",
+    "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.8",
     "com.unity.collab-proxy": "2.9.3",
