@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.GamesLoader;
+using Code.Core.ShortGamesCore.Game1;
+using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.LifeCycleService;
@@ -76,7 +78,8 @@ namespace Code.Core.GameEntryPoint
         {
             var types = new[]
             {
-                this.GetType(), 
+                typeof(Game1), 
+                typeof(Game2)
             };
 
             return types;
@@ -87,15 +90,12 @@ namespace Code.Core.GameEntryPoint
         /// </summary>
         protected virtual Dictionary<Type, string> GetResourceMapping()
         {
-            
-            // Override this in your implementation
-            // Example:
-            // return new Dictionary<Type, string>
-            // {
-            //     { typeof(MyGame1), "Games/Game1" },
-            //     { typeof(MyGame2), "Games/Game2" }
-            // };
-            return new Dictionary<Type, string>();
+            return new Dictionary<Type, string>
+            {
+                { typeof(Game1), "Assets/Games/Game1/Game1.prefab" },
+                { typeof(Game2), "Assets/Games/Game2/Game2.prefab" }
+            };
+           // return new Dictionary<Type, string>();
         }
         
         private void OnDestroy()

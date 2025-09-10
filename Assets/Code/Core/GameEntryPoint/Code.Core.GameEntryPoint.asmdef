@@ -6,7 +6,9 @@
         "Logger",
         "Code.Core.GamesLoader",
         "ResourceLoader",
-        "LightDI"
+        "LightDI",
+        "Game1_test",
+        "Game2"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

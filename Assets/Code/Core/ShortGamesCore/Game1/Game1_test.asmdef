@@ -1,4 +1,19 @@
-﻿{
-  "name": "Game1_test",
-  "references":[ "GUID:97970e3b002e4b58b19827dcfb9b8064" ]
+{
+    "name": "Game1_test",
+    "rootNamespace": "",
+    "references": [
+        "Core.ShortGame",
+        "BaseDMDisposable",
+        "LightDI",
+        "TickHandler"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

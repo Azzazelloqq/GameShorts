@@ -1,0 +1,19 @@
+﻿{
+  "name": "Game2",
+  "rootNamespace": "",
+  "references": [
+    "Core.ShortGame",
+    "BaseDMDisposable",
+    "LightDI",
+    "TickHandler"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
