@@ -1,7 +1,7 @@
 using System;
 using R3;
 
-namespace Code.Core.Tools.Extensions.Reactive
+namespace Code.Core.Tools
 {
     public static class ReactiveExtensions
     {

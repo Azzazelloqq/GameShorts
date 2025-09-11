@@ -1,22 +1,26 @@
 {
-    "name": "Code.Core.GameEntryPoint",
-    "rootNamespace": "Code.Core.GameEntryPoint",
-    "references": [
-        "Core.ShortGame",
-        "Logger",
-        "Code.Core.GamesLoader",
-        "ResourceLoader",
-        "LightDI",
-        "Game1_test",
-        "Game2"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Code.Core.GameEntryPoint",
+  "rootNamespace": "Code.Core.GameEntryPoint",
+  "references": [
+    "Core.ShortGame",
+    "Logger",
+    "Code.Core.GamesLoader",
+    "Code.Core.GameSwiper",
+    "ResourceLoader",
+    "LightDI",
+    "BaseDMDisposable",
+    "TickHandler",
+    "AddressablesGroups",
+    "Game1_test",
+    "Game2"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

@@ -1,5 +1,5 @@
 using System;
-namespace Root.Extensions.Reactive
+namespace Code.Core.Tools
 {
   public interface IReadOnlyReactiveEvent
   {

@@ -16,13 +16,18 @@ MonoBehaviour:
   m_GUID: 8869bcab39b870b438a6bf9db715abec
   m_SerializeEntries:
   - m_GUID: 55781d2d88fd48e42b0aad8a9dc1f59a
-    m_Address: Assets/Games/Game2/Game2.prefab
+    m_Address: Game2
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b44eedb105dc6a74d8779b9575af3915
+    m_Address: GameSwiper
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bd74642336a09e54481544fab0e2cff3
-    m_Address: Assets/Games/Game1/Game1.prefab
+    m_Address: Game1
     m_ReadOnly: 0
     m_SerializedLabels:
     - default

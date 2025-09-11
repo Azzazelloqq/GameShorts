@@ -5,7 +5,12 @@
         "Core.ShortGame",
         "Logger",
         "LightDI",
-        "TickHandler"
+        "TickHandler",
+        "BaseDMDisposable",
+        "R3.Unity",
+        "ResourceLoader",
+        "AddressablesGroups",
+        "Tools"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

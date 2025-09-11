@@ -1,7 +1,7 @@
 ﻿using System;
 using R3;
 
-namespace Root.Extensions.Reactive
+namespace Code.Core.Tools
 {
     public class ReactiveTrigger : IReadOnlyReactiveTrigger, IDisposable
     {

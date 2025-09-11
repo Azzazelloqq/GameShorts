@@ -200,7 +200,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1208694894178478649}
-  - component: {fileID: 5628086770371485131}
+  - component: {fileID: 8964208349686923259}
   m_Layer: 0
   m_Name: Game2
   m_TagString: Untagged
@@ -225,7 +225,7 @@ Transform:
   - {fileID: 8119403441699382476}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5628086770371485131
+--- !u!114 &8964208349686923259
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -234,9 +234,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6599063106319627186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05812a3f9b5147b490d8919abf9b0afb, type: 3}
+  m_Script: {fileID: 11500000, guid: caa9c75f756849bc8c2d36c4c99560b8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game1_test::Code.Core.ShortGamesCore.Game1.Game1
+  m_EditorClassIdentifier: Game2::Code.Core.ShortGamesCore.Game2.Game2
   _circle: {fileID: 5654988817199502059}
 --- !u!1 &7555434367663579974
 GameObject:

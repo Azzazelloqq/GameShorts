@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.GamesLoader;
+using Code.Core.GameSwiper;
 using Code.Core.ShortGamesCore.Game1;
 using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Source.Factory;
@@ -13,6 +14,9 @@ using InGameLogger;
 using LightDI.Runtime;
 using ResourceLoader;
 using ResourceLoader.AddressableResourceLoader;
+using Scripts.Generated.Addressables;
+using TickHandler;
+using TickHandler.UnityTickHandler;
 using UnityEngine;
 
 namespace Code.Core.GameEntryPoint
@@ -26,10 +30,19 @@ namespace Code.Core.GameEntryPoint
         [SerializeField] private Transform _gamesParent;
         [SerializeField] private int _preloadDepth = 2;
         
+        [Header("UI Settings")]
+        [SerializeField] private Transform _uiParent;
+        
         private IGamesLoader _queueLoader;
         private IShortGameLifeCycleService _lifeCycleService;
+        private GameSwiper.GameSwiper _gameSwiper;
+        private GameSwiperController _gameSwiperController;
         private CancellationTokenSource _cancellationTokenSource;
         private IDiContainer _globalGameDiContainer;
+        private UnityInGameLogger _logger;
+        private SimpleShortGamePool _pool;
+        private AddressableResourceLoader _resourceLoader;
+        private UnityTickHandler _tickHandler;
 
         private async void Start()
         {
@@ -40,6 +53,14 @@ namespace Code.Core.GameEntryPoint
             {
                 _gamesParent = transform;
             }
+            
+            if (_uiParent == null)
+            {
+                // Создаем отдельный родительский объект для UI, если не задан
+                var uiRoot = new GameObject("UI Root");
+                _uiParent = uiRoot.transform;
+                _uiParent.SetParent(transform);
+            }
 
             _globalGameDiContainer = DiContainerFactory.CreateContainer();
 
@@ -48,23 +69,27 @@ namespace Code.Core.GameEntryPoint
         
         private async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            var logger = new UnityInGameLogger();
-            _globalGameDiContainer.RegisterAsSingleton<IInGameLogger>(logger);
+            _logger = new UnityInGameLogger();
+            _globalGameDiContainer.RegisterAsSingleton<IInGameLogger>(_logger);
             
-            var pool = new SimpleShortGamePool(logger);
-            _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(pool);
+            _pool = new SimpleShortGamePool(_logger);
+            _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
 
-            var resourceLoader = new AddressableResourceLoader();
-            _globalGameDiContainer.RegisterAsSingleton<IResourceLoader>(resourceLoader);
+            _resourceLoader = new AddressableResourceLoader();
+            _globalGameDiContainer.RegisterAsSingleton<IResourceLoader>(_resourceLoader);
+
+            var dispatcher = gameObject.AddComponent<UnityDispatcherBehaviour>();
+            _tickHandler = new UnityTickHandler(dispatcher);
+            _globalGameDiContainer.RegisterAsSingleton<ITickHandler>(_tickHandler);
             
             var resourceMapping = GetResourceMapping();
             var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping);
             _globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
             
-            _lifeCycleService = new SimpleShortGameLifeCycleService(pool, factory, logger);
+            _lifeCycleService = new SimpleShortGameLifeCycleService(_pool, factory, _logger);
             _globalGameDiContainer.RegisterAsSingleton(_lifeCycleService);
             
-            _queueLoader = new QueueShortGamesLoader(_lifeCycleService, logger)
+            _queueLoader = new QueueShortGamesLoader(_lifeCycleService, _logger)
             {
                 PreloadDepth = _preloadDepth
             };
@@ -72,6 +97,15 @@ namespace Code.Core.GameEntryPoint
             var games = GetGameTypes();
             await _queueLoader.InitializeAsync(games, cancellationToken);
             _globalGameDiContainer.RegisterAsSingleton(_queueLoader);
+            
+            // Создаем контроллер
+            
+            _gameSwiperController = GameSwiperControllerFactory.CreateGameSwiperController(new Ctx()
+            {
+                PlaceForAllUi = _uiParent,
+            });
+            _globalGameDiContainer.RegisterAsSingleton(_gameSwiperController);
+
         }
 
         private IReadOnlyList<Type> GetGameTypes()
@@ -84,7 +118,7 @@ namespace Code.Core.GameEntryPoint
 
             return types;
         }
-        
+
         /// <summary>
         /// Override this method to provide resource mapping for your games
         /// </summary>
@@ -92,19 +126,23 @@ namespace Code.Core.GameEntryPoint
         {
             return new Dictionary<Type, string>
             {
-                { typeof(Game1), "Assets/Games/Game1/Game1.prefab" },
-                { typeof(Game2), "Assets/Games/Game2/Game2.prefab" }
+                { typeof(Game1), ResourceIdsContainer.DefaultLocalGroup.Game1 },
+                { typeof(Game2), ResourceIdsContainer.DefaultLocalGroup.Game2 }
             };
            // return new Dictionary<Type, string>();
+
         }
         
         private void OnDestroy()
         {
-            _cancellationTokenSource.Cancel();
-            _queueLoader.Dispose();
-            _lifeCycleService.Dispose();
-            _cancellationTokenSource.Dispose();
-            _globalGameDiContainer.Dispose();
+            _cancellationTokenSource?.Cancel();
+            
+            // Очистка GameSwiperController
+            _gameSwiperController?.Dispose();
+            _queueLoader?.Dispose();
+            _lifeCycleService?.Dispose();
+            _cancellationTokenSource?.Dispose();
+            _globalGameDiContainer?.Dispose();
         }
     }
 }
