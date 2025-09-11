@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.Tools;
+using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
 using R3;
 using ResourceLoader;
-using Scripts.Generated.Addressables;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

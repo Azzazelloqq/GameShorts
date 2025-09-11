@@ -12,7 +12,8 @@
     "TickHandler",
     "AddressablesGroups",
     "Game1_test",
-    "Game2"
+    "Game2",
+    "Tools"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

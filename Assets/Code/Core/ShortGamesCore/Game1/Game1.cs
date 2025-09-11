@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
+using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Game1.Scripts;
+using Code.Core.ShortGamesCore.Game1.Scripts.Core;
+using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using R3;
 using UnityEngine;
@@ -9,8 +13,9 @@ namespace Code.Core.ShortGamesCore.Game1
 {
     public class Game1 : BaseMonoBehaviour, IShortGame
     {
-        [SerializeField] private Transform _circle;
-        private IDisposable _root;
+        [SerializeField] private MainSceneContextView sceneContextView;
+        private IDisposable _core;
+        private CancellationTokenSource _cancellationTokenSource;
         public int Id => 1;
 
         public void Start()
@@ -33,11 +38,15 @@ namespace Code.Core.ShortGamesCore.Game1
 
         private void CreateRoot()
         {
-            _root?.Dispose();
-            Root.Ctx rootCtx = new Root.Ctx
+            _cancellationTokenSource?.Dispose();
+            _core?.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+            CorePm.Ctx rootCtx = new CorePm.Ctx
             {
+                sceneContextView = sceneContextView,
+                cancellationToken = _cancellationTokenSource.Token
             };
-            _root = RootFactory.CreateRoot(rootCtx);
+            _core = new CorePm(rootCtx);
         }
     }
 }

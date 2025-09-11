@@ -10,11 +10,12 @@ using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.LifeCycleService;
 using Code.Core.ShortGamesCore.Source.Pool;
+using Code.Core.Tools.Pool;
+using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
 using ResourceLoader;
 using ResourceLoader.AddressableResourceLoader;
-using Scripts.Generated.Addressables;
 using TickHandler;
 using TickHandler.UnityTickHandler;
 using UnityEngine;
@@ -43,6 +44,7 @@ namespace Code.Core.GameEntryPoint
         private SimpleShortGamePool _pool;
         private AddressableResourceLoader _resourceLoader;
         private UnityTickHandler _tickHandler;
+        private PoolManager _poolObjects;
 
         private async void Start()
         {
@@ -74,6 +76,9 @@ namespace Code.Core.GameEntryPoint
             
             _pool = new SimpleShortGamePool(_logger);
             _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
+
+            _poolObjects = new PoolManager();
+            _globalGameDiContainer.RegisterAsSingleton<IPoolManager>(_poolObjects);
 
             _resourceLoader = new AddressableResourceLoader();
             _globalGameDiContainer.RegisterAsSingleton<IResourceLoader>(_resourceLoader);
@@ -126,7 +131,7 @@ namespace Code.Core.GameEntryPoint
         {
             return new Dictionary<Type, string>
             {
-                { typeof(Game1), ResourceIdsContainer.DefaultLocalGroup.Game1 },
+                { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
                 { typeof(Game2), ResourceIdsContainer.DefaultLocalGroup.Game2 }
             };
            // return new Dictionary<Type, string>();
@@ -137,11 +142,11 @@ namespace Code.Core.GameEntryPoint
         {
             _cancellationTokenSource?.Cancel();
             
-            // Очистка GameSwiperController
             _gameSwiperController?.Dispose();
             _queueLoader?.Dispose();
             _lifeCycleService?.Dispose();
             _cancellationTokenSource?.Dispose();
+            _poolObjects?.Dispose();
             _globalGameDiContainer?.Dispose();
         }
     }

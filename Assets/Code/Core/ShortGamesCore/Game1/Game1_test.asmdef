@@ -5,7 +5,12 @@
         "Core.ShortGame",
         "BaseDMDisposable",
         "LightDI",
-        "TickHandler"
+        "TickHandler",
+        "ResourceLoader",
+        "Tools",
+        "Unity.TextMeshPro",
+        "Code.Core.InputManager",
+        "AddressablesGroups"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
