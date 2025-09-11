@@ -211,6 +211,25 @@ namespace Code.Core.ShotGamesCore.Tests.LifeCycleService
         }
         
         [Test]
+        public async Task StopCurrentGame_CallsStopMethodOnCurrentGame()
+        {
+            // Arrange
+            var mockGame = _testGameObject.AddComponent<MockShortGame>();
+            _factory.AddPrefab(typeof(MockShortGame), _testGameObject);
+            _pool.ShouldReturnFromPool = false;
+            
+            var game = await _service.LoadGameAsync<MockShortGame>();
+            
+            // Act
+            _service.StopCurrentGame();
+            
+            // Assert
+            Assert.AreEqual(1, game.StopCallCount, "Stop method should be called once on current game");
+            Assert.IsFalse(game.IsStarted, "Game should not be started after Stop is called");
+            Assert.IsFalse(game.IsPaused, "Game should not be paused after Stop is called");
+        }
+        
+        [Test]
         public async Task LoadNextGameAsync_NoPreloadedGames_ReturnsNull()
         {
             // Act

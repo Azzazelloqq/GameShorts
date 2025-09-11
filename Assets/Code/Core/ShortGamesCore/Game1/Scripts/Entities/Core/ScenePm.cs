@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Logic;
@@ -14,6 +15,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
         {
             public CancellationToken cancellationToken;
             public MainSceneContextView sceneContextView;
+            public Action restartGame;
         }
 
         private readonly Ctx _ctx;
@@ -25,7 +27,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
             {
                 sceneContextView = _ctx.sceneContextView,
                 cancellationToken = _ctx.cancellationToken,
-                restartGame = () => SceneManager.LoadScene(SceneManager.GetActiveScene().name)
+                restartGame = _ctx.restartGame
             };
             MainScenePm mainScenePm = new MainScenePm(mainSceneCtx);
             AddDispose(mainScenePm);

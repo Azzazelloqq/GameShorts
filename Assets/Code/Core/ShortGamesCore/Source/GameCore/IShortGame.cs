@@ -8,5 +8,6 @@ namespace Code.Core.ShortGamesCore.Source.GameCore
         public void Pause();
         public void Resume();
         public void Restart();
+        public void Stop();
     }
 }

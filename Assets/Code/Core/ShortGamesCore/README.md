@@ -23,6 +23,7 @@ public interface IShortGame
     void Pause();
     void Resume();
     void Restart();
+    void Stop();
 }
 
 public interface IPoolableShortGame : IShortGame

@@ -6,6 +6,7 @@ using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.Tools.Pool;
+using Code.Generated.Addressables;
 using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Settings;
@@ -15,7 +16,7 @@ using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
 {
-    public class LasetWeaponPm : BaseDisposable
+    public class LaserWeaponPm : BaseDisposable
     {
         public struct Ctx
         {
@@ -27,8 +28,7 @@ namespace Logic.Player.LaserWeapon
             public LaserSettings laserSettings;
             public IEntitiesController entitiesController;
         }
-
-        private const string LASER_PREF = "Laser";
+        
         private readonly Ctx _ctx;
         private bool _inputFire;
         private Transform _spawnPosition;
@@ -38,7 +38,7 @@ namespace Logic.Player.LaserWeapon
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
 
-        public LasetWeaponPm(Ctx ctx, 
+        public LaserWeaponPm(Ctx ctx, 
             [Inject] IPoolManager poolManager,
             [Inject] IResourceLoader resourceLoader)
         {
@@ -53,6 +53,12 @@ namespace Logic.Player.LaserWeapon
             _ctx.sceneContextView.OnFixedUpdated += FixedUpdate;
             _ctx.sceneContextView.OnUpdated += OnUpdated;
         }
+
+        public void Init()
+        {
+            
+        }
+        
         private void OnUpdated(float deltaTime)
         {
             foreach (var battery in _ctx.playerModel.Charges)
@@ -107,7 +113,7 @@ namespace Logic.Player.LaserWeapon
         
         private void LoadPref()
         {
-            _resourceLoader.LoadResource<GameObject>(LASER_PREF, pref =>
+            _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Laser, pref =>
             {
                 _laserPref = pref;
             }, _ctx.cancellationToken);

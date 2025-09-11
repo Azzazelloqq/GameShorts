@@ -29,6 +29,11 @@ namespace Code.Core.ShortGamesCore.Game2
             CreateRoot();
         }
 
+        public void Stop()
+        {
+            _root?.Dispose();
+        }
+
         private void CreateRoot()
         {
         }

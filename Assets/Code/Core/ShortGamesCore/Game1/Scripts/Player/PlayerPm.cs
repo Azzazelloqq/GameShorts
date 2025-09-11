@@ -91,7 +91,7 @@ namespace Logic.Player
             };
             AddDispose(ProjectileWeaponPmFactory.CreateProjectileWeaponPm(projectileWeaponCtx));
 
-            LasetWeaponPm.Ctx laserWeaponCtx = new LasetWeaponPm.Ctx
+            LaserWeaponPm.Ctx laserWeaponCtx = new LaserWeaponPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
                 playerModel = _ctx.playerModel,
@@ -101,7 +101,7 @@ namespace Logic.Player
                 laserSettings = _ctx.sceneContextView.laserSettings,
                 cancellationToken = _ctx.cancellationToken
             };
-            AddDispose(LasetWeaponPmFactory.CreateLasetWeaponPm(laserWeaponCtx));
+            AddDispose(LaserWeaponPmFactory.CreateLaserWeaponPm(laserWeaponCtx));
         }
 
         private void Collided(CollidedInfo collidedInfo)

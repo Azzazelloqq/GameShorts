@@ -20,7 +20,7 @@ namespace Code.Core.ShortGamesCore.Game1
 
         public void Start()
         {
-            CreateRoot();
+            Restart();
         }
 
         public void Pause()
@@ -33,18 +33,30 @@ namespace Code.Core.ShortGamesCore.Game1
 
         public void Restart()
         {
+            Dispose();
             CreateRoot();
+        }
+
+        public void Stop()
+        {
+            Dispose();
+        }
+
+        private void Dispose()
+        {
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _core?.Dispose();
         }
 
         private void CreateRoot()
         {
-            _cancellationTokenSource?.Dispose();
-            _core?.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
             CorePm.Ctx rootCtx = new CorePm.Ctx
             {
                 sceneContextView = sceneContextView,
-                cancellationToken = _cancellationTokenSource.Token
+                cancellationToken = _cancellationTokenSource.Token,
+                restartGame = Restart
             };
             _core = new CorePm(rootCtx);
         }

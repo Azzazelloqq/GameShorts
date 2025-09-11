@@ -1,4 +1,5 @@
-﻿using Logic.Entities.Core;
+﻿using System.Collections.Generic;
+using Logic.Entities.Core;
 using Logic.Player.LaserWeapon;
 using R3;
 
@@ -17,8 +18,8 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 
 		public ReactiveProperty<int> Score;
 		
-		private LaserBattery[] _charges;
-		public LaserBattery[] Charges => _charges;
+		private List<LaserBattery> _charges;
+		public List<LaserBattery> Charges => _charges;
 
 		public PlayerModel()
 		{
@@ -30,14 +31,14 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 			CountLaserShots = new ReactiveProperty<float>();
 			LaserShotDuration = new ReactiveProperty<float>();
 			Score = new ReactiveProperty<int>();
+			_charges = new List<LaserBattery>();
 		}
 
 		public void InitLaserBattary(int countCharges, float rechargeCooldown)
 		{
-			_charges = new LaserBattery[countCharges];
-			for (int i = 0; i < countCharges; i++)
+			for (var i = 0; i < countCharges; i++)
 			{
-				_charges[i] = new LaserBattery(rechargeCooldown);
+				_charges.Add(new LaserBattery(rechargeCooldown));
 			}
 		}
 	}

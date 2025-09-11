@@ -17,6 +17,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         public int PauseCallCount { get; private set; }
         public int ResumeCallCount { get; private set; }
         public int RestartCallCount { get; private set; }
+        public int StopCallCount { get; private set; }
         
         void IShortGame.Start()
         {
@@ -43,6 +44,13 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             ((IShortGame)this).Start();
         }
         
+        public void Stop()
+        {
+            IsStarted = false;
+            IsPaused = false;
+            StopCallCount++;
+        }
+        
         public void Reset()
         {
             IsStarted = false;
@@ -51,6 +59,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             PauseCallCount = 0;
             ResumeCallCount = 0;
             RestartCallCount = 0;
+            StopCallCount = 0;
         }
     }
     
@@ -87,6 +96,12 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         public void Restart()
         {
             ((IShortGame)this).Start();
+        }
+        
+        public void Stop()
+        {
+            IsStarted = false;
+            IsPaused = false;
         }
         
         public void OnPooled()

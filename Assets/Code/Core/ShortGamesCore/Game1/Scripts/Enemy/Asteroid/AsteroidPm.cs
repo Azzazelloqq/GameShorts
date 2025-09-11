@@ -66,9 +66,10 @@ namespace Logic.Enemy.Asteroid
                 {
                     model = _ctx.asteroidModel
                 });
+                
+                _ctx.asteroidModel.OnDestroy += TryCollapse;
+                _ctx.sceneContextView.OnUpdated += UpdateView;
             }, _ctx.cancellationToken);
-            _ctx.asteroidModel.OnDestroy += TryCollapse;
-            _ctx.sceneContextView.OnUpdated += UpdateView;
         }
         
         private void TryCollapse(int? killerId)

@@ -38,16 +38,14 @@ namespace Logic.UI
             {
                 GameObject objView = AddComponent(Object.Instantiate(prefab, _ctx.mainSceneContextView.UiParent, false));
                 _view = objView.GetComponent<FinishScreenView>();
+                
+                _view.SetCtx(new FinishScreenView.Ctx
+                {
+                    reloadClicked = _ctx.restartGame
+                });
+                _view.ScoreLabel.text = $"YOUR SCORE: {player.Score.Value}";
+
             }, _ctx.cancellationToken);
-            
-            _view.SetCtx(new FinishScreenView.Ctx
-            {
-                reloadClicked = _ctx.restartGame
-            });
-            _view.ScoreLabel.text = $"YOUR SCORE: {player.Score.Value}";
-            
-            
         }
-        
     }
 }

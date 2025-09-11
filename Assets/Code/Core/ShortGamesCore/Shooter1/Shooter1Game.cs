@@ -84,6 +84,15 @@ namespace Shooter1
             Start();
         }
 
+        public void Stop()
+        {
+            Debug.Log("Shooter1Game: Stopping game");
+            isGameActive = false;
+            StopAllCoroutines();
+            ClearGameObjects();
+            Time.timeScale = 1f; // Восстанавливаем нормальную скорость времени
+        }
+
         private void CreateGameObjects()
         {
             // Создаем UI

@@ -67,14 +67,12 @@ namespace Logic.Enemy.UFO
                 {
                     model = _ctx.ufoModel
                 });
+                _ctx.sceneContextView.OnUpdated += UpdateView;
             }, _ctx.cancellationToken);
-            //_ctx.ufoModel.OnDestroy += DestroyMe;
-            _ctx.sceneContextView.OnUpdated += UpdateView;
         }
 
         protected override void OnDispose()
         {
-            //_ctx.ufoModel.OnDestroy -= DestroyMe;
             _ctx.sceneContextView.OnUpdated -= UpdateView;
             _poolManager.Return(_pref, _view.gameObject);
             base.OnDispose();

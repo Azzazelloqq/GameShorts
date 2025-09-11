@@ -14,6 +14,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
         {
             public CancellationToken cancellationToken;
             public MainSceneContextView sceneContextView;
+            public Action restartGame;
         }
 
         private readonly Ctx _ctx;
@@ -24,7 +25,6 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
         public CorePm(Ctx ctx)
         {
             _ctx = ctx;
-            
             _diContainer = DiContainerFactory.CreateContainer();
             AddDispose(_diContainer);
             _inputManager = new InputManager.InputManager();
@@ -32,7 +32,8 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
             ScenePm.Ctx sceneCtx = new ScenePm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
-                cancellationToken = _ctx.cancellationToken
+                cancellationToken = _ctx.cancellationToken,
+                restartGame = _ctx.restartGame
             };
             _scene = new ScenePm(sceneCtx);
         }

@@ -2,8 +2,8 @@
 {
     public class BaseClass
     {
-        private DDebug _logger;
+        private DDebug _baseLogger;
         protected DDebug log
-            => _logger ??= new DDebug(GetType().Name);
+            => _baseLogger ??= new DDebug(GetType().Name);
     }
 }

@@ -194,7 +194,7 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 
 		_logger.Log($"Stopping current game: {_currentGame.GetType().Name}");
 
-		_currentGame.Pause();
+		_currentGame.Stop();
 
 		if (_currentGame is IPoolableShortGame poolableGame)
 		{

@@ -5,6 +5,7 @@ using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.Tools.Pool;
+using Code.Generated.Addressables;
 using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Entities.Core;
@@ -29,7 +30,6 @@ namespace Logic.Player.ProjectileWeapon
             public IEntitiesController entitiesController;
         }
 
-        private const string PROJECTILE_PREF = "Projectile";
         private readonly Ctx _ctx;
         private bool _inputFire;
         private Transform _spawnPosition;
@@ -96,7 +96,7 @@ namespace Logic.Player.ProjectileWeapon
         
         private void LoadPref()
         {
-            _resourceLoader.LoadResource<GameObject>(PROJECTILE_PREF, pref =>
+            _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Projectile, pref =>
             {
                 _projectilePref = pref;
             }, _ctx.cancellationToken);

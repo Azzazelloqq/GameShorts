@@ -10,6 +10,7 @@
         "Tools",
         "Unity.TextMeshPro",
         "Code.Core.InputManager",
+        "Logger",
         "AddressablesGroups"
     ],
     "includePlatforms": [],
