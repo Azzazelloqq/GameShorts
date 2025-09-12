@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Code.Core.InputManager
@@ -7,24 +8,24 @@ namespace Code.Core.InputManager
     /// </summary>
     public class InputManager : IInputManager
     {
-        private VariableJoystick _joystick;
-        private JoystickMode _currentMode = JoystickMode.Disabled;
+        private Joystick _joystick;
+        private AxisOptions _currentMode = AxisOptions.None;
         
-        public JoystickMode CurrentJoystickMode => _currentMode;
-        public bool IsJoystickActive => _currentMode != JoystickMode.Disabled && _joystick != null;
+        public AxisOptions CurrentJoystickOptions => _currentMode;
+        public bool IsJoystickActive => _currentMode != AxisOptions.None && _joystick != null;
 
-        public void Initialize(VariableJoystick joystick)
+        public void Initialize(Joystick joystick)
         {
             _joystick = joystick;
             
             if (_joystick != null)
             {
                 // По умолчанию отключаем джойстик
-                SetJoystickMode(JoystickMode.Disabled);
+                SetJoystickOptions(AxisOptions.None);
             }
         }
 
-        public void SetJoystickMode(JoystickMode mode)
+        public void SetJoystickOptions(AxisOptions mode)
         {
             if (_joystick == null)
             {
@@ -36,20 +37,17 @@ namespace Code.Core.InputManager
             
             switch (mode)
             {
-                case JoystickMode.Circular:
-                    _joystick.SetMode(JoystickType.Fixed);
+                case AxisOptions.Both:
+                case AxisOptions.Horizontal:
+                case AxisOptions.Vertical:
+                    _joystick.SetAxisOptions(mode);
                     _joystick.gameObject.SetActive(true);
                     break;
-                    
-                case JoystickMode.Horizontal:
-                    _joystick.SetMode(JoystickType.Fixed);
-                    _joystick.gameObject.SetActive(true);
-                    // Для горизонтального режима можно добавить дополнительную логику
-                    break;
-                    
-                case JoystickMode.Disabled:
+                case AxisOptions.None:
                     _joystick.gameObject.SetActive(false);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
             }
         }
 
@@ -61,9 +59,13 @@ namespace Code.Core.InputManager
             Vector2 input = new Vector2(_joystick.Horizontal, _joystick.Vertical);
             
             // Для горизонтального режима ограничиваем вертикальное движение
-            if (_currentMode == JoystickMode.Horizontal)
+            if (_currentMode == AxisOptions.Horizontal)
             {
                 input.y = 0f;
+            }
+            if (_currentMode == AxisOptions.Vertical)
+            {
+                input.x = 0f;
             }
             
             return input;

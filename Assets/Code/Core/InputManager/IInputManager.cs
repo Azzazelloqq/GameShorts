@@ -11,12 +11,12 @@ namespace Code.Core.InputManager
         /// Устанавливает режим джойстика
         /// </summary>
         /// <param name="mode">Режим джойстика</param>
-        void SetJoystickMode(JoystickMode mode);
+        void SetJoystickOptions(AxisOptions mode);
         
         /// <summary>
         /// Получает текущий режим джойстика
         /// </summary>
-        JoystickMode CurrentJoystickMode { get; }
+        AxisOptions CurrentJoystickOptions { get; }
         
         /// <summary>
         /// Получает значение ввода джойстика
@@ -32,6 +32,6 @@ namespace Code.Core.InputManager
         /// Инициализирует InputManager с заданным джойстиком
         /// </summary>
         /// <param name="joystick">Ссылка на джойстик</param>
-        void Initialize(VariableJoystick joystick);
+        void Initialize(Joystick joystick);
     }
 }

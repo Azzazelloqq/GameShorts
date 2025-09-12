@@ -29,6 +29,8 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
             AddDispose(_diContainer);
             _inputManager = new InputManager.InputManager();
             _diContainer.RegisterAsSingleton<IInputManager>(_inputManager);
+            _inputManager.Initialize(_ctx.sceneContextView.Joystick);
+            _inputManager.SetJoystickOptions(AxisOptions.Both);
             ScenePm.Ctx sceneCtx = new ScenePm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,

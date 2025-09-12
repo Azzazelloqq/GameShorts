@@ -45,7 +45,7 @@ namespace Code.Core.InputManager
                 Vector2 input = _inputManager.GetJoystickInput();
                 if (input.magnitude > 0.1f)
                 {
-                    Debug.Log($"Joystick Input: {input}, Mode: {_inputManager.CurrentJoystickMode}");
+                    Debug.Log($"Joystick Input: {input}, Mode: {_inputManager.CurrentJoystickOptions}");
                 }
             }
         }

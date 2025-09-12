@@ -135,6 +135,11 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         handle.anchoredPosition = Vector2.zero;
     }
 
+    public virtual void SetAxisOptions(AxisOptions axisOptions)
+    {
+        this.axisOptions = axisOptions;
+    }
+
     protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
     {
         Vector2 localPoint = Vector2.zero;
@@ -147,4 +152,4 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     }
 }
 
-public enum AxisOptions { Both, Horizontal, Vertical }
+public enum AxisOptions { Both, Horizontal, Vertical, None }

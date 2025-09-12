@@ -15,5 +15,5 @@ MonoBehaviour:
   LaserLength: 35
   LaserThickness: 0
   LaserCooldown: 4
-  CountLaserShots: 3
+  CountLaserShots: 1
   LaserShotDuration: 0.5

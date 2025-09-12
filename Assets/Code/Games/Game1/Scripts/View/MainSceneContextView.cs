@@ -1,4 +1,5 @@
 ﻿using Logic.Settings;
+using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.View
 {
@@ -11,5 +12,9 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.View
         public ProjectileSettings ProjectileSettings;
         public LaserSettings laserSettings;
         public RewardSettings RewardSettings;
+        
+        [SerializeField] DynamicJoystick _joystick;
+
+        public DynamicJoystick Joystick => _joystick;
     }
 }

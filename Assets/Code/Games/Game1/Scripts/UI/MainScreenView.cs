@@ -23,7 +23,6 @@ namespace Logic.UI
         
         [SerializeField]
         private RectTransform _laserChargeHolder;
-
         public TextMeshProUGUI Score => _score;
         public TextMeshProUGUI Speed => _speed;
         public TextMeshProUGUI Angle => _angle;

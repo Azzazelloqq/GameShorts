@@ -19,6 +19,7 @@ using ResourceLoader.AddressableResourceLoader;
 using TickHandler;
 using TickHandler.UnityTickHandler;
 using UnityEngine;
+using static Code.Generated.Addressables.ResourceIdsContainer;
 
 namespace Code.Core.GameEntryPoint
 {

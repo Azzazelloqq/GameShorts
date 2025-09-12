@@ -6,7 +6,6 @@ namespace Logic.Settings
 	[CreateAssetMenu(fileName = "PlayerSettings", menuName = "MyAsteroids/Settings/Create player settings")]
 	public class PlayerSettings : ScriptableObject
 	{
-		public Vector2 StartPosition;
 
 		[Space]
 		public float MaxSpeed;

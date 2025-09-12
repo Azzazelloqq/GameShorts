@@ -8,6 +8,7 @@ using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using Logic.Entities;
 using Root.Inputs;
+using UnityEngine;
 
 namespace Logic.Player
 {
@@ -31,12 +32,15 @@ namespace Logic.Player
             var playerController = AddDispose(
                 PlayerControllerFactory.CreatePlayerController(new PlayerController.Ctx()));
             
+            var screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
+            var startPos = _ctx.sceneContextView.Camera.ScreenToWorldPoint(screenCenter);
+            
             var playerSettings = _ctx.sceneContextView.PlayerSettings;
             var playerModel = new PlayerModel
             {
                 Id = _ctx.entitiesController.GenerateId(),
                 EntityType = EntityType.PlayerShip,
-                Position = {Value = playerSettings.StartPosition},
+                Position = {Value = startPos},
                 MaxSpeed = {Value = playerSettings.MaxSpeed},
                 AccelerationSpeed = {Value = playerSettings.Acceleration},
                 DecelerationSpeed = {Value = playerSettings.Deceleration},

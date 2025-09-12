@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Code.Core.BaseDMDisposable.Scripts
 {
-    public class BaseDisposable: BaseClass,  IDisposable
+    public class BaseDisposable:  IDisposable
     {
         protected bool isDisposed;
 
@@ -36,7 +37,7 @@ namespace Code.Core.BaseDMDisposable.Scripts
                 }
                 catch (Exception e)
                 {
-                    log.Err($"Exception when disposing {GetType().Name}: {e}");
+                    Debug.LogError($"Exception when disposing {GetType().Name}: {e}");
                 }
                 if (_unityObjects != null)
                     for (int index = _unityObjects.Count - 1; index >= 0; index--)
