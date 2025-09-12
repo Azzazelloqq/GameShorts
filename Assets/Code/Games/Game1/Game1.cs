@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
-using Code.Core.InputManager;
-using Code.Core.ShortGamesCore.Game1.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
-using R3;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game1
@@ -16,6 +13,8 @@ namespace Code.Core.ShortGamesCore.Game1
         [SerializeField] private MainSceneContextView sceneContextView;
         private IDisposable _core;
         private CancellationTokenSource _cancellationTokenSource;
+        
+        private bool _isDisposed;
         public int Id => 1;
 
         public void StartGame()
@@ -41,9 +40,16 @@ namespace Code.Core.ShortGamesCore.Game1
             Dispose();
         }
 
-        private void Dispose()
+        public void Dispose()
         {
+            if (_isDisposed)
+            {
+                return;
+            }
+            
             DisposeCore();
+
+            _isDisposed = true;
         }
 
         private void RecreateRoot()
@@ -55,9 +61,20 @@ namespace Code.Core.ShortGamesCore.Game1
 
         private void DisposeCore()
         {
-            _cancellationTokenSource?.Cancel();
-            _cancellationTokenSource?.Dispose();
+            if (_cancellationTokenSource != null)
+            {
+                if (!_cancellationTokenSource.IsCancellationRequested)
+                {
+                    _cancellationTokenSource.Cancel();
+                }
+                
+                _cancellationTokenSource.Dispose();
+                
+                _cancellationTokenSource = null;
+            }
+
             _core?.Dispose();
+            _core = null;
         }
 
         private void CreateRoot()

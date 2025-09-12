@@ -96,6 +96,17 @@ public class SimpleShortGamePool : IShortGamesPool
 			_logger.LogWarning(
 				$"Pool for {gameType.Name} is full ({_maxInstancesPerType} instances). Destroying excess game.");
 
+			// Dispose the game before destroying it
+			try
+			{
+				game.Dispose();
+				_logger.Log($"Disposed excess game: {gameType.Name}");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Error disposing excess game {gameType.Name}: {ex.Message}");
+			}
+
 			if (game is Component component && component != null)
 			{
 				if (Application.isEditor && !Application.isPlaying)
@@ -148,6 +159,17 @@ public class SimpleShortGamePool : IShortGamesPool
 			_logger.LogWarning(
 				$"Cannot warm up pool for {gameType.Name} - already at max capacity ({_maxInstancesPerType})");
 
+			// Dispose the game before destroying it
+			try
+			{
+				game.Dispose();
+				_logger.Log($"Disposed excess game during warm up: {gameType.Name}");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Error disposing excess game during warm up {gameType.Name}: {ex.Message}");
+			}
+
 			if (game is Component component)
 			{
 				if (Application.isEditor && !Application.isPlaying)
@@ -192,6 +214,17 @@ public class SimpleShortGamePool : IShortGamesPool
 			while (gamesQueue.Count > 0)
 			{
 				var game = gamesQueue.Dequeue();
+				
+				// Dispose the game before destroying it
+				try
+				{
+					game.Dispose();
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Error disposing pooled game {gameType.Name}: {ex.Message}");
+				}
+
 				if (game is Component component && component != null)
 				{
 					if (Application.isEditor && !Application.isPlaying)
@@ -214,6 +247,16 @@ public class SimpleShortGamePool : IShortGamesPool
 
 			foreach (var game in activeGames)
 			{
+				// Dispose the active game before destroying it
+				try
+				{
+					game.Dispose();
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Error disposing active game {gameType.Name}: {ex.Message}");
+				}
+
 				if (game is Component component && component != null)
 				{
 					if (Application.isEditor && !Application.isPlaying)
@@ -245,6 +288,17 @@ public class SimpleShortGamePool : IShortGamesPool
 			while (gamesQueue.Count > 0)
 			{
 				var game = gamesQueue.Dequeue();
+				
+				// Dispose the game before destroying it
+				try
+				{
+					game.Dispose();
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Error disposing pooled game {gameType.Name}: {ex.Message}");
+				}
+
 				if (game is Component component && component != null)
 				{
 					if (Application.isEditor && !Application.isPlaying)
@@ -268,6 +322,16 @@ public class SimpleShortGamePool : IShortGamesPool
 
 			foreach (var game in activeGames)
 			{
+				// Dispose the active game before destroying it
+				try
+				{
+					game.Dispose();
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Error disposing active game {gameType.Name}: {ex.Message}");
+				}
+
 				if (game is Component component && component != null)
 				{
 					if (Application.isEditor && !Application.isPlaying)
