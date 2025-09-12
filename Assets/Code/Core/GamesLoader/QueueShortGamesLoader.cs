@@ -6,6 +6,7 @@ using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.LifeCycleService;
 using InGameLogger;
 using LightDI.Runtime;
+using UnityEngine;
 
 namespace Code.Core.GamesLoader
 {
@@ -55,6 +56,41 @@ public class QueueShortGamesLoader : IGamesLoader
 	{
 		_lifeCycleService = lifeCycleService ?? throw new ArgumentNullException(nameof(lifeCycleService));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+	}
+	
+	public void Dispose()
+	{
+		_logger.Log("Disposing QueueShortGamesLoader");
+
+		try
+		{
+			// Cancel any ongoing operations
+			if (_disposeCancellationTokenSource is { IsCancellationRequested: false })
+			{
+				_disposeCancellationTokenSource.Cancel();
+			}
+
+			
+			ClearQueue();
+
+			_lifeCycleService?.Dispose();
+		}
+		catch (Exception ex)
+		{
+			// Log error but don't rethrow to avoid cascading failures
+			_logger.LogError($"Error during QueueShortGamesLoader disposal: {ex.Message}");
+		}
+		finally
+		{
+			try
+			{
+				_disposeCancellationTokenSource?.Dispose();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Error disposing cancellation token source: {ex.Message}");
+			}
+		}
 	}
 
 	public async ValueTask InitializeAsync(IReadOnlyList<Type> gameTypes, CancellationToken cancellationToken = default)
@@ -223,14 +259,9 @@ public class QueueShortGamesLoader : IGamesLoader
 	public void ClearQueue()
 	{
 		_logger.Log("Clearing game queue");
-
-		// Stop current game
+		
 		StopCurrentGame();
-
-		// Clear preloaded games
-		_lifeCycleService.ClearPreloadedGames();
-
-		// Clear tracking data
+		
 		_gameQueue.Clear();
 		_preloadedTypes.Clear();
 		_preloadingTasks.Clear();
@@ -447,28 +478,6 @@ public class QueueShortGamesLoader : IGamesLoader
 		finally
 		{
 			_preloadingTasks.Remove(gameType);
-		}
-	}
-
-	public void Dispose()
-	{
-		_logger.Log("Disposing QueueShortGamesLoader");
-
-		try
-		{
-			_disposeCancellationTokenSource?.Cancel();
-
-			ClearQueue();
-
-			_lifeCycleService?.Dispose();
-		}
-		catch (Exception ex)
-		{
-			_logger.LogError($"Error during disposal: {ex.Message}");
-		}
-		finally
-		{
-			_disposeCancellationTokenSource?.Dispose();
 		}
 	}
 }

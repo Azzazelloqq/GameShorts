@@ -1,7 +1,9 @@
 ﻿
+using System;
+
 namespace Code.Core.ShortGamesCore.Source.GameCore
 {
-    public interface IShortGame
+    public interface IShortGame : IDisposable
     {
         public int Id { get; }
         public void StartGame();

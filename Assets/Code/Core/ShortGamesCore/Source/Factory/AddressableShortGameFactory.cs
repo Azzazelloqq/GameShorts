@@ -36,6 +36,33 @@ public class AddressableShortGameFactory : IShortGameFactory
 		_resourcesInfo = resourcesInfo;
 	}
 	
+	public void Dispose()
+	{
+		if (_disposed)
+		{
+			_logger.LogError("AddressableShortGameFactory already disposed, skipping");
+			return;
+		}
+		
+		_disposed = true;
+		
+		try
+		{
+			if (!_disposeCancellationTokenSource.IsCancellationRequested)
+			{
+				_disposeCancellationTokenSource.Cancel();
+			}
+			
+		
+			
+			_disposeCancellationTokenSource.Dispose();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Error during dispose: {ex.Message}");
+		}
+	}
+	
 	public async ValueTask<T> CreateShortGameAsync<T>(CancellationToken token) where T : Component, IShortGame
 	{
 		token.ThrowIfCancellationRequested();
@@ -206,10 +233,20 @@ public class AddressableShortGameFactory : IShortGameFactory
 		
 		if (_preloadRefCount[gameType] <= 0)
 		{
+			// Only release Addressable resources if we're not in editor or if we're still playing
+			bool shouldReleaseAddressables = !Application.isEditor || Application.isPlaying;
+			
 			if (_preloadedPrefabs.TryGetValue(gameType, out var prefab))
 			{
-				_resourceLoader.ReleaseResource(prefab);
-				_logger.Log($"Unloaded resources for {gameType.Name}");
+				if (shouldReleaseAddressables)
+				{
+					_resourceLoader.ReleaseResource(prefab);
+					_logger.Log($"Unloaded resources for {gameType.Name}");
+				}
+				else
+				{
+					_logger.Log($"Skipping Addressable release for {gameType.Name} - editor mode");
+				}
 			}
 			
 			_preloadedPrefabs.Remove(gameType);
@@ -220,49 +257,26 @@ public class AddressableShortGameFactory : IShortGameFactory
 			_logger.Log($"Decreased ref count for {gameType.Name}, current: {_preloadRefCount[gameType]}");
 		}
 	}
-
-	public void Dispose()
+	
+	private void DisposePreloadedPrefabs()
 	{
-		if (_disposed)
+		if (_preloadedPrefabs.Count <= 0 || Application.isEditor)
 		{
-			_logger.Log("AddressableShortGameFactory already disposed, skipping");
 			return;
 		}
-		
-		_disposed = true;
-		_logger.Log("Disposing AddressableShortGameFactory - START");
-		
-		try
+
+		foreach (var prefab in _preloadedPrefabs.Values)
 		{
-			_logger.Log($"Disposing: Checking cancellation token state");
-			if (!_disposeCancellationTokenSource.IsCancellationRequested)
+			if (prefab == null)
 			{
-				_logger.Log($"Disposing: Cancelling token source");
-				_disposeCancellationTokenSource.Cancel();
+				continue;
 			}
-			
-			_logger.Log($"Disposing: Releasing {_preloadedPrefabs.Count} prefabs");
-			// Выгружаем все предзагруженные префабы
-			foreach (var prefab in _preloadedPrefabs.Values)
-			{
-				_logger.Log($"Disposing: Releasing prefab {prefab?.name ?? "null"}");
-				_resourceLoader.ReleaseResource(prefab);
-			}
-			
-			_logger.Log($"Disposing: Clearing collections");
-			_preloadedPrefabs.Clear();
-			_preloadRefCount.Clear();
-			
-			_logger.Log($"Disposing: Disposing cancellation token source");
-			_disposeCancellationTokenSource.Dispose();
-			
-			_logger.Log("Disposing AddressableShortGameFactory - COMPLETED");
+
+			_resourceLoader.ReleaseResource(prefab);
 		}
-		catch (Exception ex)
-		{
-			_logger.LogError($"Error during dispose: {ex.Message}");
-			throw;
-		}
+
+		_preloadedPrefabs.Clear();
+		_preloadRefCount.Clear();
 	}
 }
 }

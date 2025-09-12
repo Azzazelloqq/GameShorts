@@ -36,6 +36,21 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		_logger = logger;
 	}
 
+	public void Dispose()
+	{
+		_logger.Log("Disposing SimpleShortGameLifeCycleService");
+
+		StopCurrentGame();
+		DisposePreloadedGames();
+		
+		if (!_disposeCancellationTokenSource.IsCancellationRequested)
+		{
+			_disposeCancellationTokenSource.Cancel();
+		}
+
+		_disposeCancellationTokenSource.Dispose();
+	}
+	
 	public async ValueTask PreloadGamesAsync(IEnumerable<Type> gameTypes, CancellationToken cancellationToken = default)
 	{
 		using var linkedCts =
@@ -152,24 +167,17 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		StopCurrentGame();
 
 		IShortGame game = null;
-		var fromPool = false;
 
 		if (typeof(IPoolableShortGame).IsAssignableFrom(gameType))
 		{
 			if (_pool.TryGetShortGame(gameType, out var pooledGame))
 			{
 				game = pooledGame;
-				fromPool = true;
 				pooledGame.OnUnpooled();
-				_logger.Log($"Got game {gameType.Name} from pool");
 			}
 		}
 
-		if (game == null)
-		{
-			game = await _factory.CreateShortGameAsync(gameType, linkedCts.Token);
-			_logger.Log($"Created new game instance: {gameType.Name}");
-		}
+		game ??= await _factory.CreateShortGameAsync(gameType, linkedCts.Token);
 
 		_currentGame = game;
 		_currentGame.StartGame();
@@ -179,8 +187,6 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		{
 			_currentGameIndex = index;
 		}
-
-		_logger.Log($"Started game: {gameType.Name} (from pool: {fromPool})");
 
 		return game;
 	}
@@ -192,30 +198,22 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 			return;
 		}
 
-		_logger.Log($"Stopping current game: {_currentGame.GetType().Name}");
-
 		_currentGame.StopGame();
 
 		if (_currentGame is IPoolableShortGame poolableGame)
 		{
 			poolableGame.OnPooled();
 			_pool.ReleaseShortGame(poolableGame);
-			_logger.Log($"Returned game {_currentGame.GetType().Name} to pool");
 		}
 		else
 		{
-			if (_currentGame is Component component)
+			try
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					Object.DestroyImmediate(component.gameObject);
-				}
-				else
-				{
-					Object.Destroy(component.gameObject);
-				}
-
-				_logger.Log($"Destroyed non-poolable game: {_currentGame.GetType().Name}");
+				_currentGame.Dispose();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Error disposing game {_currentGame.GetType().Name}: {ex.Message}");
 			}
 		}
 
@@ -270,7 +268,13 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		}
 
 		_preloadedGameTypes.Clear();
-		_currentGameIndex = -1;
+	}
+
+	private void DisposePreloadedGames()
+	{
+		_preloadedGameTypes.Clear();
+		_pool.Dispose();
+		_factory.Dispose();
 	}
 
 	private async ValueTask PreloadGameInternalAsync(Type gameType, CancellationToken cancellationToken)
@@ -288,23 +292,6 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 				_logger.Log($"Added {gameType.Name} to pool for preloading");
 			}
 		}
-	}
-
-	public void Dispose()
-	{
-		_logger.Log("Disposing SimpleShortGameLifeCycleService");
-
-		StopCurrentGame();
-		ClearPreloadedGames();
-
-		if (!_disposeCancellationTokenSource.IsCancellationRequested)
-		{
-			_disposeCancellationTokenSource.Cancel();
-		}
-
-		_disposeCancellationTokenSource.Dispose();
-		_pool?.Dispose();
-		_factory?.Dispose();
 	}
 }
 }

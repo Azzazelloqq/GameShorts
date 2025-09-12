@@ -19,6 +19,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         public int RestartCallCount { get; private set; }
         public int StopCallCount { get; private set; }
         
+        public void Dispose()
+        {
+        }
+        
         void IShortGame.StartGame()
         {
             IsStarted = true;
@@ -123,6 +127,11 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPooled = false;
             OnPooledCallCount = 0;
             OnUnpooledCallCount = 0;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

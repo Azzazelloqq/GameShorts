@@ -44,8 +44,14 @@ namespace Shooter1
             gameCamera = Camera.main;
             if (gameCamera == null)
             {
-                gameCamera = FindObjectOfType<Camera>();
+                gameCamera = FindFirstObjectByType<Camera>();
             }
+        }
+        
+        public void Dispose()
+        {
+            StopAllCoroutines();
+            ClearGameObjects();
         }
 
         public void StartGame()
@@ -331,12 +337,6 @@ namespace Shooter1
             {
                 gameUI.ResetScore();
             }
-        }
-
-        private void OnDestroy()
-        {
-            StopAllCoroutines();
-            ClearGameObjects();
         }
     }
 }
