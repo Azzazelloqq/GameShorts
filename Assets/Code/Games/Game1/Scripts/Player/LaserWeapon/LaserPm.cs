@@ -27,6 +27,7 @@ namespace Logic.Player.LaserWeapon
         private float _timer;
         private ContactFilter2D _contactFilter;
         private RaycastHit2D[] _hits;
+        private float _currentRotationAngle;
 
         public LaserPm(Ctx ctx)
         {
@@ -34,11 +35,17 @@ namespace Logic.Player.LaserWeapon
             _view = _ctx.view;
             _laserModel = _ctx.laserModel;
             _playerModel = _ctx.playerModel;
-            _view.Laser.SetPosition(1, Vector3.right * _laserModel.Length.Value);
+            // Setup 3-point laser: start -> center -> end
+            _view.Laser.positionCount = 3;
+            float halfLength = _laserModel.Length.Value / 2f;
+            _view.Laser.SetPosition(0, Vector3.left * halfLength);  // Start point
+            _view.Laser.SetPosition(1, Vector3.zero);               // Center point (spawn position)
+            _view.Laser.SetPosition(2, Vector3.right * halfLength); // End point
             _view.Laser.gameObject.SetActive(true);
             _timer = _laserModel.Duration.Value;
             _contactFilter = new ContactFilter2D();
             _hits = new RaycastHit2D[10];
+            _currentRotationAngle = _ctx.playerModel.CurrentAngle.Value; // Start from player's direction
             _ctx.sceneContextView.OnFixedUpdated += OnFixedUpdated;
             _ctx.sceneContextView.OnUpdated += OnOnUpdated;
         }
@@ -50,15 +57,48 @@ namespace Logic.Player.LaserWeapon
         }
         private void OnFixedUpdated(float deltaTime)
         {
-            float angleRadians = _ctx.playerModel.CurrentAngle.Value * Mathf.Deg2Rad;
+            // Update rotation angle (clockwise rotation in world space)
+            _currentRotationAngle += _laserModel.RotationSpeed.Value * deltaTime;
+            
+            // Convert angle to radians and create direction vectors
+            float angleRadians = _currentRotationAngle * Mathf.Deg2Rad;
             Vector2 directionVector = new Vector2(Mathf.Cos(angleRadians), Mathf.Sin(angleRadians));
+            Vector2 oppositeDirection = -directionVector;
+            
+            // Update laser visual direction - bidirectional from center
+            float halfLength = _laserModel.Length.Value / 2f;
+            Vector3 startPosition = new Vector3(
+                -halfLength * Mathf.Cos(angleRadians),
+                -halfLength * Mathf.Sin(angleRadians),
+                0
+            );
+            Vector3 endPosition = new Vector3(
+                halfLength * Mathf.Cos(angleRadians),
+                halfLength * Mathf.Sin(angleRadians),
+                0
+            );
+            
+            _view.Laser.SetPosition(0, startPosition);  // Start point
+            _view.Laser.SetPosition(1, Vector3.zero);   // Center point (spawn position)
+            _view.Laser.SetPosition(2, endPosition);    // End point
 
-            var collisions = Physics2D.Raycast(_view.transform.position, directionVector, _contactFilter.NoFilter(), _hits, _ctx.laserModel.Length.Value);
-          //  Debug.DrawLine(_view.transform.position, directionVector * _ctx.laserModel.Length.Value, Color.green,1f);
-            Debug.DrawRay(_view.transform.position, directionVector , Color.green,1f);
+            // Perform raycast for collision detection in both directions
+            var collisions1 = Physics2D.Raycast(_view.transform.position, directionVector, _contactFilter.NoFilter(), _hits, halfLength);
             
+            // Process collisions in positive direction
+            for (int i = 0; i < collisions1; i++)
+            {
+                IEntityView entityView = _hits[i].transform != null ? _hits[i].transform.GetComponent<IEntityView>() : null;
+
+                if (entityView?.Model.EntityType != EntityType.PlayerShip)
+                    _ctx.entitiesController.TryDestroyEntity(entityView.Model.Id, _playerModel.Id);
+            }
             
-            for (int i = 0; i < collisions; i++)
+            // Raycast in opposite direction
+            var collisions2 = Physics2D.Raycast(_view.transform.position, oppositeDirection, _contactFilter.NoFilter(), _hits, halfLength);
+            
+            // Process collisions in negative direction
+            for (int i = 0; i < collisions2; i++)
             {
                 IEntityView entityView = _hits[i].transform != null ? _hits[i].transform.GetComponent<IEntityView>() : null;
 

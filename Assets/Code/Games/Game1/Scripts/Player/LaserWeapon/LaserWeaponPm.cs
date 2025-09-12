@@ -28,7 +28,7 @@ namespace Logic.Player.LaserWeapon
             public LaserSettings laserSettings;
             public IEntitiesController entitiesController;
         }
-        
+
         private readonly Ctx _ctx;
         private bool _inputFire;
         private Transform _spawnPosition;
@@ -38,7 +38,7 @@ namespace Logic.Player.LaserWeapon
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
 
-        public LaserWeaponPm(Ctx ctx, 
+        public LaserWeaponPm(Ctx ctx,
             [Inject] IPoolManager poolManager,
             [Inject] IResourceLoader resourceLoader)
         {
@@ -49,22 +49,17 @@ namespace Logic.Player.LaserWeapon
             _laserSettings = _ctx.laserSettings;
             _ctx.playerModel.InitLaserBattary(_laserSettings.CountLaserShots, _laserSettings.LaserCooldown);
             LoadPref();
-            _ctx.PlayerController.Fire2 += Fire;
-            _ctx.sceneContextView.OnFixedUpdated += FixedUpdate;
             _ctx.sceneContextView.OnUpdated += OnUpdated;
         }
 
-        public void Init()
-        {
-            
-        }
-        
         private void OnUpdated(float deltaTime)
         {
             foreach (var battery in _ctx.playerModel.Charges)
             {
                 battery.UpdateMe(deltaTime);
             }
+
+            Fire();
         }
 
         private void Fire()
@@ -75,15 +70,17 @@ namespace Logic.Player.LaserWeapon
             readyBattary.LastShot.Value = Time.time;
             CreateLaser();
         }
+
         private void CreateLaser()
-        { 
+        {
             var position = _spawnPosition.position;
             var model = new LaserModel()
             {
                 EntityType = EntityType.Laser,
                 Id = _ctx.entitiesController.GenerateId(),
-                Duration = {Value = _laserSettings.LaserShotDuration},
-                Length = {Value = _laserSettings.LaserLength}
+                Duration = { Value = _laserSettings.LaserShotDuration },
+                Length = { Value = _laserSettings.LaserLength },
+                RotationSpeed = {Value = _laserSettings.LaserRotationSpeed}
             };
 
             var view = _poolManager.Get(_laserPref, _spawnPosition);
@@ -92,7 +89,7 @@ namespace Logic.Player.LaserWeapon
             {
                 model = model
             });
-           
+
             LaserPm.Ctx laserCtx = new LaserPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
@@ -108,29 +105,20 @@ namespace Logic.Player.LaserWeapon
             {
                 Logic = laser,
                 Model = model
-            } );
-        }
-        
-        private void LoadPref()
-        {
-            _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Laser, pref =>
-            {
-                _laserPref = pref;
-            }, _ctx.cancellationToken);
+            });
         }
 
-        private void FixedUpdate(float deltaTime)
+        private void LoadPref()
         {
-            
+            _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Laser,
+                pref => { _laserPref = pref; }, _ctx.cancellationToken);
         }
+
 
         protected override void OnDispose()
         {
             _ctx.sceneContextView.OnUpdated -= OnUpdated;
-            _ctx.PlayerController.Fire1 -= Fire;
-            _ctx.sceneContextView.OnFixedUpdated -= FixedUpdate;
             base.OnDispose();
         }
-        
     }
 }

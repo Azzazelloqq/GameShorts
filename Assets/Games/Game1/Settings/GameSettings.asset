@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   SpawnEnemyCooldown: 2
-  MaxCountEnemies: 10
+  MaxCountEnemies: 14

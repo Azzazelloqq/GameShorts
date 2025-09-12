@@ -8,11 +8,13 @@ namespace Logic.Player.LaserWeapon
         public int OwnerId;
         public ReactiveProperty<float> Duration;
         public ReactiveProperty<float> Length;
+        public ReactiveProperty<float> RotationSpeed;
 
         public LaserModel()
         {
             Duration = new ReactiveProperty<float>();
             Length = new ReactiveProperty<float>();
+            RotationSpeed = new ReactiveProperty<float>();
         }
     }
 }

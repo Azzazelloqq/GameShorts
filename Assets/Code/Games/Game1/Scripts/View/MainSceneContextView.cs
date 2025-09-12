@@ -13,8 +13,8 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.View
         public LaserSettings laserSettings;
         public RewardSettings RewardSettings;
         
-        [SerializeField] DynamicJoystick _joystick;
+        [SerializeField] Joystick _joystick;
 
-        public DynamicJoystick Joystick => _joystick;
+        public Joystick Joystick => _joystick;
     }
 }

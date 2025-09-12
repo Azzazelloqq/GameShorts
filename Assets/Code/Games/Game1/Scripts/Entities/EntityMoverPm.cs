@@ -39,9 +39,24 @@ namespace Logic.Entities
 
         protected virtual Vector2 GetInput()
         {
-           return _ctx.isPlayer 
-               ? _inputManager.GetJoystickInput() 
-               : Vector2.up;
+            if (!_ctx.isPlayer)
+                return Vector2.up;
+
+            // Получаем направление джойстика (абсолютное направление в мировых координатах)
+            Vector2 joystickDirection = _inputManager.GetJoystickInput();
+            
+            // Если джойстик не активен, не двигаемся
+            if (joystickDirection.magnitude < 0.01f)
+                return Vector2.zero;
+
+            // Устанавливаем целевой угол напрямую из направления джойстика
+            float targetAngle = Mathf.Atan2(joystickDirection.y, joystickDirection.x) * Mathf.Rad2Deg;
+            _requiredAngle = targetAngle;
+            
+            // Для совместимости со старой системой возвращаем (0, magnitude)
+            // x = 0 так как мы напрямую управляем углом через _requiredAngle
+            // y = magnitude для контроля скорости движения
+            return new Vector2(0f, joystickDirection.magnitude);
         }
 
         protected override void OnDispose()
@@ -106,9 +121,9 @@ namespace Logic.Entities
         }
         protected virtual void UpdateDirectionAngle(float deltaTime)
         {
-            _requiredAngle -= _ctx.model.CurrentRotateSpeed.Value * deltaTime;
-            var currentAngle = Mathf.LerpAngle(_ctx.model.CurrentAngle.Value, _requiredAngle, .5f);
-            _ctx.model.CurrentAngle.Value = currentAngle % 360;
+            // Плавно поворачиваем к целевому углу
+            var currentAngle = Mathf.LerpAngle(_ctx.model.CurrentAngle.Value, _requiredAngle, 0.1f);
+            _ctx.model.CurrentAngle.Value = currentAngle;
         }
 
         private void UpdatePosition(float deltaTime)

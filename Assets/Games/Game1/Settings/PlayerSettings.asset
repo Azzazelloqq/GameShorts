@@ -12,15 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422431af69e462448b3e2bb5697b059c, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
-  StartPosition: {x: 0, y: 0}
-  MaxSpeed: 35
-  Acceleration: 10
+  MaxSpeed: 15
+  Acceleration: 8
   Deceleration: 7
-  MaxRotationSpeed: 120
+  MaxRotationSpeed: 80
   RotationAcceleration: 150
   RotationDeceleration: 70
-  LaserLength: 0
-  LaserThickness: 0
-  LaserCooldown: 0
-  CountLaserShots: 0
-  LaserShotDuration: 0

@@ -13,6 +13,9 @@ namespace Logic.Settings
         [Range(1,5)]
         public int CountLaserShots;
         public float LaserShotDuration;
+        
+        [Header("Rotation Settings")]
+        public float LaserRotationSpeed = 90f; // degrees per second
 
     }
 }

@@ -35,13 +35,35 @@ namespace Logic.Entities
 			var playerPos = _ctx.playerModel.Position.Value;
 			Vector3 viewPosition = _camera.WorldToViewportPoint(playerPos);
 
-            if (viewPosition.x is < 0 or > 1)
-	            playerPos.x = -playerPos.x;
-            
-            if (viewPosition.y is < 0 or > 1)
-	            playerPos.y = -playerPos.y;
-            
-            _ctx.playerModel.Position.Value = playerPos;
+			// Телепортация по X оси
+			if (viewPosition.x < 0)
+			{
+				// Игрок вышел за левый край - телепортируем на правый край
+				Vector3 rightEdge = _camera.ViewportToWorldPoint(new Vector3(1, viewPosition.y, viewPosition.z));
+				playerPos.x = rightEdge.x;
+			}
+			else if (viewPosition.x > 1)
+			{
+				// Игрок вышел за правый край - телепортируем на левый край
+				Vector3 leftEdge = _camera.ViewportToWorldPoint(new Vector3(0, viewPosition.y, viewPosition.z));
+				playerPos.x = leftEdge.x;
+			}
+
+			// Телепортация по Y оси
+			if (viewPosition.y < 0)
+			{
+				// Игрок вышел за нижний край - телепортируем на верхний край
+				Vector3 topEdge = _camera.ViewportToWorldPoint(new Vector3(viewPosition.x, 1, viewPosition.z));
+				playerPos.y = topEdge.y;
+			}
+			else if (viewPosition.y > 1)
+			{
+				// Игрок вышел за верхний край - телепортируем на нижний край
+				Vector3 bottomEdge = _camera.ViewportToWorldPoint(new Vector3(viewPosition.x, 0, viewPosition.z));
+				playerPos.y = bottomEdge.y;
+			}
+
+			_ctx.playerModel.Position.Value = playerPos;
 		}
 		
 	}

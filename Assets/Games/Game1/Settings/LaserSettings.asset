@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9383ada54851eb5488c56cf2d2bae7e4, type: 3}
   m_Name: LaserSettings
   m_EditorClassIdentifier: 
-  LaserLength: 35
+  LaserLength: 40
   LaserThickness: 0
-  LaserCooldown: 4
+  LaserCooldown: 5
   CountLaserShots: 1
-  LaserShotDuration: 0.5
+  LaserShotDuration: 2
+  LaserRotationSpeed: 720

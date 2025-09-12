@@ -38,6 +38,7 @@ namespace Logic.Player.ProjectileWeapon
         private GameObject _projectilePref;
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
+        private float _startFire;
 
         public ProjectileWeaponPm(Ctx ctx, 
             [Inject] IPoolManager poolManager,
@@ -49,12 +50,14 @@ namespace Logic.Player.ProjectileWeapon
             _spawnPosition = _ctx.playerView.ShootPoint;
             _projectileSettings = _ctx.projectileSettings;
             LoadPref();
-            _ctx.PlayerController.Fire1 += Fire;
-            _ctx.sceneContextView.OnFixedUpdated += FixedUpdate;
         }
         
-        private void Fire()
+        private void Fire(float deltaTime)
         {
+            if (Time.time - _startFire < _ctx.projectileSettings.ProjectileRate)
+                return;
+            
+            _startFire = Time.time;
             CreateProjectile();
         }
         private void CreateProjectile()
@@ -99,20 +102,14 @@ namespace Logic.Player.ProjectileWeapon
             _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Projectile, pref =>
             {
                 _projectilePref = pref;
+                _ctx.sceneContextView.OnUpdated += Fire;
             }, _ctx.cancellationToken);
-        }
-
-        private void FixedUpdate(float deltaTime)
-        {
-            
         }
 
         protected override void OnDispose()
         {
-            _ctx.PlayerController.Fire1 -= Fire;
-            _ctx.sceneContextView.OnFixedUpdated -= FixedUpdate;
+            _ctx.sceneContextView.OnUpdated -= Fire;
             base.OnDispose();
         }
-        
     }
 }

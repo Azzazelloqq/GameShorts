@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ProjectileSettings
   m_EditorClassIdentifier: 
   ProjectileMaxSpeed: 75
-  ProjectileRate: 2
+  ProjectileRate: 0.3

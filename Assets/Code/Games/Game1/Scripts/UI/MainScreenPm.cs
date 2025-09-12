@@ -48,6 +48,12 @@ namespace Logic.UI
             Load();
         }
 
+        protected override void OnDispose()
+        {
+            _ctx.mainSceneContextView.OnUpdated -= OnUpdated;
+            base.OnDispose();
+        }
+
         private async Task Load()
         {
             try
