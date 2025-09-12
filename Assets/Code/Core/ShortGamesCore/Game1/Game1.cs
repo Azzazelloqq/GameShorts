@@ -18,31 +18,42 @@ namespace Code.Core.ShortGamesCore.Game1
         private CancellationTokenSource _cancellationTokenSource;
         public int Id => 1;
 
-        public void Start()
+        public void StartGame()
         {
-            Restart();
-        }
-
-        public void Pause()
-        {
-        }
-
-        public void Resume()
-        {
-        }
-
-        public void Restart()
-        {
-            Dispose();
             CreateRoot();
         }
 
-        public void Stop()
+        public void PauseGame()
+        {
+        }
+
+        public void ResumeGame()
+        {
+        }
+
+        public void RestartGame()
+        {
+            RecreateRoot();
+        }
+
+        public void StopGame()
         {
             Dispose();
         }
 
         private void Dispose()
+        {
+            DisposeCore();
+        }
+
+        private void RecreateRoot()
+        {
+            DisposeCore();
+            
+            CreateRoot();
+        }
+
+        private void DisposeCore()
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
@@ -56,7 +67,7 @@ namespace Code.Core.ShortGamesCore.Game1
             {
                 sceneContextView = sceneContextView,
                 cancellationToken = _cancellationTokenSource.Token,
-                restartGame = Restart
+                restartGame = RestartGame
             };
             _core = new CorePm(rootCtx);
         }

@@ -48,7 +48,7 @@ namespace Shooter1
             }
         }
 
-        public void Start()
+        public void StartGame()
         {
             if (isGameActive) return;
 
@@ -60,31 +60,31 @@ namespace Shooter1
             StartCoroutine(GameLoop());
         }
 
-        public void Pause()
+        public void PauseGame()
         {
             Debug.Log("Shooter1Game: Pausing game");
             isGameActive = false;
             Time.timeScale = 0f;
         }
 
-        public void Resume()
+        public void ResumeGame()
         {
             Debug.Log("Shooter1Game: Resuming game");
             isGameActive = true;
             Time.timeScale = 1f;
         }
 
-        public void Restart()
+        public void RestartGame()
         {
             Debug.Log("Shooter1Game: Restarting game");
             StopAllCoroutines();
             ClearGameObjects();
             gameTimer = 0f;
             targetSpeed = 3f; // Сбрасываем скорость
-            Start();
+            StartGame();
         }
 
-        public void Stop()
+        public void StopGame()
         {
             Debug.Log("Shooter1Game: Stopping game");
             isGameActive = false;
@@ -212,7 +212,7 @@ namespace Shooter1
             {
                 Debug.Log("Shooter1Game: Game completed, restarting...");
                 yield return new WaitForSeconds(1f);
-                Restart();
+                RestartGame();
             }
         }
 

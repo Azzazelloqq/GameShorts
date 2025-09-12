@@ -11,25 +11,25 @@ namespace Code.Core.ShortGamesCore.Game2
         private IDisposable _root;
         public int Id => 1;
 
-        public void Start()
+        public void StartGame()
         {
             CreateRoot();
         }
 
-        public void Pause()
+        public void PauseGame()
         {
         }
 
-        public void Resume()
+        public void ResumeGame()
         {
         }
 
-        public void Restart()
+        public void RestartGame()
         {
             CreateRoot();
         }
 
-        public void Stop()
+        public void StopGame()
         {
             _root?.Dispose();
         }

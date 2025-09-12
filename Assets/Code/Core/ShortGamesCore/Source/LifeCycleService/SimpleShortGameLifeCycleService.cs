@@ -131,7 +131,7 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		}
 
 		_currentGame = game;
-		_currentGame.Start();
+		_currentGame.StartGame();
 
 		var index = _preloadedGameTypes.IndexOf(typeof(T));
 		if (index >= 0)
@@ -172,7 +172,7 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		}
 
 		_currentGame = game;
-		_currentGame.Start();
+		_currentGame.StartGame();
 
 		var index = _preloadedGameTypes.IndexOf(gameType);
 		if (index >= 0)
@@ -194,7 +194,7 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 
 		_logger.Log($"Stopping current game: {_currentGame.GetType().Name}");
 
-		_currentGame.Stop();
+		_currentGame.StopGame();
 
 		if (_currentGame is IPoolableShortGame poolableGame)
 		{
