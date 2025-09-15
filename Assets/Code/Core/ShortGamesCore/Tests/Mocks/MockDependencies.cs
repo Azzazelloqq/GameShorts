@@ -473,7 +473,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
     /// </summary>
     public class MockShortGamesPool : IShortGamesPool
     {
-        private readonly Dictionary<Type, Queue<IPoolableShortGame>> _pool = new();
+        private readonly Dictionary<Type, Queue<IShortGamePoolable>> _pool = new();
         
         public int GetCallCount { get; private set; }
         public int ReleaseCallCount { get; private set; }
@@ -482,7 +482,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         public bool ShouldReturnFromPool { get; set; } = true;
         
-        public bool TryGetShortGame<T>(out T game) where T : class, IPoolableShortGame
+        public bool TryGetShortGame<T>(out T game) where T : class, IShortGamePoolable
         {
             if (TryGetShortGame(typeof(T), out var pooledGame))
             {
@@ -494,7 +494,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             return false;
         }
         
-        public bool TryGetShortGame(Type gameType, out IPoolableShortGame game)
+        public bool TryGetShortGame(Type gameType, out IShortGamePoolable game)
         {
             GetCallCount++;
             game = null;
@@ -513,37 +513,37 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             return false;
         }
         
-        public void ReleaseShortGame<T>(T game) where T : class, IPoolableShortGame
+        public void ReleaseShortGame<T>(T game) where T : class, IShortGamePoolable
         {
-            ReleaseShortGame((IPoolableShortGame)game);
+            ReleaseShortGame((IShortGamePoolable)game);
         }
         
-        public void ReleaseShortGame(IPoolableShortGame game)
+        public void ReleaseShortGame(IShortGamePoolable game)
         {
             ReleaseCallCount++;
             
             var type = game.GetType();
             if (!_pool.ContainsKey(type))
             {
-                _pool[type] = new Queue<IPoolableShortGame>();
+                _pool[type] = new Queue<IShortGamePoolable>();
             }
             
             _pool[type].Enqueue(game);
         }
         
-        public void WarmUpPool<T>(T game) where T : class, IPoolableShortGame
+        public void WarmUpPool<T>(T game) where T : class, IShortGamePoolable
         {
-            WarmUpPool((IPoolableShortGame)game);
+            WarmUpPool((IShortGamePoolable)game);
         }
         
-        public void WarmUpPool(IPoolableShortGame game)
+        public void WarmUpPool(IShortGamePoolable game)
         {
             WarmUpCallCount++;
             
             var type = game.GetType();
             if (!_pool.ContainsKey(type))
             {
-                _pool[type] = new Queue<IPoolableShortGame>();
+                _pool[type] = new Queue<IShortGamePoolable>();
             }
             
             _pool[type].Enqueue(game);
@@ -554,7 +554,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             return _pool.Keys;
         }
         
-        public void ClearPoolForType<T>() where T : class, IPoolableShortGame
+        public void ClearPoolForType<T>() where T : class, IShortGamePoolable
         {
             ClearPoolForType(typeof(T));
         }

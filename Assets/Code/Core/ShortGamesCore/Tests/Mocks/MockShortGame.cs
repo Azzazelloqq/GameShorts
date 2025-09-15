@@ -70,7 +70,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
     /// <summary>
     /// Мок для тестирования мини-игры с поддержкой пулинга
     /// </summary>
-    public class MockPoolableShortGame : MonoBehaviour, IPoolableShortGame
+    public class MockPoolableShortGame : MonoBehaviour, IShortGamePoolable
     {
         public int Id { get; set; } = 2;
         
@@ -132,6 +132,193 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         public void Dispose()
         {
             
+        }
+    }
+    
+    /// <summary>
+    /// Мок для тестирования 3D игры
+    /// </summary>
+    public class MockShortGame3D : MonoBehaviour, IShortGame3D
+    {
+        public int Id { get; set; } = 3;
+        public bool IsStarted { get; private set; }
+        public bool IsPaused { get; private set; }
+        
+        public void StartGame()
+        {
+            IsStarted = true;
+            IsPaused = false;
+        }
+        
+        public void StopGame()
+        {
+            IsStarted = false;
+            IsPaused = false;
+        }
+        
+        public void PauseGame()
+        {
+            IsPaused = true;
+        }
+        
+        public void ResumeGame()
+        {
+            IsPaused = false;
+        }
+        
+        public void RestartGame()
+        {
+            StopGame();
+            StartGame();
+        }
+        
+        public void Dispose()
+        {
+            StopGame();
+        }
+    }
+    
+    /// <summary>
+    /// Мок для тестирования 2D игры
+    /// </summary>
+    public class MockShortGame2D : MonoBehaviour, IShortGame2D
+    {
+        public int Id { get; set; } = 4;
+        public bool IsStarted { get; private set; }
+        public bool IsPaused { get; private set; }
+        
+        public void StartGame()
+        {
+            IsStarted = true;
+            IsPaused = false;
+        }
+        
+        public void StopGame()
+        {
+            IsStarted = false;
+            IsPaused = false;
+        }
+        
+        public void PauseGame()
+        {
+            IsPaused = true;
+        }
+        
+        public void ResumeGame()
+        {
+            IsPaused = false;
+        }
+        
+        public void RestartGame()
+        {
+            StopGame();
+            StartGame();
+        }
+        
+        public void Dispose()
+        {
+            StopGame();
+        }
+    }
+    
+    /// <summary>
+    /// Мок для тестирования UI игры
+    /// </summary>
+    public class MockShortGameUI : MonoBehaviour, IShortGameUI
+    {
+        public int Id { get; set; } = 5;
+        public bool IsStarted { get; private set; }
+        public bool IsPaused { get; private set; }
+        
+        public void StartGame()
+        {
+            IsStarted = true;
+            IsPaused = false;
+        }
+        
+        public void StopGame()
+        {
+            IsStarted = false;
+            IsPaused = false;
+        }
+        
+        public void PauseGame()
+        {
+            IsPaused = true;
+        }
+        
+        public void ResumeGame()
+        {
+            IsPaused = false;
+        }
+        
+        public void RestartGame()
+        {
+            StopGame();
+            StartGame();
+        }
+        
+        public void Dispose()
+        {
+            StopGame();
+        }
+    }
+    
+    /// <summary>
+    /// Мок для тестирования poolable 3D игры
+    /// </summary>
+    public class MockPoolableShortGame3D : MonoBehaviour, IShortGame3D, IShortGamePoolable
+    {
+        public int Id { get; set; } = 6;
+        public bool IsStarted { get; private set; }
+        public bool IsPaused { get; private set; }
+        public bool IsPooled { get; private set; }
+        public int OnPooledCallCount { get; private set; }
+        public int OnUnpooledCallCount { get; private set; }
+        
+        public void StartGame()
+        {
+            IsStarted = true;
+            IsPaused = false;
+        }
+        
+        public void StopGame()
+        {
+            IsStarted = false;
+            IsPaused = false;
+        }
+        
+        public void PauseGame()
+        {
+            IsPaused = true;
+        }
+        
+        public void ResumeGame()
+        {
+            IsPaused = false;
+        }
+        
+        public void RestartGame()
+        {
+            StopGame();
+            StartGame();
+        }
+        
+        public void Dispose()
+        {
+            StopGame();
+        }
+        
+        public void OnPooled()
+        {
+            IsPooled = true;
+            OnPooledCallCount++;
+        }
+        
+        public void OnUnpooled()
+        {
+            IsPooled = false;
+            OnUnpooledCallCount++;
         }
     }
 }
