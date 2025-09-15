@@ -35,9 +35,6 @@ namespace Code.Core.GameEntryPoint
         [Header("UI Settings")]
         [SerializeField] private Transform _uiParent;
         
-        [SerializeField]
-        private GamePositioningConfig  _gamePositioningConfig;
-        
         private IGamesLoader _queueLoader;
         private IShortGameLifeCycleService _lifeCycleService;
         private GameSwiper.GameSwiper _gameSwiper;
@@ -92,7 +89,7 @@ namespace Code.Core.GameEntryPoint
             _globalGameDiContainer.RegisterAsSingleton<ITickHandler>(_tickHandler);
             
             var resourceMapping = GetResourceMapping();
-            var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping, _gamePositioningConfig);
+            var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping);
             _globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
             
             _lifeCycleService = new SimpleShortGameLifeCycleService(_pool, factory, _logger);

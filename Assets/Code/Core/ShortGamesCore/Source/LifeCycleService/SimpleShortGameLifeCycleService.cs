@@ -114,18 +114,12 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		using var linkedCts =
 			CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _disposeCancellationTokenSource.Token);
 
-		// Store reference to previous game and pause it
-		var previousGame = _currentGame;
-		if (previousGame != null)
-		{
-			previousGame.PauseGame();
-		}
+		StopCurrentGame();
 
 		T game = null;
 		var fromPool = false;
 
-		// Check if game supports pooling using new detection method
-		if (GameTypeDetector.IsPoolable(typeof(T)))
+		if (typeof(IPoolableShortGame).IsAssignableFrom(typeof(T)))
 		{
 			if (_pool.TryGetShortGame(typeof(T), out var pooledGame))
 			{
@@ -133,7 +127,7 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 				if (game != null)
 				{
 					fromPool = true;
-					(game as IShortGamePoolable)?.OnUnpooled();
+					(game as IPoolableShortGame)?.OnUnpooled();
 					_logger.Log($"Got game {typeof(T).Name} from pool");
 				}
 			}
@@ -160,24 +154,7 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 			_currentGameIndex = index;
 		}
 
-		var detectedType = GameTypeDetector.GetGameType(typeof(T));
-		_logger.Log($"Started {detectedType} game: {typeof(T).Name} (from pool: {fromPool})");
-
-		// Clean up previous non-poolable game after successfully loading new one
-		if (previousGame != null && previousGame != game && !(previousGame is IShortGamePoolable))
-		{
-			try
-			{
-				// Don't call StopGame() as it resets IsPaused flag which tests check
-				// Just dispose the game directly
-				previousGame.Dispose();
-				_logger.Log($"Destroyed non-poolable game {previousGame.GetType().Name}");
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Error disposing previous game: {ex.Message}");
-			}
-		}
+		_logger.Log($"Started game: {typeof(T).Name} (from pool: {fromPool})");
 
 		return game;
 	}
@@ -187,17 +164,11 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 		using var linkedCts =
 			CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _disposeCancellationTokenSource.Token);
 
-		// Store reference to previous game and pause it
-		var previousGame = _currentGame;
-		if (previousGame != null)
-		{
-			previousGame.PauseGame();
-		}
+		StopCurrentGame();
 
 		IShortGame game = null;
 
-		// Check if game supports pooling using new detection method
-		if (GameTypeDetector.IsPoolable(gameType))
+		if (typeof(IPoolableShortGame).IsAssignableFrom(gameType))
 		{
 			if (_pool.TryGetShortGame(gameType, out var pooledGame))
 			{
@@ -217,25 +188,6 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 			_currentGameIndex = index;
 		}
 
-		var detectedType = GameTypeDetector.GetGameType(gameType);
-		_logger.Log($"Started {detectedType} game: {gameType.Name}");
-
-		// Clean up previous non-poolable game after successfully loading new one
-		if (previousGame != null && previousGame != game && !(previousGame is IShortGamePoolable))
-		{
-			try
-			{
-				// Don't call StopGame() as it resets IsPaused flag which tests check
-				// Just dispose the game directly
-				previousGame.Dispose();
-				_logger.Log($"Destroyed non-poolable game {previousGame.GetType().Name}");
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Error disposing previous game: {ex.Message}");
-			}
-		}
-
 		return game;
 	}
 
@@ -246,26 +198,22 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 			return;
 		}
 
-		var gameType = _currentGame.GetType();
 		_currentGame.StopGame();
 
-		// Check for pooling support
-		if (_currentGame is IShortGamePoolable poolableGame)
+		if (_currentGame is IPoolableShortGame poolableGame)
 		{
 			poolableGame.OnPooled();
 			_pool.ReleaseShortGame(poolableGame);
-			_logger.Log($"Returned game {gameType.Name} to pool");
 		}
 		else
 		{
 			try
 			{
 				_currentGame.Dispose();
-				_logger.Log($"Destroyed non-poolable game {gameType.Name}");
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError($"Error disposing game {gameType.Name}: {ex.Message}");
+				_logger.LogError($"Error disposing game {_currentGame.GetType().Name}: {ex.Message}");
 			}
 		}
 
@@ -333,12 +281,11 @@ public class SimpleShortGameLifeCycleService : IShortGameLifeCycleService
 	{
 		await _factory.PreloadGameResourcesAsync(gameType, cancellationToken);
 
-		// Only pool games that implement the pooling interfaces
-		if (GameTypeDetector.IsPoolable(gameType) && typeof(IShortGamePoolable).IsAssignableFrom(gameType))
+		if (typeof(IPoolableShortGame).IsAssignableFrom(gameType))
 		{
 			var game = await _factory.CreateShortGameAsync(gameType, cancellationToken);
 
-			if (game is IShortGamePoolable poolableGame)
+			if (game is IPoolableShortGame poolableGame)
 			{
 				poolableGame.OnPooled();
 				_pool.WarmUpPool(poolableGame);
