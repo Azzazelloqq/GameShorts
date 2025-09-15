@@ -1,11 +1,14 @@
 ﻿{
-  "name": "Game2",
+  "name": "Game2_test",
   "rootNamespace": "",
   "references": [
     "Core.ShortGame",
     "BaseDMDisposable",
     "LightDI",
-    "TickHandler"
+    "TickHandler",
+    "Unity.TextMeshPro",
+    "Tools",
+    "R3.Unity"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

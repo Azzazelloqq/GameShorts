@@ -133,7 +133,7 @@ namespace Code.Core.GameEntryPoint
             return new Dictionary<Type, string>
             {
                 { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
-                { typeof(Game2), ResourceIdsContainer.DefaultLocalGroup.Game2 }
+                { typeof(Game2), ResourceIdsContainer.GameBoxTower.Game2Main }
             };
            // return new Dictionary<Type, string>();
 

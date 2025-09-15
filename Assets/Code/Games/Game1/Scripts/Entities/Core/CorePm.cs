@@ -42,6 +42,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
 
         protected override void OnDispose()
         {
+            _inputManager?.SetJoystickOptions(AxisOptions.None);
             _scene?.Dispose();
             base.OnDispose();
         }

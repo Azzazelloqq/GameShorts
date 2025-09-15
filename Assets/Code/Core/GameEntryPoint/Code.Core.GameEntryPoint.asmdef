@@ -13,7 +13,8 @@
     "AddressablesGroups",
     "Game1_test",
     "Game2",
-    "Tools"
+    "Tools",
+    "Game2_test"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

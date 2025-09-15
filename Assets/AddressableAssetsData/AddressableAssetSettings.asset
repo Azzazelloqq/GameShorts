@@ -62,6 +62,7 @@ MonoBehaviour:
   m_GroupAssets:
   - {fileID: 11400000, guid: 3422f9b346a9875489540e3f44e0d5a2, type: 2}
   - {fileID: 11400000, guid: 435079d01650ddd49b760544266d15b7, type: 2}
+  - {fileID: 11400000, guid: 03f1a7aa158436a409c71436c9ab8736, type: 2}
   m_BuildSettings:
     m_LogResourceManagerExceptions: 1
     m_BundleBuildPath: Temp/com.unity.addressables/AssetBundles
@@ -102,6 +103,7 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - Game1
+    - BoxTower
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: e2ffc53d46819fb45920011659ef65e1, type: 2}

@@ -7,5 +7,6 @@ namespace Code.Generated.Addressables
     {
         public static readonly GameAsteroids GameAsteroids = new GameAsteroids();
         public static readonly DefaultLocalGroup DefaultLocalGroup = new DefaultLocalGroup();
+        public static readonly GameBoxTower GameBoxTower = new GameBoxTower();
     }
 }

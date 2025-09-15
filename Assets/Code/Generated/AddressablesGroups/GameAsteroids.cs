@@ -9,9 +9,9 @@ namespace Code.Generated.Addressables
         public string Player = "Player";
         public string Asteroid = "Asteroid";
         public string MainScreen = "MainScreen";
+        public string Laser = "Laser";
         public string Game1MAIN = "Game1_MAIN";
         public string LaserChargeUI = "LaserChargeUI";
-        public string Laser = "Laser";
         public string Projectile = "Projectile";
     }
 }
