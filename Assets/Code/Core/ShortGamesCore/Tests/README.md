@@ -1,255 +1,247 @@
-# ShortGames Core - Test Suite
+# ShortGamesCore Tests
 
 ## Overview
-Comprehensive test suite for the ShortGames Core system, covering unit tests, integration tests, and performance benchmarks.
 
-## Test Categories
+This directory contains unit and integration tests for the ShortGamesCore system, including the new game loading architecture.
 
-### 1. Unit Tests
-Individual component testing in isolation:
-- **Factory Tests**: Game creation and resource management
-- **Pool Tests**: Object pooling operations
-- **LifeCycleService Tests**: Game lifecycle management
+## Test Structure
 
-### 2. Integration Tests
-System-wide interaction testing:
-- **Full cycle preload and switch**
-- **Pooling with lifecycle management**
-- **Resource management flows**
-- **Error handling scenarios**
+### `/GamesLoader`
+Tests for the new game loading architecture:
+- **GameRegistryTests.cs** - Tests for game type registration
+- **GameQueueServiceTests.cs** - Tests for queue management
+- **QueueShortGamesLoaderTests.cs** - Tests for game loading and preloading
+- **GameProviderTests.cs** - Tests for the game provider bridge
 
-### 3. Performance Tests
-Benchmarking critical operations:
-- **Pool efficiency measurements**
-- **Preloading performance**
-- **Memory usage tracking**
-- **Rapid switching benchmarks**
+### `/Mocks`
+Mock implementations for testing:
+- **MockShortGame.cs** - Basic game implementation
+- **MockPoolableShortGame.cs** - Poolable game implementation
+- **MockShortGame2D.cs** - 2D game implementation
+- **MockShortGame3D.cs** - 3D game implementation
+- **MockShortGameUI.cs** - UI game implementation
+- **MockLogger.cs** - Mock logger for testing
+- **MockResourceLoader.cs** - Mock resource loader
+- **MockDependencies.cs** - Other mock dependencies
+
+### `/Factory`
+Tests for game factory implementations:
+- Factory creation tests
+- Resource loading tests
+- Game instantiation tests
+
+### `/Performance`
+Performance benchmarks and tests
 
 ## Running Tests
 
-### Unity Test Runner
-1. Open Unity Editor
-2. Navigate to `Window > General > Test Runner`
-3. Select tests to run or click "Run All"
+### In Unity Editor
+1. Open Unity Test Runner: `Window > General > Test Runner`
+2. Switch to "EditMode" tab
+3. Click "Run All" or select specific tests
 
-### Command Line (Windows)
-```powershell
-# Run all tests
+### Via Command Line
+```bash
+# Windows
 .\RunTests.ps1
 
-# Run specific category
-.\RunTests.ps1 -TestFilter "Code.Core.ShotGamesCore.Tests.Factory"
-.\RunTests.ps1 -TestFilter "Code.Core.ShotGamesCore.Tests.Pool"
-.\RunTests.ps1 -TestFilter "Code.Core.ShotGamesCore.Tests.Integration"
-```
-
-### Command Line (Linux/Mac)
-```bash
-# Run all tests
+# Mac/Linux
 ./run-tests.sh
-
-# Run specific category
-./run-tests.sh --filter "Code.Core.ShotGamesCore.Tests.Factory"
 ```
 
-## Test Architecture
+## New Architecture Tests
 
-### Assembly Structure
-```
-Core.ShortGame.Tests (Editor-only)
-├── Factory/
-│   ├── AddressableShortGameFactoryTests.cs
-│   └── AddressableShortGameFactoryDebugTest.cs
-├── LifeCycleService/
-│   └── SimpleShortGameLifeCycleServiceTests.cs
-├── Pool/
-│   └── SimpleShortGamePoolTests.cs
-├── Integration/
-│   └── ShortGamesSystemIntegrationTests.cs
-├── Performance/
-│   └── PerformanceTests.cs
-└── Mocks/ → Moved to separate assembly
+The test suite covers the new game loading architecture:
 
-Core.ShortGame.Tests.Mocks (Runtime)
-├── MockShortGame.cs
-├── MockDependencies.cs
-└── Core.ShortGame.Tests.Mocks.asmdef
-```
+### GameRegistry
+- Game type registration
+- Validation of IShortGame implementation
+- Event notifications
+- Registry management
 
-### Mock Implementations
+### GameQueueService
+- Queue initialization
+- Navigation (next, previous, by index)
+- Queue state management
+- Game preloading selection
 
-#### MockShortGame
-Basic implementation of IShortGame for testing:
+### QueueShortGamesLoader
+- Game loading and starting
+- Game preloading without starting
+- Batch preloading
+- Game lifecycle management
+- Resource management
+- Event notifications
+
+### GameProvider
+- Service integration
+- Game state management (pause, unpause, stop)
+- Render texture access
+- Preloaded games management
+
+## Key Test Scenarios
+
+### Basic Flow
 ```csharp
-public class MockShortGame : MonoBehaviour, IShortGame
-{
-    public bool IsStarted { get; private set; }
-    public bool IsPaused { get; private set; }
-    public int StartCallCount { get; private set; }
-    // ... tracking properties for testing
-}
+// 1. Register games
+var registry = new GameRegistry(logger);
+registry.RegisterGames(new[] { typeof(Game1), typeof(Game2) });
+
+// 2. Initialize queue
+var queueService = new GameQueueService(logger);
+
+// 3. Create loader
+var loader = new QueueShortGamesLoader(factory, queueService, logger);
+
+// 4. Create provider
+var provider = new GameProvider(logger);
+await provider.InitializeAsync(registry, queueService, loader);
+
+// 5. Navigate and control games
+queueService.MoveNext();
+await provider.UpdatePreloadedGamesAsync();
+provider.StartCurrentGame();
 ```
 
-#### MockPoolableShortGame
-Poolable version with lifecycle callbacks:
+### Preloading Test
 ```csharp
-public class MockPoolableShortGame : MonoBehaviour, IPoolableShortGame
-{
-    public int OnPooledCallCount { get; private set; }
-    public int OnUnpooledCallCount { get; private set; }
-    // ... additional pooling tracking
-}
+// Preload multiple games
+var games = await loader.PreloadGamesAsync(gameTypes);
+
+// Check preload status
+Assert.IsTrue(loader.IsGameLoaded(gameType));
+Assert.IsTrue(game.IsPreloaded);
+
+// Start preloaded game
+loader.StartPreloadedGame(gameType);
 ```
 
-#### Mock Dependencies
-- **MockLogger**: Tracks all logging calls
-- **MockResourceLoader**: Simulates resource loading
-- **MockShortGameFactory**: Controls game creation
-- **MockShortGamesPool**: Manages pooling behavior
-
-## Test Coverage
-
-### Factory Tests
-- ✅ Create game instance (generic and by type)
-- ✅ Preload resources
-- ✅ Use preloaded prefabs
-- ✅ Handle missing resources
-- ✅ Cancellation support
-- ✅ Reference counting
-- ✅ Disposal cleanup
-
-### Pool Tests
-- ✅ Get/release games
-- ✅ Pool capacity limits
-- ✅ Warm up pool
-- ✅ Clear pool by type
-- ✅ Active game tracking
-- ✅ Disposal
-
-### LifeCycleService Tests
-- ✅ Load games (pooled and new)
-- ✅ Stop current game
-- ✅ Preload game lists
-- ✅ Navigate next/previous
-- ✅ Clear preloaded games
-- ✅ Error handling
-- ✅ Disposal
-
-### Integration Tests
-- ✅ Full preload and switch cycle
-- ✅ Pool reuse across lifecycle
-- ✅ Mixed poolable/non-poolable games
-- ✅ Resource management
-- ✅ Navigation flow
-- ✅ Error scenarios
-- ✅ Cleanup and disposal
-
-### Performance Tests
-- ✅ Pool vs new instance creation
-- ✅ Preloading efficiency
-- ✅ Memory usage
-- ✅ Rapid sequential operations
-- ✅ Large scale pooling
-
-## Common Test Patterns
-
-### Setup and Teardown
+### Queue Navigation Test
 ```csharp
-[SetUp]
-public void SetUp()
-{
-    _logger = new MockLogger();
-    _pool = new SimpleShortGamePool(_logger);
-    _testGameObject = new GameObject("TestGame");
-}
+// Navigate forward
+queueService.MoveNext();
+Assert.IsTrue(queueService.HasNext);
 
-[TearDown]
-public void TearDown()
+// Navigate backward
+queueService.MovePrevious();
+Assert.IsTrue(queueService.HasPrevious);
+
+// Jump to index
+queueService.MoveToIndex(2);
+```
+
+## Mock Objects
+
+### MockShortGame
+Basic implementation with:
+- Start/Stop/Pause functionality
+- Preload support
+- Render texture generation
+- State tracking for assertions
+
+### MockLogger
+Captures all log messages for verification:
+```csharp
+Assert.That(logger.LoggedMessages, Has.Some.Contains("expected message"));
+Assert.That(logger.LoggedErrors, Has.Count.EqualTo(0));
+```
+
+### MockResourceLoader
+Simulates Unity's Addressables system:
+```csharp
+resourceLoader.AddResource("GamePrefab", prefab);
+var loaded = await resourceLoader.LoadResourceAsync<GameObject>("GamePrefab");
+```
+
+## Writing New Tests
+
+### Test Template
+```csharp
+[TestFixture]
+public class MyComponentTests
 {
-    // Clean up in correct order
-    if (_testGameObject != null)
-        GameObject.DestroyImmediate(_testGameObject);
+    private MyComponent _component;
+    private MockLogger _logger;
     
-    _pool?.Dispose();
-}
-```
-
-### Async Testing
-```csharp
-[Test]
-public async Task LoadGameAsync_CreatesNewInstance()
-{
-    // Arrange
-    var factory = new MockShortGameFactory();
-    
-    // Act
-    var game = await service.LoadGameAsync<MockShortGame>();
-    
-    // Assert
-    Assert.IsNotNull(game);
-    Assert.IsTrue(game.IsStarted);
-}
-```
-
-### Performance Benchmarking
-```csharp
-[Test]
-public void MeasurePoolPerformance()
-{
-    var sw = Stopwatch.StartNew();
-    
-    // Perform operations
-    for (int i = 0; i < 100; i++)
+    [SetUp]
+    public void SetUp()
     {
-        _pool.TryGetShortGame<MockPoolableShortGame>(out var game);
-        _pool.ReleaseShortGame(game);
+        _logger = new MockLogger();
+        _component = new MyComponent(_logger);
     }
     
-    sw.Stop();
-    Assert.Less(sw.ElapsedMilliseconds, 100);
+    [TearDown]
+    public void TearDown()
+    {
+        _component?.Dispose();
+    }
+    
+    [Test]
+    public void MyMethod_ValidInput_ExpectedResult()
+    {
+        // Arrange
+        var input = "test";
+        
+        // Act
+        var result = _component.MyMethod(input);
+        
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("expected", result);
+    }
 }
 ```
 
-## Unity-Specific Considerations
+### Async Test Template
+```csharp
+[Test]
+public async Task MyAsyncMethod_ValidInput_ExpectedResult()
+{
+    // Arrange
+    var input = "test";
+    
+    // Act
+    var result = await _component.MyAsyncMethodAsync(input);
+    
+    // Assert
+    Assert.IsNotNull(result);
+}
+```
 
-### GameObject Creation
-- All GameObject operations must happen on the main thread
-- Use `DestroyImmediate` in Editor mode tests
-- Check for null before destroying
+## Test Coverage Goals
 
-### Async Operations
-- Use `async Task` instead of `async void`
-- Handle cancellation tokens properly
-- Avoid `Task.Run` for GameObject operations
+- **Unit Tests**: 80% code coverage minimum
+- **Integration Tests**: Cover all major workflows
+- **Performance Tests**: Benchmark critical paths
 
-### Test Attributes
-- `[Test]` - Standard synchronous test
-- `[UnityTest]` - Tests that yield or use coroutines
-- `[TestFixture]` - Group related tests
-- `[SetUp]`/`[TearDown]` - Test lifecycle hooks
+## Continuous Integration
+
+Tests are automatically run on:
+- Pull request creation
+- Commits to main branch
+- Nightly builds
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **"Can't add script behaviour because it is an editor script"**
-   - Solution: Mocks are in separate runtime assembly
+1. **Tests not appearing in Test Runner**
+   - Check assembly definition references
+   - Ensure test class has `[TestFixture]` attribute
+   - Methods must have `[Test]` attribute
 
-2. **"Destroy may not be called from edit mode"**
-   - Solution: Use `DestroyImmediate` in editor tests
+2. **Mock objects not working**
+   - Verify mock assembly is referenced
+   - Check namespace imports
 
-3. **"Internal_CreateGameObject can only be called from the main thread"**
-   - Solution: Don't use `Task.Run` for GameObject operations
-
-4. **"The object has been destroyed but you are still trying to access it"**
-   - Solution: Check for null before operations
+3. **Async tests timing out**
+   - Use proper cancellation tokens
+   - Add timeout attributes: `[Test, Timeout(5000)]`
 
 ## Contributing
 
-When adding new tests:
-1. Follow existing patterns and naming conventions
-2. Add appropriate test categories
-3. Include setup and teardown
-4. Handle Unity-specific requirements
-5. Document complex test scenarios
-6. Ensure thread safety for Unity operations
+When adding new features:
+1. Write tests first (TDD approach)
+2. Ensure all tests pass
+3. Add integration tests for complex scenarios
+4. Update this README if adding new test categories

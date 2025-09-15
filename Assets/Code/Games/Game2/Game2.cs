@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using UnityEngine;
@@ -8,13 +9,27 @@ namespace Code.Core.ShortGamesCore.Game2
 {
     public class Game2: BaseMonoBehaviour, IShortGame2D
     {
-        [SerializeField] private BoxTowerSceneContextView sceneContextView;
-        private IDisposable _core;
-        private CancellationTokenSource _cancellationTokenSource;
+        [SerializeField] private Transform _circle;
+        private IDisposable _root;
+        public int Id => 1;
+        public bool IsPreloaded { get; }
         
-        private bool _isDisposed;
-        public int Id => 2;
+        public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        {
+            return default;
+        }
 
+        public RenderTexture GetRenderTexture()
+        {
+            return null;
+        }
+
+        public void Dispose()
+        {
+            _root?.Dispose();
+            _root = null;
+        }
+        
         public void StartGame()
         {
             CreateRoot();
@@ -30,61 +45,16 @@ namespace Code.Core.ShortGamesCore.Game2
 
         public void RestartGame()
         {
-            RecreateRoot();
+            CreateRoot();
         }
 
         public void StopGame()
         {
-            Dispose();
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-            
-            DisposeCore();
-
-            _isDisposed = true;
-        }
-
-        private void RecreateRoot()
-        {
-            DisposeCore();
-            
-            CreateRoot();
-        }
-
-        private void DisposeCore()
-        {
-            if (_cancellationTokenSource != null)
-            {
-                if (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    _cancellationTokenSource.Cancel();
-                }
-                
-                _cancellationTokenSource.Dispose();
-                
-                _cancellationTokenSource = null;
-            }
-
-            _core?.Dispose();
-            _core = null;
+            _root?.Dispose();
         }
 
         private void CreateRoot()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
-            BoxTowerCorePm.Ctx rootCtx = new BoxTowerCorePm.Ctx
-            {
-                sceneContextView = sceneContextView,
-                cancellationToken = _cancellationTokenSource.Token,
-                restartGame = RestartGame
-            };
-            _core = BoxTowerCorePmFactory.CreateBoxTowerCorePm(rootCtx);
         }
     }
 }

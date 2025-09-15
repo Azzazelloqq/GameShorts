@@ -2,6 +2,8 @@ using UnityEngine;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shooter1
 {
@@ -21,6 +23,9 @@ namespace Shooter1
         [SerializeField] private GameObject shooterPrefab;
         [SerializeField] private GameObject bulletPrefab;
 
+        public int Id { get; private set; } = System.Guid.NewGuid().GetHashCode();
+        public bool IsPreloaded { get; }
+        
         // Game objects
         private GameObject target;
         private GameObject shooter;
@@ -36,8 +41,16 @@ namespace Shooter1
         // Game boundaries
         private float leftBoundary = -8f;
         private float rightBoundary = 8f;
+        
+        public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        {
+            return default;
+        }
 
-        public int Id { get; private set; } = System.Guid.NewGuid().GetHashCode();
+        public RenderTexture GetRenderTexture()
+        {
+            return null;
+        }
 
         private void Awake()
         {

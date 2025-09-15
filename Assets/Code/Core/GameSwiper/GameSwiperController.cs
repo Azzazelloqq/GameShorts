@@ -36,7 +36,7 @@ namespace Code.Core.GameSwiper
         {
             _ctx = ctx;
             _cancellationTokenSource = new CancellationTokenSource();
-            _gameSwiper = GameSwiperFactory.CreateGameSwiper();
+            //_gameSwiper = GameSwiperFactory.CreateGameSwiper();
             _logger = logger;
             _resourceLoader = resourceLoader;
             _onNextGame = new ReactiveTrigger();
@@ -95,19 +95,19 @@ namespace Code.Core.GameSwiper
                 // Уведомляем view о начале загрузки
                 _gameSwiperView?.SetLoadingState(true);
                 
-                var nextGame = await _gameSwiper.NextGameAsync(_cancellationTokenSource.Token);
+                //var nextGame = await _gameSwiper.NextGameAsync(_cancellationTokenSource.Token);
                 
                 // Уведомляем view о завершении загрузки
                 _gameSwiperView?.SetLoadingState(false);
                 
-                if (nextGame != null)
-                {
-                    _logger.Log($"GameSwiperController: Successfully switched to next game: {nextGame.GetType().Name}");
-                }
-                else
-                {
-                    _logger.LogWarning("GameSwiperController: Failed to switch to next game - no game returned");
-                }
+                // if (nextGame != null)
+                // {
+                //     _logger.Log($"GameSwiperController: Successfully switched to next game: {nextGame.GetType().Name}");
+                // }
+                // else
+                // {
+                //     _logger.LogWarning("GameSwiperController: Failed to switch to next game - no game returned");
+                // }
             }
             catch (OperationCanceledException)
             {
@@ -132,20 +132,20 @@ namespace Code.Core.GameSwiper
                 // Уведомляем view о начале загрузки
                 _gameSwiperView?.SetLoadingState(true);
                 
-                var previousGame = await _gameSwiper.PreviousGameAsync(_cancellationTokenSource.Token);
+                //var previousGame = await _gameSwiper.PreviousGameAsync(_cancellationTokenSource.Token);
                 
                 // Уведомляем view о завершении загрузки
                 _gameSwiperView?.SetLoadingState(false);
                 
-                if (previousGame != null)
-                {
-                    _logger.Log($"GameSwiperController: Successfully switched to previous game: {previousGame.GetType().Name}");
-                   
-                }
-                else
-                {
-                    _logger.LogWarning("GameSwiperController: Failed to switch to previous game - no game returned");
-                }
+                // if (previousGame != null)
+                // {
+                //     _logger.Log($"GameSwiperController: Successfully switched to previous game: {previousGame.GetType().Name}");
+                //    
+                // }
+                // else
+                // {
+                //     _logger.LogWarning("GameSwiperController: Failed to switch to previous game - no game returned");
+                // }
             }
             catch (OperationCanceledException)
             {

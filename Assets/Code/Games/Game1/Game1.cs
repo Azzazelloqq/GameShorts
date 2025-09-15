@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
@@ -14,8 +15,20 @@ namespace Code.Core.ShortGamesCore.Game1
         private IDisposable _core;
         private CancellationTokenSource _cancellationTokenSource;
         
-        private bool _isDisposed;
         public int Id => 1;
+        public bool IsPreloaded { get; }
+        
+        private bool _isDisposed;
+        
+        public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        {
+            return default;
+        }
+
+        public RenderTexture GetRenderTexture()
+        {
+            return null;
+        }
 
         public void StartGame()
         {

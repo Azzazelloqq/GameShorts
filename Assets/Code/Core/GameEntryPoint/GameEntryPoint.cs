@@ -8,7 +8,6 @@ using Code.Core.ShortGamesCore.Game1;
 using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
-using Code.Core.ShortGamesCore.Source.LifeCycleService;
 using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
@@ -34,8 +33,13 @@ namespace Code.Core.GameEntryPoint
         [Header("UI Settings")]
         [SerializeField] private Transform _uiParent;
         
-        private IGamesLoader _queueLoader;
-        private IShortGameLifeCycleService _lifeCycleService;
+        [SerializeField]
+        private GamePositioningConfig  _gamePositioningConfig;
+        
+        private IGameRegistry _gameRegistry;
+        private IGameQueueService _queueService;
+        private IGamesLoader _gamesLoader;
+        private IGameProvider _gameProvider;
         private GameSwiper.GameSwiper _gameSwiper;
         private GameSwiperController _gameSwiperController;
         private CancellationTokenSource _cancellationTokenSource;
@@ -88,20 +92,24 @@ namespace Code.Core.GameEntryPoint
             _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
 
             var resourceMapping = GetResourceMapping();
-            var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping);
+            var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping, _gamePositioningConfig);
             _globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
             
-            _lifeCycleService = new SimpleShortGameLifeCycleService(_pool, factory, _logger);
-            _globalGameDiContainer.RegisterAsSingleton(_lifeCycleService);
-            
-            _queueLoader = new QueueShortGamesLoader(_lifeCycleService, _logger)
-            {
-                PreloadDepth = _preloadDepth
-            };
-
+            // Create new game system components
+            _gameRegistry = new GameRegistry(_logger);
             var games = GetGameTypes();
-            await _queueLoader.InitializeAsync(games, cancellationToken);
-            _globalGameDiContainer.RegisterAsSingleton(_queueLoader);
+            _gameRegistry.RegisterGames(games);
+            _globalGameDiContainer.RegisterAsSingleton(_gameRegistry);
+            
+            _queueService = new GameQueueService(_logger);
+            _globalGameDiContainer.RegisterAsSingleton(_queueService);
+            
+            _gamesLoader = new QueueShortGamesLoader(factory, _queueService, _logger);
+            _globalGameDiContainer.RegisterAsSingleton(_gamesLoader);
+            
+            _gameProvider = new GameProvider(_logger);
+            await _gameProvider.InitializeAsync(_gameRegistry, _queueService, _gamesLoader, cancellationToken);
+            _globalGameDiContainer.RegisterAsSingleton(_gameProvider);
             
             // Создаем контроллер
             
@@ -132,7 +140,7 @@ namespace Code.Core.GameEntryPoint
             return new Dictionary<Type, string>
             {
                 { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
-                { typeof(Game2), ResourceIdsContainer.GameBoxTower.Game2Main }
+                { typeof(Game2), ResourceIdsContainer.DefaultLocalGroup.Game2 }
             };
            // return new Dictionary<Type, string>();
 
@@ -143,8 +151,10 @@ namespace Code.Core.GameEntryPoint
             _cancellationTokenSource?.Cancel();
             
             _gameSwiperController?.Dispose();
-            _queueLoader?.Dispose();
-            _lifeCycleService?.Dispose();
+            _gameProvider?.Dispose();
+            _gamesLoader?.Dispose();
+            _queueService?.Clear();
+            _gameRegistry?.Clear();
             _cancellationTokenSource?.Dispose();
             _poolObjects?.Dispose();
             _globalGameDiContainer?.Dispose();
