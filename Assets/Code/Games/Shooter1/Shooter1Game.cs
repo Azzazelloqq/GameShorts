@@ -73,7 +73,7 @@ namespace Shooter1
             Time.timeScale = 0f;
         }
 
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             Debug.Log("Shooter1Game: Resuming game");
             isGameActive = true;

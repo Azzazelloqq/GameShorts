@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game1
 {
-    public class Game1 : BaseMonoBehaviour, IShortGame
+    public class Game1 : BaseMonoBehaviour, IShortGame2D
     {
         [SerializeField] private MainSceneContextView sceneContextView;
         private IDisposable _core;
@@ -26,7 +26,7 @@ namespace Code.Core.ShortGamesCore.Game1
         {
         }
 
-        public void ResumeGame()
+        public void UnpauseGame()
         {
         }
 
