@@ -36,7 +36,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             PauseCallCount++;
         }
         
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             IsPaused = false;
             ResumeCallCount++;
@@ -92,7 +92,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = true;
         }
         
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             IsPaused = false;
         }
@@ -161,7 +161,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = true;
         }
         
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             IsPaused = false;
         }
@@ -204,7 +204,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = true;
         }
         
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             IsPaused = false;
         }
@@ -247,7 +247,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = true;
         }
         
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             IsPaused = false;
         }
@@ -293,7 +293,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = true;
         }
         
-        public void ResumeGame()
+        public void UnpauseGame()
         {
             IsPaused = false;
         }

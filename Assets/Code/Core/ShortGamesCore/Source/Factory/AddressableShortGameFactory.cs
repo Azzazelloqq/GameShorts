@@ -39,7 +39,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 		_disposeCancellationTokenSource = new CancellationTokenSource();
 		_parent = parent;
 		_resourcesInfo = resourcesInfo;
-		_positioningConfig = positioningConfig ?? GamePositioningConfig.CreateDefault();
+		_positioningConfig = positioningConfig;
 		
 		InitializeGameTypeParents();
 	}

@@ -288,6 +288,7 @@ MonoBehaviour:
   _gamesParent: {fileID: 1697159579}
   _preloadDepth: 2
   _uiParent: {fileID: 1873510899}
+  _gamePositioningConfig: {fileID: 11400000, guid: 8b273f20c92633f41898e71d2e8b3b6c, type: 2}
 --- !u!4 &662709185
 Transform:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class Game2: BaseMonoBehaviour, IShortGame
+    public class Game2: BaseMonoBehaviour, IShortGame2D
     {
         [SerializeField] private Transform _circle;
         private IDisposable _root;
@@ -26,7 +26,7 @@ namespace Code.Core.ShortGamesCore.Game2
         {
         }
 
-        public void ResumeGame()
+        public void UnpauseGame()
         {
         }
 

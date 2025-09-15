@@ -19,7 +19,6 @@ using ResourceLoader.AddressableResourceLoader;
 using TickHandler;
 using TickHandler.UnityTickHandler;
 using UnityEngine;
-using static Code.Generated.Addressables.ResourceIdsContainer;
 
 namespace Code.Core.GameEntryPoint
 {
@@ -78,9 +77,6 @@ namespace Code.Core.GameEntryPoint
             _logger = new UnityInGameLogger();
             _globalGameDiContainer.RegisterAsSingleton<IInGameLogger>(_logger);
             
-            _pool = new SimpleShortGamePool(_logger);
-            _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
-
             _poolObjects = new PoolManager();
             _globalGameDiContainer.RegisterAsSingleton<IPoolManager>(_poolObjects);
 
@@ -91,6 +87,9 @@ namespace Code.Core.GameEntryPoint
             _tickHandler = new UnityTickHandler(dispatcher);
             _globalGameDiContainer.RegisterAsSingleton<ITickHandler>(_tickHandler);
             
+            _pool = new SimpleShortGamePool(_logger);
+            _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
+
             var resourceMapping = GetResourceMapping();
             var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping, _gamePositioningConfig);
             _globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
