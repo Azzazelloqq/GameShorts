@@ -1,101 +1,125 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Core;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
-using Code.Core.Tools.Pool;
-using Code.Core.InputManager;
-using LightDI;
-using TickHandler;
-using TickHandler.UnityTickHandler;
+using Code.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Code.Core.ShortGamesCore.Lawnmower
 {
-    public class LawnmowerGame : BaseMonoBehaviour, IShortGame
-    {
-        [SerializeField] private LawnmowerSceneContextView sceneContextView;
-        private IDisposable _core;
-        private CancellationTokenSource _cancellationTokenSource;
-        
-        private bool _isDisposed;
-        public int Id => 3; // Уникальный ID для игры Lawnmower
+public class LawnmowerGame : BaseMonoBehaviour, IShortGame2D
+{
+	[FormerlySerializedAs("sceneContextView")]
+	[SerializeField]
+	private LawnmowerSceneContextView _sceneContextView;
 
-        public void StartGame()
-        {
-            CreateRoot();
-        }
+	[SerializeField]
+	private Camera _camera;
+	
+	private IDisposable _core;
+	private CancellationTokenSource _cancellationTokenSource;
 
-        public void PauseGame()
-        {
-            // TODO: Реализовать паузу если нужно
-        }
+	public bool IsPreloaded { get; private set; }
 
-        public void ResumeGame()
-        {
-            // TODO: Реализовать возобновление если нужно
-        }
+	private bool _isDisposed;
+	private RenderTexture _renderTexture;
 
-        public void RestartGame()
-        {
-            RecreateRoot();
-        }
+	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	{
+		_renderTexture = RenderTextureUtils.GetRenderTexture(_camera);
+		IsPreloaded = true;
+		
+		return default;
+	}
 
-        public void StopGame()
-        {
-            Dispose();
-        }
+	public RenderTexture GetRenderTexture()
+	{
+		return _renderTexture;
+	}
 
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-            
-            DisposeCore();
+	public void StartGame()
+	{
+		CreateRoot();
+	}
 
-            _isDisposed = true;
-        }
+	public void PauseGame()
+	{
+		// TODO: Реализовать паузу если нужно
+	}
 
-        private void RecreateRoot()
-        {
-            DisposeCore();
-            
-            CreateRoot();
-        }
+	public void UnpauseGame()
+	{
+		throw new NotImplementedException();
+	}
 
-        private void DisposeCore()
-        {
-            if (_cancellationTokenSource != null)
-            {
-                if (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    _cancellationTokenSource.Cancel();
-                }
-                
-                _cancellationTokenSource.Dispose();
-                
-                _cancellationTokenSource = null;
-            }
+	public void ResumeGame()
+	{
+		// TODO: Реализовать возобновление если нужно
+	}
 
-            _core?.Dispose();
-            _core = null;
-        }
+	public void RestartGame()
+	{
+		RecreateRoot();
+	}
 
-        private void CreateRoot()
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-            
-            LawnmowerCorePm.Ctx rootCtx = new LawnmowerCorePm.Ctx
-            {
-                sceneContextView = sceneContextView,
-                cancellationToken = _cancellationTokenSource.Token,
-                restartGame = RestartGame
-            };
-            
-            _core = new LawnmowerCorePm(rootCtx);
-        }
-    }
+	public void StopGame()
+	{
+		Dispose();
+	}
+
+	public void Dispose()
+	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		DisposeCore();
+
+		_isDisposed = true;
+	}
+
+	private void RecreateRoot()
+	{
+		DisposeCore();
+
+		CreateRoot();
+	}
+
+	private void DisposeCore()
+	{
+		if (_cancellationTokenSource != null)
+		{
+			if (!_cancellationTokenSource.IsCancellationRequested)
+			{
+				_cancellationTokenSource.Cancel();
+			}
+
+			_cancellationTokenSource.Dispose();
+
+			_cancellationTokenSource = null;
+		}
+
+		_core?.Dispose();
+		_core = null;
+	}
+
+	private void CreateRoot()
+	{
+		_cancellationTokenSource = new CancellationTokenSource();
+
+		var rootCtx = new LawnmowerCorePm.Ctx
+		{
+			sceneContextView = _sceneContextView,
+			cancellationToken = _cancellationTokenSource.Token,
+			restartGame = RestartGame
+		};
+
+		_core = new LawnmowerCorePm(rootCtx);
+	}
+}
 }

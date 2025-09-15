@@ -538,6 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3013f4aaaaac0604b9bc3936dee0413f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Code.Core.Tester::Code.Core.Tester.SimpleTester
+  _gamePositioningConfig: {fileID: 11400000, guid: 8b273f20c92633f41898e71d2e8b3b6c, type: 2}
   _gamesParent: {fileID: 292242347}
   _preloadDepth: 2
   gameListContainer: {fileID: 1765228556}

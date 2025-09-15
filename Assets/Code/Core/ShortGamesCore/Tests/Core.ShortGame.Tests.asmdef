@@ -4,10 +4,12 @@
   "references": [
     "Core.ShortGame",
     "Core.ShortGame.Tests.Mocks",
+    "Code.Core.GamesLoader",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
     "Logger",
-    "ResourceLoader"
+    "ResourceLoader",
+    "LightDI"
   ],
   "includePlatforms": [
     "Editor"

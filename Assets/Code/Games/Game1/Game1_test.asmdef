@@ -11,7 +11,8 @@
         "Unity.TextMeshPro",
         "Code.Core.InputManager",
         "Logger",
-        "AddressablesGroups"
+        "AddressablesGroups",
+        "Utils"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

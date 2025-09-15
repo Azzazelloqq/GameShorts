@@ -10,7 +10,9 @@
         "R3.Unity",
         "ResourceLoader",
         "AddressablesGroups",
-        "Tools"
+        "Tools",
+        "Code.Core.GamesLoader",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

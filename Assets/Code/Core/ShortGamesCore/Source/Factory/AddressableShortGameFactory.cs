@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
@@ -7,6 +8,7 @@ using InGameLogger;
 using LightDI.Runtime;
 using ResourceLoader;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Code.Core.ShortGamesCore.Source.Factory
@@ -21,19 +23,37 @@ public class AddressableShortGameFactory : IShortGameFactory
 	
 	private readonly Dictionary<Type, GameObject> _preloadedPrefabs = new();
 	private readonly Dictionary<Type, int> _preloadRefCount = new();
+	private readonly GamePositioningConfig _positioningConfig;
+	private readonly Dictionary<GameType, int> _gameTypeCounters = new();
+	private readonly Dictionary<GameType, Transform> _gameTypeParents = new();
 	private bool _disposed;
 
 	public AddressableShortGameFactory(
 		Transform parent,
 		Dictionary<Type, string> resourcesInfo,
 		[Inject] IResourceLoader resourceLoader,
-		[Inject] IInGameLogger logger)
+		[Inject] IInGameLogger logger,
+		GamePositioningConfig positioningConfig = null)
 	{
 		_resourceLoader = resourceLoader;
 		_logger = logger;
 		_disposeCancellationTokenSource = new CancellationTokenSource();
 		_parent = parent;
 		_resourcesInfo = resourcesInfo;
+		_positioningConfig = positioningConfig;
+		
+		InitializeGameTypeParents();
+	}
+	
+	private void InitializeGameTypeParents()
+	{
+		// Initialize counters for each game type
+		// We'll use the main parent transform directly instead of creating sub-containers
+		foreach (GameType gameType in Enum.GetValues(typeof(GameType)))
+		{
+			_gameTypeParents[gameType] = _parent; // Use the same parent for all
+			_gameTypeCounters[gameType] = 0;
+		}
 	}
 	
 	public void Dispose()
@@ -44,6 +64,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 			return;
 		}
 		
+		_logger.Log("Disposing AddressableShortGameFactory - START");
 		_disposed = true;
 		
 		try
@@ -53,9 +74,10 @@ public class AddressableShortGameFactory : IShortGameFactory
 				_disposeCancellationTokenSource.Cancel();
 			}
 			
-		
+			DisposePreloadedPrefabs();
 			
 			_disposeCancellationTokenSource.Dispose();
+			_logger.Log("Disposing AddressableShortGameFactory - COMPLETED");
 		}
 		catch (Exception ex)
 		{
@@ -102,12 +124,26 @@ public class AddressableShortGameFactory : IShortGameFactory
 			return null;
 		}
 		
-		var instance = Object.Instantiate(prefab, _parent);
+		var gameType = GameTypeDetector.GetGameType(typeof(T));
+		var instance = InstantiateGameWithPositioning(prefab, gameType, typeof(T));
 		var shortGame = instance.GetComponent<T>();
+		
+		// If specific type not found, try base interface
+		if (shortGame == null)
+		{
+			var baseGame = instance.GetComponent<IShortGame>();
+			if (baseGame is T typedGame)
+			{
+				shortGame = typedGame;
+				_logger.Log($"Found component via interface cast: {baseGame.GetType().Name}");
+			}
+		}
 		
 		if (shortGame == null)
 		{
-			_logger.LogError($"Prefab for {typeof(T).Name} doesn't have component {typeof(T).Name}");
+			// Log all components for debugging
+			var components = instance.GetComponents<Component>();
+			_logger.LogError($"Prefab for {typeof(T).Name} doesn't have component {typeof(T).Name}. Found components: {string.Join(", ", components.Select(c => c.GetType().Name))}");
 			if (Application.isEditor && !Application.isPlaying)
 				Object.DestroyImmediate(instance);
 			else
@@ -163,12 +199,27 @@ public class AddressableShortGameFactory : IShortGameFactory
 			return null;
 		}
 		
-		var instance = Object.Instantiate(prefab, _parent);
+		var detectedGameType = GameTypeDetector.GetGameType(gameType);
+		var instance = InstantiateGameWithPositioning(prefab, detectedGameType, gameType);
+		
+		// Try to get the component
 		var shortGame = instance.GetComponent(gameType) as IShortGame;
+		
+		// If not found, try to get IShortGame interface directly
+		if (shortGame == null)
+		{
+			shortGame = instance.GetComponent<IShortGame>();
+			if (shortGame != null)
+			{
+				_logger.Log($"Found IShortGame component of type {shortGame.GetType().Name} instead of {gameType.Name}");
+			}
+		}
 		
 		if (shortGame == null)
 		{
-			_logger.LogError($"Prefab for {gameType.Name} doesn't have component {gameType.Name}");
+			// Log all components for debugging
+			var components = instance.GetComponents<Component>();
+			_logger.LogError($"Prefab for {gameType.Name} doesn't have component {gameType.Name}. Found components: {string.Join(", ", components.Select(c => c.GetType().Name))}");
 			if (Application.isEditor && !Application.isPlaying)
 				Object.DestroyImmediate(instance);
 			else
@@ -233,20 +284,10 @@ public class AddressableShortGameFactory : IShortGameFactory
 		
 		if (_preloadRefCount[gameType] <= 0)
 		{
-			// Only release Addressable resources if we're not in editor or if we're still playing
-			bool shouldReleaseAddressables = !Application.isEditor || Application.isPlaying;
-			
 			if (_preloadedPrefabs.TryGetValue(gameType, out var prefab))
 			{
-				if (shouldReleaseAddressables)
-				{
-					_resourceLoader.ReleaseResource(prefab);
-					_logger.Log($"Unloaded resources for {gameType.Name}");
-				}
-				else
-				{
-					_logger.Log($"Skipping Addressable release for {gameType.Name} - editor mode");
-				}
+				_resourceLoader.ReleaseResource(prefab);
+				_logger.Log($"Unloaded resources for {gameType.Name}");
 			}
 			
 			_preloadedPrefabs.Remove(gameType);
@@ -260,7 +301,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 	
 	private void DisposePreloadedPrefabs()
 	{
-		if (_preloadedPrefabs.Count <= 0 || Application.isEditor)
+		if (_preloadedPrefabs.Count <= 0)
 		{
 			return;
 		}
@@ -277,6 +318,109 @@ public class AddressableShortGameFactory : IShortGameFactory
 
 		_preloadedPrefabs.Clear();
 		_preloadRefCount.Clear();
+	}
+	
+	private GameObject InstantiateGameWithPositioning(GameObject prefab, GameType gameType, Type gameClassType)
+	{
+		GameObject instance;
+		Transform parentTransform = _gameTypeParents[gameType];
+		
+		switch (gameType)
+		{
+			case GameType.UI:
+				instance = InstantiateUIGame(prefab, parentTransform);
+				break;
+				
+			case GameType.TwoD:
+				instance = Instantiate2DGame(prefab, parentTransform);
+				break;
+				
+			case GameType.ThreeD:
+				instance = Instantiate3DGame(prefab, parentTransform);
+				break;
+				
+			default:
+				// Fallback for unknown types
+				instance = Object.Instantiate(prefab, parentTransform);
+				break;
+		}
+		
+		// Ensure the instance is active (even if prefab was inactive)
+		if (!instance.activeSelf)
+		{
+			instance.SetActive(true);
+			_logger.Log($"Activated instantiated {gameClassType.Name} (prefab was inactive)");
+		}
+		
+		_gameTypeCounters[gameType]++;
+		_logger.Log($"Instantiated {gameClassType.Name} as {gameType} game at position {instance.transform.position}");
+		
+		return instance;
+	}
+	
+	private GameObject Instantiate3DGame(GameObject prefab, Transform parent)
+	{
+		var instance = Object.Instantiate(prefab, parent);
+		
+		// Position 3D games with spacing to avoid overlap
+		if (_positioningConfig != null)
+		{
+			int index = _gameTypeCounters[GameType.ThreeD];
+			instance.transform.position = _positioningConfig.GetPosition3D(index);
+		}
+		
+		return instance;
+	}
+	
+	private GameObject Instantiate2DGame(GameObject prefab, Transform parent)
+	{
+		var instance = Object.Instantiate(prefab, parent);
+		
+		// Position 2D games with spacing, offset from 3D games
+		if (_positioningConfig != null)
+		{
+			int index = _gameTypeCounters[GameType.TwoD];
+			instance.transform.position = _positioningConfig.GetPosition2D(index);
+		}
+		
+		return instance;
+	}
+	
+	private GameObject InstantiateUIGame(GameObject prefab, Transform parent)
+	{
+		GameObject instance;
+		int index = _gameTypeCounters[GameType.UI];
+		
+		if (_positioningConfig != null && _positioningConfig.CreateSeparateCanvasForUIGames)
+		{
+			// Create a dedicated Canvas for this UI game
+			var canvasGO = new GameObject($"UIGameCanvas_{index}");
+			canvasGO.transform.SetParent(parent);
+			
+			var canvas = canvasGO.AddComponent<Canvas>();
+			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+			canvas.sortingOrder = _positioningConfig != null ? _positioningConfig.GetCanvasSortOrder(index) : index;
+			
+			canvasGO.AddComponent<CanvasScaler>();
+			canvasGO.AddComponent<GraphicRaycaster>();
+			
+			instance = Object.Instantiate(prefab, canvasGO.transform);
+			
+			// Reset position for UI elements
+			var rectTransform = instance.GetComponent<RectTransform>();
+			if (rectTransform != null)
+			{
+				rectTransform.anchoredPosition = Vector2.zero;
+				rectTransform.localScale = Vector3.one;
+			}
+		}
+		else
+		{
+			// Use existing Canvas structure
+			instance = Object.Instantiate(prefab, parent);
+		}
+		
+		return instance;
 	}
 }
 }

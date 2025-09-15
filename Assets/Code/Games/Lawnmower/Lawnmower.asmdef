@@ -8,7 +8,8 @@
         "Tools",
         "Code.Core.InputManager",
         "Unity.TextMeshPro",
-        "TickHandler"
+        "TickHandler",
+        "Utils"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

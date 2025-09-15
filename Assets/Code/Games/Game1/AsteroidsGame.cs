@@ -1,93 +1,123 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1.Scripts.View;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Core;
-using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
+using Code.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Asteroids.Code.Games.Game1
 {
-    public class AsteroidsGame : BaseMonoBehaviour, IShortGame
-    {
-        [SerializeField] private MainSceneContextView sceneContextView;
-        private IDisposable _core;
-        private CancellationTokenSource _cancellationTokenSource;
-        
-        private bool _isDisposed;
-        public int Id => 1;
+public class AsteroidsGame : BaseMonoBehaviour, IShortGame
+{
+	[FormerlySerializedAs("sceneContextView")]
+	[SerializeField]
+	private MainSceneContextView _sceneContextView;
 
-        public void StartGame()
-        {
-            CreateRoot();
-        }
+	[SerializeField]
+	private Camera _camera;
+	
+	private IDisposable _core;
+	private CancellationTokenSource _cancellationTokenSource;
 
-        public void PauseGame()
-        {
-        }
+	private bool _isDisposed;
+	private RenderTexture _renderTexture;
+	public int Id => 1;
 
-        public void ResumeGame()
-        {
-        }
+	public bool IsPreloaded { get; private set; }
 
-        public void RestartGame()
-        {
-            RecreateRoot();
-        }
+	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	{
+		IsPreloaded = true;
 
-        public void StopGame()
-        {
-            Dispose();
-        }
+		_renderTexture = RenderTextureUtils.GetRenderTexture(_camera);
+		
+		return default;
+	}
 
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-            
-            DisposeCore();
+	public RenderTexture GetRenderTexture()
+	{
+		return _renderTexture;
+	}
 
-            _isDisposed = true;
-        }
+	public void StartGame()
+	{
+		CreateRoot();
+	}
 
-        private void RecreateRoot()
-        {
-            DisposeCore();
-            
-            CreateRoot();
-        }
+	public void PauseGame()
+	{
+	}
 
-        private void DisposeCore()
-        {
-            if (_cancellationTokenSource != null)
-            {
-                if (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    _cancellationTokenSource.Cancel();
-                }
-                
-                _cancellationTokenSource.Dispose();
-                
-                _cancellationTokenSource = null;
-            }
+	public void UnpauseGame()
+	{
+		throw new NotImplementedException();
+	}
 
-            _core?.Dispose();
-            _core = null;
-        }
+	public void ResumeGame()
+	{
+	}
 
-        private void CreateRoot()
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-            CorePm.Ctx rootCtx = new CorePm.Ctx
-            {
-                sceneContextView = sceneContextView,
-                cancellationToken = _cancellationTokenSource.Token,
-                restartGame = RestartGame
-            };
-            _core = CorePmFactory.CreateCorePm(rootCtx);
-        }
-    }
+	public void RestartGame()
+	{
+		RecreateRoot();
+	}
+
+	public void StopGame()
+	{
+		Dispose();
+	}
+
+	public void Dispose()
+	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		DisposeCore();
+
+		_isDisposed = true;
+	}
+
+	private void RecreateRoot()
+	{
+		DisposeCore();
+
+		CreateRoot();
+	}
+
+	private void DisposeCore()
+	{
+		if (_cancellationTokenSource != null)
+		{
+			if (!_cancellationTokenSource.IsCancellationRequested)
+			{
+				_cancellationTokenSource.Cancel();
+			}
+
+			_cancellationTokenSource.Dispose();
+
+			_cancellationTokenSource = null;
+		}
+
+		_core?.Dispose();
+		_core = null;
+	}
+
+	private void CreateRoot()
+	{
+		_cancellationTokenSource = new CancellationTokenSource();
+		var rootCtx = new CorePm.Ctx
+		{
+			sceneContextView = _sceneContextView,
+			cancellationToken = _cancellationTokenSource.Token,
+			restartGame = RestartGame
+		};
+		_core = CorePmFactory.CreateCorePm(rootCtx);
+	}
+}
 }

@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: fef29529eb291c94a96df583956602e7
   m_SerializeEntries:
   - m_GUID: 55781d2d88fd48e42b0aad8a9dc1f59a
-    m_Address: Game2_Main
+    m_Address: BoxTower
     m_ReadOnly: 0
     m_SerializedLabels:
     - BoxTower

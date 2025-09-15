@@ -6,7 +6,7 @@ namespace Code.Core.InputManager
     /// Пример использования InputManager
     /// Компонент для управления джойстиком на основе текущей игры
     /// </summary>
-    public class InputManagerExample : MonoBehaviour
+    internal class InputManagerExample : MonoBehaviour
     {
         [SerializeField] private VariableJoystick joystick;
         

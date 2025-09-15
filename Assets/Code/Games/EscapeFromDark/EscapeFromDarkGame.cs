@@ -1,95 +1,122 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
-using LightDI;
+using Code.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark
 {
-    public class EscapeFromDarkGame : BaseMonoBehaviour, IShortGame
-    {
-        [SerializeField] private EscapeFromDarkSceneContextView sceneContextView;
-        private IDisposable _core;
-        private CancellationTokenSource _cancellationTokenSource;
-        
-        private bool _isDisposed;
-        public int Id => 4; // Уникальный ID для EscapeFromDark
+public class EscapeFromDarkGame : BaseMonoBehaviour, IShortGame2D
+{
+	[FormerlySerializedAs("sceneContextView")]
+	[SerializeField]
+	private EscapeFromDarkSceneContextView _sceneContextView;
 
-        public void StartGame()
-        {
-            CreateRoot();
-        }
+	[SerializeField]
+	private Camera _camera; 
+	
+	private IDisposable _core;
+	private CancellationTokenSource _cancellationTokenSource;
+	private bool _isDisposed;
+	private RenderTexture _renderTexture;
 
-        public void PauseGame()
-        {
-            // TODO: Реализовать паузу игры
-        }
+	public bool IsPreloaded { get; private set; }
 
-        public void ResumeGame()
-        {
-            // TODO: Реализовать возобновление игры
-        }
+	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	{
+		_renderTexture = RenderTextureUtils.GetRenderTexture(_camera);
 
-        public void RestartGame()
-        {
-            RecreateRoot();
-        }
+		IsPreloaded = true;
+		
+		return default;
+	}
 
-        public void StopGame()
-        {
-            Dispose();
-        }
+	public RenderTexture GetRenderTexture()
+	{
+		return _renderTexture;
+	}
 
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-            
-            DisposeCore();
+	public void StartGame()
+	{
+		CreateRoot();
+	}
 
-            _isDisposed = true;
-        }
+	public void PauseGame()
+	{
+		// TODO: Реализовать паузу игры
+	}
 
-        private void RecreateRoot()
-        {
-            DisposeCore();
-            
-            CreateRoot();
-        }
+	public void UnpauseGame()
+	{
+	}
 
-        private void DisposeCore()
-        {
-            if (_cancellationTokenSource != null)
-            {
-                if (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    _cancellationTokenSource.Cancel();
-                }
-                
-                _cancellationTokenSource.Dispose();
-                
-                _cancellationTokenSource = null;
-            }
+	public void ResumeGame()
+	{
+		// TODO: Реализовать возобновление игры
+	}
 
-            _core?.Dispose();
-            _core = null;
-        }
+	public void RestartGame()
+	{
+		RecreateRoot();
+	}
 
-        private void CreateRoot()
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-            EscapeFromDarkCorePm.Ctx rootCtx = new EscapeFromDarkCorePm.Ctx
-            {
-                sceneContextView = sceneContextView,
-                cancellationToken = _cancellationTokenSource.Token,
-                restartGame = RestartGame
-            };
-            _core = new EscapeFromDarkCorePm(rootCtx);
-        }
-    }
+	public void StopGame()
+	{
+		Dispose();
+	}
+
+	public void Dispose()
+	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		DisposeCore();
+
+		_isDisposed = true;
+	}
+
+	private void RecreateRoot()
+	{
+		DisposeCore();
+
+		CreateRoot();
+	}
+
+	private void DisposeCore()
+	{
+		if (_cancellationTokenSource != null)
+		{
+			if (!_cancellationTokenSource.IsCancellationRequested)
+			{
+				_cancellationTokenSource.Cancel();
+			}
+
+			_cancellationTokenSource.Dispose();
+
+			_cancellationTokenSource = null;
+		}
+
+		_core?.Dispose();
+		_core = null;
+	}
+
+	private void CreateRoot()
+	{
+		_cancellationTokenSource = new CancellationTokenSource();
+		var rootCtx = new EscapeFromDarkCorePm.Ctx
+		{
+			sceneContextView = _sceneContextView,
+			cancellationToken = _cancellationTokenSource.Token,
+			restartGame = RestartGame
+		};
+		_core = new EscapeFromDarkCorePm(rootCtx);
+	}
+}
 }
