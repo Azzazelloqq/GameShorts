@@ -61,7 +61,11 @@ var logger = new InGameLogger();
 var resourceLoader = new AddressableResourceLoader();
 var pool = new SimpleShortGamePool(logger, maxInstancesPerType: 3);
 var factory = new AddressableShortGameFactory(parent, resourcesInfo, resourceLoader, logger);
-var lifeCycleService = new SimpleShortGameLifeCycleService(pool, factory, logger);
+// New architecture - create components
+var gameRegistry = new GameRegistry(logger);
+var queueService = new GameQueueService(logger);
+var gamesLoader = new QueueShortGamesLoader(factory, queueService, logger);
+var gameProvider = new GameProvider(logger);
 ```
 
 ### Preload Games
@@ -74,28 +78,43 @@ var gameTypes = new List<Type>
     typeof(ShooterGame)
 };
 
-await lifeCycleService.PreloadGamesAsync(gameTypes);
+// Register games and initialize
+gameRegistry.RegisterGames(gameTypes);
+await gameProvider.InitializeAsync(gameRegistry, queueService, gamesLoader);
+await gameProvider.UpdatePreloadedGamesAsync();
 ```
 
 ### Navigate Between Games
 ```csharp
-// Load first game
-var game = await lifeCycleService.LoadNextGameAsync();
-
-// Switch to next game (cycles through preloaded list)
-game = await lifeCycleService.LoadNextGameAsync();
+// Navigate with queue service
+if (queueService.HasNext)
+{
+    queueService.MoveNext();
+    await gameProvider.UpdatePreloadedGamesAsync();
+    gameProvider.StartCurrentGame();
+}
 
 // Go back to previous game
-game = await lifeCycleService.LoadPreviousGameAsync();
+if (queueService.HasPrevious)
+{
+    queueService.MovePrevious();
+    await gameProvider.UpdatePreloadedGamesAsync();
+    gameProvider.StartCurrentGame();
+}
 ```
 
 ### Direct Game Loading
 ```csharp
 // Load specific game type
-var puzzleGame = await lifeCycleService.LoadGameAsync<PuzzleGame>();
+var puzzleGame = await gamesLoader.LoadGameAsync(typeof(PuzzleGame));
 
-// Stop current game (returns to pool if poolable)
-lifeCycleService.StopCurrentGame();
+// Control games through provider
+gameProvider.StopCurrentGame();
+gameProvider.PauseCurrentGame();
+gameProvider.UnpauseCurrentGame();
+
+// Access render textures
+var texture = gameProvider.CurrentGameRenderTexture;
 ```
 
 ## Configuration

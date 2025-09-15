@@ -61,54 +61,54 @@ namespace Code.Core.GameEntryPoint
         
         private async void TestNextGame()
         {
-            if (_gameSwiper == null)
-            {
-                Debug.LogWarning("GameSwiperTester: GameSwiper is not set");
-                return;
-            }
-            
-            try
-            {
-                var nextGame = await _gameSwiper.NextGameAsync();
-                if (nextGame != null)
-                {
-                    Debug.Log($"GameSwiperTester: Successfully switched to next game: {nextGame.GetType().Name}");
-                }
-                else
-                {
-                    Debug.LogWarning("GameSwiperTester: Failed to switch to next game");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"GameSwiperTester: Error switching to next game: {ex.Message}");
-            }
+            // if (_gameSwiper == null)
+            // {
+            //     Debug.LogWarning("GameSwiperTester: GameSwiper is not set");
+            //     return;
+            // }
+            //
+            // try
+            // {
+            //     var nextGame = await _gameSwiper.NextGameAsync();
+            //     if (nextGame != null)
+            //     {
+            //         Debug.Log($"GameSwiperTester: Successfully switched to next game: {nextGame.GetType().Name}");
+            //     }
+            //     else
+            //     {
+            //         Debug.LogWarning("GameSwiperTester: Failed to switch to next game");
+            //     }
+            // }
+            // catch (System.Exception ex)
+            // {
+            //     Debug.LogError($"GameSwiperTester: Error switching to next game: {ex.Message}");
+            // }
         }
         
         private async void TestPreviousGame()
         {
-            if (_gameSwiper == null)
-            {
-                Debug.LogWarning("GameSwiperTester: GameSwiper is not set");
-                return;
-            }
-            
-            try
-            {
-                var previousGame = await _gameSwiper.PreviousGameAsync();
-                if (previousGame != null)
-                {
-                    Debug.Log($"GameSwiperTester: Successfully switched to previous game: {previousGame.GetType().Name}");
-                }
-                else
-                {
-                    Debug.LogWarning("GameSwiperTester: Failed to switch to previous game");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"GameSwiperTester: Error switching to previous game: {ex.Message}");
-            }
+            // if (_gameSwiper == null)
+            // {
+            //     Debug.LogWarning("GameSwiperTester: GameSwiper is not set");
+            //     return;
+            // }
+            //
+            // try
+            // {
+            //     var previousGame = await _gameSwiper.PreviousGameAsync();
+            //     if (previousGame != null)
+            //     {
+            //         Debug.Log($"GameSwiperTester: Successfully switched to previous game: {previousGame.GetType().Name}");
+            //     }
+            //     else
+            //     {
+            //         Debug.LogWarning("GameSwiperTester: Failed to switch to previous game");
+            //     }
+            // }
+            // catch (System.Exception ex)
+            // {
+            //     Debug.LogError($"GameSwiperTester: Error switching to previous game: {ex.Message}");
+            // }
         }
         
         private void TestControllerConnection()
