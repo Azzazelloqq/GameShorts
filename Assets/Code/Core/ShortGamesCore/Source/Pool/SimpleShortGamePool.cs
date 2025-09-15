@@ -11,8 +11,8 @@ namespace Code.Core.ShortGamesCore.Source.Pool
 {
 public class SimpleShortGamePool : IShortGamesPool
 {
-	private readonly Dictionary<Type, Queue<IPoolableShortGame>> _pooledGames = new();
-	private readonly Dictionary<Type, HashSet<IPoolableShortGame>> _activeGames = new();
+	private readonly Dictionary<Type, Queue<IShortGamePoolable>> _pooledGames = new();
+	private readonly Dictionary<Type, HashSet<IShortGamePoolable>> _activeGames = new();
 	private readonly IInGameLogger _logger;
 
 	private readonly int _maxInstancesPerType;
@@ -23,7 +23,7 @@ public class SimpleShortGamePool : IShortGamesPool
 		_maxInstancesPerType = maxInstancesPerType;
 	}
 
-	public bool TryGetShortGame<T>(out T game) where T : class, IPoolableShortGame
+	public bool TryGetShortGame<T>(out T game) where T : class, IShortGamePoolable
 	{
 		if (TryGetShortGame(typeof(T), out var pooledGame))
 		{
@@ -35,7 +35,7 @@ public class SimpleShortGamePool : IShortGamesPool
 		return false;
 	}
 
-	public bool TryGetShortGame(Type gameType, out IPoolableShortGame game)
+	public bool TryGetShortGame(Type gameType, out IShortGamePoolable game)
 	{
 		game = null;
 
@@ -49,7 +49,7 @@ public class SimpleShortGamePool : IShortGamesPool
 
 		if (!_activeGames.ContainsKey(gameType))
 		{
-			_activeGames[gameType] = new HashSet<IPoolableShortGame>();
+			_activeGames[gameType] = new HashSet<IShortGamePoolable>();
 		}
 
 		_activeGames[gameType].Add(game);
@@ -64,12 +64,12 @@ public class SimpleShortGamePool : IShortGamesPool
 		return true;
 	}
 
-	public void ReleaseShortGame<T>(T game) where T : class, IPoolableShortGame
+	public void ReleaseShortGame<T>(T game) where T : class, IShortGamePoolable
 	{
-		ReleaseShortGame((IPoolableShortGame)game);
+		ReleaseShortGame((IShortGamePoolable)game);
 	}
 
-	public void ReleaseShortGame(IPoolableShortGame game)
+	public void ReleaseShortGame(IShortGamePoolable game)
 	{
 		if (game == null)
 		{
@@ -86,7 +86,7 @@ public class SimpleShortGamePool : IShortGamesPool
 
 		if (!_pooledGames.ContainsKey(gameType))
 		{
-			_pooledGames[gameType] = new Queue<IPoolableShortGame>();
+			_pooledGames[gameType] = new Queue<IShortGamePoolable>();
 		}
 
 		var gamesQueue = _pooledGames[gameType];
@@ -132,12 +132,12 @@ public class SimpleShortGamePool : IShortGamesPool
 		_logger.Log($"Released {gameType.Name} to pool. Total in pool: {gamesQueue.Count}");
 	}
 
-	public void WarmUpPool<T>(T game) where T : class, IPoolableShortGame
+	public void WarmUpPool<T>(T game) where T : class, IShortGamePoolable
 	{
-		WarmUpPool((IPoolableShortGame)game);
+		WarmUpPool((IShortGamePoolable)game);
 	}
 
-	public void WarmUpPool(IPoolableShortGame game)
+	public void WarmUpPool(IShortGamePoolable game)
 	{
 		if (game == null)
 		{
@@ -149,7 +149,7 @@ public class SimpleShortGamePool : IShortGamesPool
 
 		if (!_pooledGames.ContainsKey(gameType))
 		{
-			_pooledGames[gameType] = new Queue<IPoolableShortGame>();
+			_pooledGames[gameType] = new Queue<IShortGamePoolable>();
 		}
 
 		var gamesQueue = _pooledGames[gameType];
@@ -200,7 +200,7 @@ public class SimpleShortGamePool : IShortGamesPool
 		return _pooledGames.Where(kvp => kvp.Value.Count > 0).Select(kvp => kvp.Key);
 	}
 
-	public void ClearPoolForType<T>() where T : class, IPoolableShortGame
+	public void ClearPoolForType<T>() where T : class, IShortGamePoolable
 	{
 		ClearPoolForType(typeof(T));
 	}
