@@ -26,7 +26,7 @@ namespace Code.Core.GamesLoader
         
         public int TotalGamesCount => _gameQueue.Count;
         
-        public bool HasNext => _currentIndex >= 0 && _currentIndex < _gameQueue.Count - 1;
+        public bool HasNext => _currentIndex < _gameQueue.Count - 1;
         
         public bool HasPrevious => _currentIndex > 0;
         
@@ -58,7 +58,8 @@ namespace Code.Core.GamesLoader
         
         public bool MoveNext()
         {
-            if (!HasNext)
+            // Check if we can move to the next position
+            if (_currentIndex >= _gameQueue.Count - 1)
             {
                 _logger.Log("Cannot move to next game - already at the end of the queue");
                 return false;

@@ -298,15 +298,23 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             int eventCount = 0;
             _queueService.OnQueueUpdated += () => eventCount++;
             
-            // Act
-            _queueService.MoveNext();
-            _queueService.MovePrevious();
-            _queueService.MoveToIndex(1);
-            _queueService.Reset();
-            _queueService.Clear();
+            // Act & Assert each action
+            _queueService.MoveNext(); // Move to index 0 - should fire event
+            Assert.AreEqual(1, eventCount, "Event should fire after MoveNext");
             
-            // Assert
-            Assert.AreEqual(5, eventCount);
+            // MovePrevious from index 0 won't work (no previous), so no event
+            bool movedBack = _queueService.MovePrevious();
+            Assert.IsFalse(movedBack, "Should not be able to move previous from index 0");
+            Assert.AreEqual(1, eventCount, "Event count should not change after failed MovePrevious");
+            
+            _queueService.MoveToIndex(1); // Move to index 1 - should fire event
+            Assert.AreEqual(2, eventCount, "Event should fire after MoveToIndex");
+            
+            _queueService.Reset(); // Reset to -1 - should fire event
+            Assert.AreEqual(3, eventCount, "Event should fire after Reset");
+            
+            _queueService.Clear(); // Clear queue - should fire event
+            Assert.AreEqual(4, eventCount, "Event should fire after Clear");
         }
     }
 }

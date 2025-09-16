@@ -254,7 +254,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async void UnloadGame_PreloadedGame_RemovesFromPreloaded()
+        public async Task UnloadGame_PreloadedGame_RemovesFromPreloaded()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
@@ -318,7 +318,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async void IsGameLoaded_LoadedGame_ReturnsTrue()
+        public async Task IsGameLoaded_LoadedGame_ReturnsTrue()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
@@ -329,7 +329,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async void IsGameLoaded_PreloadedGame_ReturnsTrue()
+        public async Task IsGameLoaded_PreloadedGame_ReturnsTrue()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
@@ -340,7 +340,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async void Reset_ClearsQueueAndGames()
+        public async Task Reset_ClearsQueueAndGames()
         {
             // Arrange
             var gameTypes = new[] { typeof(MockShortGame), typeof(MockPoolableShortGame) };
@@ -400,8 +400,9 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             var cts = new CancellationTokenSource();
             cts.Cancel();
             
-            // Act & Assert
-            Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            // Act & Assert - TaskCanceledException derives from OperationCanceledException
+            // but Unity's test framework doesn't handle inheritance properly
+            Assert.ThrowsAsync<TaskCanceledException>(async () =>
                 await _loader.LoadGameAsync(typeof(MockShortGame), cts.Token));
         }
     }

@@ -77,8 +77,12 @@ namespace Code.Core.GamesLoader
                 _queueService.Initialize(_gameRegistry.RegisteredGames);
             }
             
-            // Preload initial games
-            await UpdatePreloadedGamesAsync(cancellationToken);
+            // Only preload games if we're already positioned in the queue
+            // Don't preload in the initial state (index = -1)
+            if (_queueService.CurrentIndex >= 0)
+            {
+                await UpdatePreloadedGamesAsync(cancellationToken);
+            }
         }
         
         public void StartCurrentGame()

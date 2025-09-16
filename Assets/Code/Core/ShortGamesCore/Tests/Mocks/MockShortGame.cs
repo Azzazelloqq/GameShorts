@@ -44,7 +44,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             if (_renderTexture != null)
             {
                 _renderTexture.Release();
-                UnityEngine.Object.Destroy(_renderTexture);
+                if (Application.isEditor && !Application.isPlaying)
+                    UnityEngine.Object.DestroyImmediate(_renderTexture);
+                else
+                    UnityEngine.Object.Destroy(_renderTexture);
                 _renderTexture = null;
             }
         }
@@ -180,7 +183,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             if (_renderTexture != null)
             {
                 _renderTexture.Release();
-                UnityEngine.Object.Destroy(_renderTexture);
+                if (Application.isEditor && !Application.isPlaying)
+                    UnityEngine.Object.DestroyImmediate(_renderTexture);
+                else
+                    UnityEngine.Object.Destroy(_renderTexture);
                 _renderTexture = null;
             }
         }
@@ -247,7 +253,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             if (_renderTexture != null)
             {
                 _renderTexture.Release();
-                UnityEngine.Object.Destroy(_renderTexture);
+                if (Application.isEditor && !Application.isPlaying)
+                    UnityEngine.Object.DestroyImmediate(_renderTexture);
+                else
+                    UnityEngine.Object.Destroy(_renderTexture);
                 _renderTexture = null;
             }
         }
@@ -314,7 +323,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             if (_renderTexture != null)
             {
                 _renderTexture.Release();
-                UnityEngine.Object.Destroy(_renderTexture);
+                if (Application.isEditor && !Application.isPlaying)
+                    UnityEngine.Object.DestroyImmediate(_renderTexture);
+                else
+                    UnityEngine.Object.Destroy(_renderTexture);
                 _renderTexture = null;
             }
         }
@@ -381,7 +393,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             if (_renderTexture != null)
             {
                 _renderTexture.Release();
-                UnityEngine.Object.Destroy(_renderTexture);
+                if (Application.isEditor && !Application.isPlaying)
+                    UnityEngine.Object.DestroyImmediate(_renderTexture);
+                else
+                    UnityEngine.Object.Destroy(_renderTexture);
                 _renderTexture = null;
             }
         }
@@ -451,7 +466,10 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             if (_renderTexture != null)
             {
                 _renderTexture.Release();
-                UnityEngine.Object.Destroy(_renderTexture);
+                if (Application.isEditor && !Application.isPlaying)
+                    UnityEngine.Object.DestroyImmediate(_renderTexture);
+                else
+                    UnityEngine.Object.Destroy(_renderTexture);
                 _renderTexture = null;
             }
         }

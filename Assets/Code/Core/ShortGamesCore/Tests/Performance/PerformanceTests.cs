@@ -242,7 +242,7 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
         }
         
         [Test]
-        public void MemoryUsage_LoadedGames()
+        public async Task MemoryUsage_LoadedGames()
         {
             // Arrange
             var initialMemory = GC.GetTotalMemory(true);
@@ -261,7 +261,7 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
             {
                 loadTasks.Add(_loader.PreloadGameAsync(gameType).AsTask());
             }
-            Task.WaitAll(loadTasks.ToArray());
+            await Task.WhenAll(loadTasks.ToArray());
             
             var afterLoadMemory = GC.GetTotalMemory(false);
             var memoryUsed = (afterLoadMemory - initialMemory) / 1024f / 1024f;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
@@ -127,9 +128,22 @@ public class AddressableShortGameFactory : IShortGameFactory
 		var instance = InstantiateGameWithPositioning(prefab, gameType, typeof(T));
 		var shortGame = instance.GetComponent<T>();
 		
+		// If specific type not found, try base interface
 		if (shortGame == null)
 		{
-			_logger.LogError($"Prefab for {typeof(T).Name} doesn't have component {typeof(T).Name}");
+			var baseGame = instance.GetComponent<IShortGame>();
+			if (baseGame is T typedGame)
+			{
+				shortGame = typedGame;
+				_logger.Log($"Found component via interface cast: {baseGame.GetType().Name}");
+			}
+		}
+		
+		if (shortGame == null)
+		{
+			// Log all components for debugging
+			var components = instance.GetComponents<Component>();
+			_logger.LogError($"Prefab for {typeof(T).Name} doesn't have component {typeof(T).Name}. Found components: {string.Join(", ", components.Select(c => c.GetType().Name))}");
 			if (Application.isEditor && !Application.isPlaying)
 				Object.DestroyImmediate(instance);
 			else
@@ -187,11 +201,25 @@ public class AddressableShortGameFactory : IShortGameFactory
 		
 		var detectedGameType = GameTypeDetector.GetGameType(gameType);
 		var instance = InstantiateGameWithPositioning(prefab, detectedGameType, gameType);
+		
+		// Try to get the component
 		var shortGame = instance.GetComponent(gameType) as IShortGame;
+		
+		// If not found, try to get IShortGame interface directly
+		if (shortGame == null)
+		{
+			shortGame = instance.GetComponent<IShortGame>();
+			if (shortGame != null)
+			{
+				_logger.Log($"Found IShortGame component of type {shortGame.GetType().Name} instead of {gameType.Name}");
+			}
+		}
 		
 		if (shortGame == null)
 		{
-			_logger.LogError($"Prefab for {gameType.Name} doesn't have component {gameType.Name}");
+			// Log all components for debugging
+			var components = instance.GetComponents<Component>();
+			_logger.LogError($"Prefab for {gameType.Name} doesn't have component {gameType.Name}. Found components: {string.Join(", ", components.Select(c => c.GetType().Name))}");
 			if (Application.isEditor && !Application.isPlaying)
 				Object.DestroyImmediate(instance);
 			else
@@ -317,6 +345,13 @@ public class AddressableShortGameFactory : IShortGameFactory
 				break;
 		}
 		
+		// Ensure the instance is active (even if prefab was inactive)
+		if (!instance.activeSelf)
+		{
+			instance.SetActive(true);
+			_logger.Log($"Activated instantiated {gameClassType.Name} (prefab was inactive)");
+		}
+		
 		_gameTypeCounters[gameType]++;
 		_logger.Log($"Instantiated {gameClassType.Name} as {gameType} game at position {instance.transform.position}");
 		
@@ -328,8 +363,11 @@ public class AddressableShortGameFactory : IShortGameFactory
 		var instance = Object.Instantiate(prefab, parent);
 		
 		// Position 3D games with spacing to avoid overlap
-		int index = _gameTypeCounters[GameType.ThreeD];
-		instance.transform.position = _positioningConfig.GetPosition3D(index);
+		if (_positioningConfig != null)
+		{
+			int index = _gameTypeCounters[GameType.ThreeD];
+			instance.transform.position = _positioningConfig.GetPosition3D(index);
+		}
 		
 		return instance;
 	}
@@ -339,8 +377,11 @@ public class AddressableShortGameFactory : IShortGameFactory
 		var instance = Object.Instantiate(prefab, parent);
 		
 		// Position 2D games with spacing, offset from 3D games
-		int index = _gameTypeCounters[GameType.TwoD];
-		instance.transform.position = _positioningConfig.GetPosition2D(index);
+		if (_positioningConfig != null)
+		{
+			int index = _gameTypeCounters[GameType.TwoD];
+			instance.transform.position = _positioningConfig.GetPosition2D(index);
+		}
 		
 		return instance;
 	}
@@ -350,7 +391,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 		GameObject instance;
 		int index = _gameTypeCounters[GameType.UI];
 		
-		if (_positioningConfig.CreateSeparateCanvasForUIGames)
+		if (_positioningConfig != null && _positioningConfig.CreateSeparateCanvasForUIGames)
 		{
 			// Create a dedicated Canvas for this UI game
 			var canvasGO = new GameObject($"UIGameCanvas_{index}");
@@ -358,7 +399,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 			
 			var canvas = canvasGO.AddComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			canvas.sortingOrder = _positioningConfig.GetCanvasSortOrder(index);
+			canvas.sortingOrder = _positioningConfig != null ? _positioningConfig.GetCanvasSortOrder(index) : index;
 			
 			canvasGO.AddComponent<CanvasScaler>();
 			canvasGO.AddComponent<GraphicRaycaster>();
