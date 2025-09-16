@@ -19,6 +19,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         private MockLogger _logger;
         private Transform _parent;
         private GameObject _parentObject;
+        private List<GameObject> _prefabs;
         
         [SetUp]
         public void SetUp()
@@ -26,6 +27,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             _logger = new MockLogger();
             _parentObject = new GameObject("TestParent");
             _parent = _parentObject.transform;
+            _prefabs = new List<GameObject>();
             
             // Create mock factory
             var resourceMapping = new Dictionary<Type, string>
@@ -48,6 +50,19 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         {
             _loader?.Dispose();
             
+            // Clean up prefabs
+            if (_prefabs != null)
+            {
+                foreach (var prefab in _prefabs)
+                {
+                    if (prefab != null)
+                    {
+                        GameObject.DestroyImmediate(prefab);
+                    }
+                }
+                _prefabs.Clear();
+            }
+            
             if (_parentObject != null)
             {
                 GameObject.DestroyImmediate(_parentObject);
@@ -58,14 +73,17 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         {
             var mockGamePrefab = new GameObject("MockGamePrefab");
             mockGamePrefab.AddComponent<MockShortGame>();
+            _prefabs.Add(mockGamePrefab);
             resourceLoader.AddResource("MockGame", mockGamePrefab);
             
             var poolableGamePrefab = new GameObject("MockPoolableGamePrefab");
             poolableGamePrefab.AddComponent<MockPoolableShortGame>();
+            _prefabs.Add(poolableGamePrefab);
             resourceLoader.AddResource("MockPoolableGame", poolableGamePrefab);
             
             var game2DPrefab = new GameObject("MockGame2DPrefab");
             game2DPrefab.AddComponent<MockShortGame2D>();
+            _prefabs.Add(game2DPrefab);
             resourceLoader.AddResource("MockGame2D", game2DPrefab);
         }
         
@@ -128,11 +146,11 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public void StartPreloadedGame_PreloadedGame_StartsSuccessfully()
+        public async Task StartPreloadedGame_PreloadedGame_StartsSuccessfully()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
-            var game = _loader.PreloadGameAsync(typeof(MockShortGame)).Result;
+            var game = await _loader.PreloadGameAsync(typeof(MockShortGame));
             
             // Act
             var result = _loader.StartPreloadedGame(typeof(MockShortGame));
@@ -221,11 +239,11 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public void UnloadGame_LoadedGame_RemovesFromLoaded()
+        public async Task UnloadGame_LoadedGame_RemovesFromLoaded()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
-            var game = _loader.LoadGameAsync(typeof(MockShortGame)).Result;
+            var game = await _loader.LoadGameAsync(typeof(MockShortGame));
             
             // Act
             _loader.UnloadGame(typeof(MockShortGame));
@@ -251,7 +269,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async void UnloadAllGames_RemovesAllGames()
+        public async Task UnloadAllGames_RemovesAllGames()
         {
             // Arrange
             var gameTypes = new[]
@@ -272,11 +290,11 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public void GetGame_LoadedGame_ReturnsGame()
+        public async Task GetGame_LoadedGame_ReturnsGame()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
-            var loadedGame = _loader.LoadGameAsync(typeof(MockShortGame)).Result;
+            var loadedGame = await _loader.LoadGameAsync(typeof(MockShortGame));
             
             // Act
             var game = _loader.GetGame(typeof(MockShortGame));
@@ -286,11 +304,11 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public void GetGame_PreloadedGame_ReturnsGame()
+        public async Task GetGame_PreloadedGame_ReturnsGame()
         {
             // Arrange
             _queueService.Initialize(new[] { typeof(MockShortGame) });
-            var preloadedGame = _loader.PreloadGameAsync(typeof(MockShortGame)).Result;
+            var preloadedGame = await _loader.PreloadGameAsync(typeof(MockShortGame));
             
             // Act
             var game = _loader.GetGame(typeof(MockShortGame));
@@ -388,3 +406,4 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
     }
 }
+

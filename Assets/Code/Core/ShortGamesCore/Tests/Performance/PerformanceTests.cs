@@ -26,6 +26,7 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
         private MockLogger _logger;
         private GameObject _parentObject;
         private Transform _parent;
+        private List<GameObject> _prefabs;
         
         [SetUp]
         public void SetUp()
@@ -34,6 +35,7 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
             _pool = new SimpleShortGamePool(_logger, maxInstancesPerType: 10);
             _parentObject = new GameObject("Parent");
             _parent = _parentObject.transform;
+            _prefabs = new List<GameObject>();
             
             // Setup mock factory with resources
             var resourceMapping = new Dictionary<Type, string>
@@ -58,6 +60,20 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
         {
             _loader?.Dispose();
             _pool?.Dispose();
+            
+            // Clean up prefabs
+            if (_prefabs != null)
+            {
+                foreach (var prefab in _prefabs)
+                {
+                    if (prefab != null)
+                    {
+                        GameObject.DestroyImmediate(prefab);
+                    }
+                }
+                _prefabs.Clear();
+            }
+            
             if (_parentObject != null)
             {
                 GameObject.DestroyImmediate(_parentObject);
@@ -68,14 +84,17 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
         {
             var mockGamePrefab = new GameObject("MockGamePrefab");
             mockGamePrefab.AddComponent<MockShortGame>();
+            _prefabs.Add(mockGamePrefab);
             resourceLoader.AddResource("MockGame", mockGamePrefab);
             
             var poolableGamePrefab = new GameObject("MockPoolableGamePrefab");
             poolableGamePrefab.AddComponent<MockPoolableShortGame>();
+            _prefabs.Add(poolableGamePrefab);
             resourceLoader.AddResource("MockPoolableGame", poolableGamePrefab);
             
             var game2DPrefab = new GameObject("MockGame2DPrefab");
             game2DPrefab.AddComponent<MockShortGame2D>();
+            _prefabs.Add(game2DPrefab);
             resourceLoader.AddResource("MockGame2D", game2DPrefab);
         }
         

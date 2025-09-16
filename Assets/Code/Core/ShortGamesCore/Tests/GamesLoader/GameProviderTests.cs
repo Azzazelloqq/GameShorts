@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Code.Core.GamesLoader;
 using Code.Core.ShortGamesCore.Source.Factory;
@@ -18,6 +19,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         private MockLogger _logger;
         private Transform _parent;
         private GameObject _parentObject;
+        private List<GameObject> _prefabs;
         
         [SetUp]
         public async Task SetUp()
@@ -25,6 +27,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             _logger = new MockLogger();
             _parentObject = new GameObject("TestParent");
             _parent = _parentObject.transform;
+            _prefabs = new List<GameObject>();
             
             // Setup registry
             _registry = new GameRegistry(_logger);
@@ -39,7 +42,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             _queueService = new GameQueueService(_logger);
             
             // Setup loader
-            var resourceMapping = new System.Collections.Generic.Dictionary<Type, string>
+            var resourceMapping = new Dictionary<Type, string>
             {
                 { typeof(MockShortGame), "MockGame" },
                 { typeof(MockPoolableShortGame), "MockPoolableGame" },
@@ -63,6 +66,19 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             _provider?.Dispose();
             _loader?.Dispose();
             
+            // Clean up prefabs
+            if (_prefabs != null)
+            {
+                foreach (var prefab in _prefabs)
+                {
+                    if (prefab != null)
+                    {
+                        GameObject.DestroyImmediate(prefab);
+                    }
+                }
+                _prefabs.Clear();
+            }
+            
             if (_parentObject != null)
             {
                 GameObject.DestroyImmediate(_parentObject);
@@ -72,15 +88,21 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         private void SetupMockResources(MockResourceLoader resourceLoader)
         {
             var mockGamePrefab = new GameObject("MockGamePrefab");
-            mockGamePrefab.AddComponent<MockShortGame>();
+            var mockComponent = mockGamePrefab.AddComponent<MockShortGame>();
+            Assert.IsNotNull(mockComponent, "Failed to add MockShortGame component");
+            _prefabs.Add(mockGamePrefab);
             resourceLoader.AddResource("MockGame", mockGamePrefab);
             
             var poolableGamePrefab = new GameObject("MockPoolableGamePrefab");
-            poolableGamePrefab.AddComponent<MockPoolableShortGame>();
+            var poolableComponent = poolableGamePrefab.AddComponent<MockPoolableShortGame>();
+            Assert.IsNotNull(poolableComponent, "Failed to add MockPoolableShortGame component");
+            _prefabs.Add(poolableGamePrefab);
             resourceLoader.AddResource("MockPoolableGame", poolableGamePrefab);
             
             var game2DPrefab = new GameObject("MockGame2DPrefab");
-            game2DPrefab.AddComponent<MockShortGame2D>();
+            var game2DComponent = game2DPrefab.AddComponent<MockShortGame2D>();
+            Assert.IsNotNull(game2DComponent, "Failed to add MockShortGame2D component");
+            _prefabs.Add(game2DPrefab);
             resourceLoader.AddResource("MockGame2D", game2DPrefab);
         }
         
@@ -108,14 +130,15 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         public async Task CurrentGame_AfterLoading_ReturnsCorrectGame()
         {
             // Arrange
-            _queueService.MoveNext();
-            await _loader.LoadGameAsync(typeof(MockShortGame));
+            _queueService.MoveNext(); // Move to first game (index 0)
+            var loadedGame = await _loader.LoadGameAsync(typeof(MockShortGame));
+            Assert.IsNotNull(loadedGame, "Failed to load MockShortGame");
             
             // Act
             var currentGame = _provider.CurrentGame;
             
             // Assert
-            Assert.IsNotNull(currentGame);
+            Assert.IsNotNull(currentGame, "CurrentGame should not be null after loading");
             Assert.IsInstanceOf<MockShortGame>(currentGame);
         }
         
@@ -123,14 +146,18 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         public async Task NextGame_WhenPreloaded_ReturnsCorrectGame()
         {
             // Arrange
-            _queueService.MoveNext(); // Move to first game
+            _queueService.MoveNext(); // Move to first game (index 0)
             await _provider.UpdatePreloadedGamesAsync();
+            
+            // Verify queue state
+            Assert.IsTrue(_queueService.HasNext, "Should have next game");
+            Assert.AreEqual(typeof(MockPoolableShortGame), _queueService.NextGameType);
             
             // Act
             var nextGame = _provider.NextGame;
             
             // Assert
-            Assert.IsNotNull(nextGame);
+            Assert.IsNotNull(nextGame, "NextGame should not be null after preloading");
             Assert.IsInstanceOf<MockPoolableShortGame>(nextGame);
         }
         
@@ -138,14 +165,18 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         public async Task PreviousGame_WhenPreloaded_ReturnsCorrectGame()
         {
             // Arrange
-            _queueService.MoveToIndex(1); // Move to middle
+            _queueService.MoveToIndex(1); // Move to middle (index 1)
             await _provider.UpdatePreloadedGamesAsync();
+            
+            // Verify queue state
+            Assert.IsTrue(_queueService.HasPrevious, "Should have previous game");
+            Assert.AreEqual(typeof(MockShortGame), _queueService.PreviousGameType);
             
             // Act
             var previousGame = _provider.PreviousGame;
             
             // Assert
-            Assert.IsNotNull(previousGame);
+            Assert.IsNotNull(previousGame, "PreviousGame should not be null after preloading");
             Assert.IsInstanceOf<MockShortGame>(previousGame);
         }
         
@@ -169,13 +200,15 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         {
             // Arrange
             _queueService.MoveNext();
-            await _loader.LoadGameAsync(typeof(MockShortGame));
+            var loadedGame = await _loader.LoadGameAsync(typeof(MockShortGame));
+            Assert.IsNotNull(loadedGame, "Failed to load game");
             
             // Act
             _provider.PauseCurrentGame();
             
             // Assert
             var game = _provider.CurrentGame as MockShortGame;
+            Assert.IsNotNull(game, "CurrentGame should not be null");
             Assert.IsTrue(game.IsPaused);
         }
         
@@ -201,6 +234,12 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             // Arrange
             _queueService.MoveToIndex(1);
             await _provider.UpdatePreloadedGamesAsync();
+            
+            // Verify games are loaded
+            Assert.IsNotNull(_provider.CurrentGame, "Current game should be loaded");
+            Assert.IsNotNull(_provider.NextGame, "Next game should be loaded");
+            Assert.IsNotNull(_provider.PreviousGame, "Previous game should be loaded");
+            
             _provider.StartCurrentGame();
             _provider.StartNextGame();
             _provider.StartPreviousGame();
@@ -212,6 +251,10 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             var current = _provider.CurrentGame as MockPoolableShortGame;
             var next = _provider.NextGame as MockShortGame2D;
             var previous = _provider.PreviousGame as MockShortGame;
+            
+            Assert.IsNotNull(current, "Current game cast failed");
+            Assert.IsNotNull(next, "Next game cast failed");
+            Assert.IsNotNull(previous, "Previous game cast failed");
             
             Assert.IsTrue(current.IsPaused);
             Assert.IsTrue(next.IsPaused);
@@ -365,5 +408,73 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await newProvider.InitializeAsync(_registry, _queueService, null));
         }
+        
+        [Test]
+        public async Task BasicLoadingTest_VerifySetup()
+        {
+            // This test verifies the basic setup works
+            
+            // Verify queue was initialized by GameProvider
+            Assert.AreEqual(3, _queueService.TotalGamesCount, "Queue should have 3 games");
+            Assert.AreEqual(-1, _queueService.CurrentIndex, "Initial index should be -1");
+            
+            // Arrange & Act
+            var moveResult = _queueService.MoveNext(); // Move to index 0
+            Assert.IsTrue(moveResult, "MoveNext should return true");
+            Assert.AreEqual(0, _queueService.CurrentIndex, "Index should be 0 after MoveNext");
+            
+            var gameType = _queueService.CurrentGameType;
+            Assert.IsNotNull(gameType, "CurrentGameType should not be null after MoveNext");
+            Assert.AreEqual(typeof(MockShortGame), gameType);
+            
+            // Try to load the game directly
+            var game = await _loader.LoadGameAsync(gameType);
+            
+            // Assert
+            Assert.IsNotNull(game, "Game should be loaded successfully");
+            Assert.IsInstanceOf<MockShortGame>(game);
+            
+            // Check if we can get it back
+            var retrievedGame = _loader.GetGame(gameType);
+            Assert.IsNotNull(retrievedGame, "Should be able to retrieve loaded game");
+            Assert.AreEqual(game, retrievedGame);
+        }
+        
+        [Test]
+        public async Task BasicPreloadingTest_VerifySetup()
+        {
+            // This test verifies preloading works
+            
+            // Arrange & Act
+            var gameType = typeof(MockShortGame);
+            
+            // Log initial state
+            Assert.IsNotNull(_loader, "Loader should not be null");
+            Assert.IsNotNull(_queueService, "Queue service should not be null");
+            
+            // Check queue is initialized
+            if (_queueService.TotalGamesCount == 0)
+            {
+                _queueService.Initialize(new[] { gameType });
+            }
+            
+            var game = await _loader.PreloadGameAsync(gameType);
+            
+            // Assert
+            Assert.IsNotNull(game, "Game should be preloaded successfully");
+            
+            // Cast to check it's the right type
+            var mockGame = game as MockShortGame;
+            Assert.IsNotNull(mockGame, "Game should be MockShortGame type");
+            
+            // Check preloaded flag
+            Assert.IsTrue(game.IsPreloaded, "Game should be marked as preloaded");
+            
+            // Check if we can get it back
+            var retrievedGame = _loader.GetGame(gameType);
+            Assert.IsNotNull(retrievedGame, "Should be able to retrieve preloaded game");
+            Assert.AreEqual(game, retrievedGame);
+        }
     }
 }
+
