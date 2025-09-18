@@ -11,6 +11,7 @@ using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Settings;
 using ResourceLoader;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
@@ -22,7 +23,6 @@ namespace Logic.Player.LaserWeapon
             public CancellationToken cancellationToken;
             public PlayerModel playerModel;
             public PlayerView playerView;
-            public MainSceneContextView sceneContextView;
             public LaserSettings laserSettings;
             public IEntitiesController entitiesController;
         }
@@ -36,19 +36,22 @@ namespace Logic.Player.LaserWeapon
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
         private bool _isInited;
+        private readonly ITickHandler _tickHandler;
 
         public LaserWeaponPm(Ctx ctx,
             [Inject] IPoolManager poolManager,
-            [Inject] IResourceLoader resourceLoader)
+            [Inject] IResourceLoader resourceLoader,
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _poolManager = poolManager;
             _resourceLoader = resourceLoader;
+            _tickHandler = tickHandler;
             _spawnPosition = _ctx.playerView.ShootPoint;
             _laserSettings = _ctx.laserSettings;
             _ctx.playerModel.InitLaserBattary(_laserSettings.CountLaserShots, _laserSettings.LaserCooldown);
             LoadPref();
-            _ctx.sceneContextView.OnUpdated += OnUpdated;
+            _tickHandler.FrameUpdate += (OnUpdated);
         }
 
         private void OnUpdated(float deltaTime)
@@ -65,7 +68,7 @@ namespace Logic.Player.LaserWeapon
         {
             if (!_isInited)
                 return;
-            
+
             LaserBattery readyBattary = _ctx.playerModel.Charges.FirstOrDefault(battary => battary.IsReady);
             if (readyBattary == null)
                 return;
@@ -75,14 +78,13 @@ namespace Logic.Player.LaserWeapon
 
         private void CreateLaser()
         {
-            var position = _spawnPosition.position;
             var model = new LaserModel()
             {
                 EntityType = EntityType.Laser,
                 Id = _ctx.entitiesController.GenerateId(),
                 Duration = { Value = _laserSettings.LaserShotDuration },
                 Length = { Value = _laserSettings.LaserLength },
-                RotationSpeed = {Value = _laserSettings.LaserRotationSpeed}
+                RotationSpeed = { Value = _laserSettings.LaserRotationSpeed }
             };
 
             var view = _poolManager.Get(_laserPref, _spawnPosition);
@@ -94,7 +96,6 @@ namespace Logic.Player.LaserWeapon
 
             LaserPm.Ctx laserCtx = new LaserPm.Ctx
             {
-                sceneContextView = _ctx.sceneContextView,
                 view = laserView,
                 laserModel = model,
                 returnView = () => { _poolManager.Return(_laserPref, view); },
@@ -102,8 +103,7 @@ namespace Logic.Player.LaserWeapon
                 playerModel = _ctx.playerModel
             };
 
-            var laser = new LaserPm(laserCtx);
-            AddDispose(laser);
+            var laser = LaserPmFactory.CreateLaserPm(laserCtx);
             _ctx.entitiesController.AddEntity(model.Id, new EntityInfo
             {
                 Logic = laser,
@@ -124,11 +124,13 @@ namespace Logic.Player.LaserWeapon
 
         protected override void OnDispose()
         {
+            _tickHandler.FrameUpdate -= (OnUpdated);
+
             foreach (var entitiesControllerAllEntity in _ctx.entitiesController.AllEntities)
             {
                 entitiesControllerAllEntity.Value.Logic?.Dispose();
             }
-            _ctx.sceneContextView.OnUpdated -= OnUpdated;
+
             base.OnDispose();
         }
     }

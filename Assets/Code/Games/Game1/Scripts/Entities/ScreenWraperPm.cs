@@ -2,6 +2,8 @@
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using LightDI.Runtime;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Entities
@@ -16,18 +18,21 @@ namespace Logic.Entities
 
 		private readonly Ctx _ctx;
 		private Camera _camera;
+		private readonly ITickHandler _tickHandler;
 
-		public ScreenWraperPm(Ctx ctx)
+		public ScreenWraperPm(Ctx ctx, 
+			[Inject] ITickHandler tickHandler)
 		{
 			_ctx = ctx;
+			_tickHandler = tickHandler;
 			_camera = _ctx.sceneContextView.Camera;
-			_ctx.sceneContextView.OnFixedUpdated += CheckScreenPos;
+			_tickHandler.PhysicUpdate += (CheckScreenPos);
 		}
 
 		protected override void OnDispose()
 		{
 			base.OnDispose(); 
-			_ctx.sceneContextView.OnFixedUpdated -= CheckScreenPos;
+			_tickHandler.PhysicUpdate -= (CheckScreenPos);
 		}
 
 		private void CheckScreenPos(float deltaTime)

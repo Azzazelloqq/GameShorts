@@ -28,7 +28,7 @@ namespace Logic.Enemy
                 sceneContextView = _ctx.sceneContextView,
                 entitiesController = _ctx.entitiesController
             };
-            var enemyController = new EnemyCoutControllerPm(enemyCoutControllerCtx);
+            var enemyController = EnemyCoutControllerPmFactory.CreateEnemyCoutControllerPm(enemyCoutControllerCtx);
             AddDispose(enemyController);
 
             EnemySpawnerPm.Ctx enemySpawnerCtx = new EnemySpawnerPm.Ctx

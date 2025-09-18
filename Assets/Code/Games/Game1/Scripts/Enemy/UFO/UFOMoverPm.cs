@@ -3,6 +3,7 @@ using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Entities.Core;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Enemy.UFO
@@ -17,7 +18,9 @@ namespace Logic.Enemy.UFO
         private readonly UFOMoverCtx _ufoMoverCtx;
         private PlayerModel _playerModel;
 
-        public UFOMoverPm(UFOMoverCtx ctx, Ctx baseCtx , [Inject] IInputManager inputManager):base (baseCtx, inputManager)
+        public UFOMoverPm(UFOMoverCtx ctx, Ctx baseCtx ,
+            [Inject] IInputManager inputManager, 
+            [Inject] ITickHandler tickHandler) : base (baseCtx, inputManager, tickHandler)
         {
             _ufoMoverCtx = ctx;
             _playerModel = _ufoMoverCtx.playerModel;

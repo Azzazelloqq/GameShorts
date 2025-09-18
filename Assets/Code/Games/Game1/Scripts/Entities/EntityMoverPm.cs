@@ -3,6 +3,7 @@ using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using LightDI.Runtime;
 using Logic.Entities.Core;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Entities
@@ -12,7 +13,6 @@ namespace Logic.Entities
         internal struct Ctx
         {
             public BaseModel model;
-            public SceneContextView sceneContextView;
             public bool useAcceleration;
             public bool isPlayer ;
         }
@@ -21,14 +21,18 @@ namespace Logic.Entities
         protected float _requiredAngle;
         protected Vector2 _inputDirection;
         private readonly IInputManager _inputManager;
+        private readonly ITickHandler _tickHandler;
 
-        public EntityMoverPm(Ctx ctx, [Inject] IInputManager inputManager)
+        public EntityMoverPm(Ctx ctx, 
+            [Inject] IInputManager inputManager, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _inputManager = inputManager;
+            _tickHandler = tickHandler;
             _requiredAngle = _ctx.model.CurrentAngle.Value;
-            _ctx.sceneContextView.OnFixedUpdated += FixedUpdate;
-            _ctx.sceneContextView.OnUpdated += Update;
+            _tickHandler.PhysicUpdate += (FixedUpdate);
+            _tickHandler.FrameUpdate += (Update);
         }
         private void Update(float deltaTime)
         {
@@ -59,8 +63,8 @@ namespace Logic.Entities
 
         protected override void OnDispose()
         {
-            _ctx.sceneContextView.OnUpdated -= Update;
-            _ctx.sceneContextView.OnFixedUpdated -= FixedUpdate;
+            _tickHandler.PhysicUpdate -= (FixedUpdate);
+            _tickHandler.FrameUpdate -= (Update);
             base.OnDispose();
         }
 

@@ -3,7 +3,9 @@ using System;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using LightDI.Runtime;
 using Logic.Entities;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
@@ -15,7 +17,6 @@ namespace Logic.Player.LaserWeapon
             public LaserView view;
             public LaserModel laserModel;
             public PlayerModel playerModel;
-            public SceneContextView sceneContextView;
             public Action returnView;
             public IEntitiesController entitiesController;
         }
@@ -28,10 +29,13 @@ namespace Logic.Player.LaserWeapon
         private ContactFilter2D _contactFilter;
         private RaycastHit2D[] _hits;
         private float _currentRotationAngle;
+        private readonly ITickHandler _tickHandler;
 
-        public LaserPm(Ctx ctx)
+        public LaserPm(Ctx ctx, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             _view = _ctx.view;
             _laserModel = _ctx.laserModel;
             _playerModel = _ctx.playerModel;
@@ -46,8 +50,8 @@ namespace Logic.Player.LaserWeapon
             _contactFilter = new ContactFilter2D();
             _hits = new RaycastHit2D[10];
             _currentRotationAngle = _ctx.playerModel.CurrentAngle.Value; // Start from player's direction
-            _ctx.sceneContextView.OnFixedUpdated += OnFixedUpdated;
-            _ctx.sceneContextView.OnUpdated += OnOnUpdated;
+            _tickHandler.PhysicUpdate += (OnFixedUpdated);
+            _tickHandler.FrameUpdate += (OnOnUpdated);
         }
         private void OnOnUpdated(float deltaTime)
         {
@@ -121,9 +125,9 @@ namespace Logic.Player.LaserWeapon
 
         protected override void OnDispose()
         {
+            _tickHandler.PhysicUpdate -= (OnFixedUpdated);
+            _tickHandler.FrameUpdate -= (OnOnUpdated);
             _view.Laser.gameObject.SetActive(false);
-            _ctx.sceneContextView.OnUpdated -= OnOnUpdated;
-            _ctx.sceneContextView.OnFixedUpdated -= OnFixedUpdated;
             _ctx.returnView?.Invoke();
             base.OnDispose();
         }

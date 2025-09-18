@@ -10,6 +10,7 @@ using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Settings;
 using ResourceLoader;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Player.ProjectileWeapon
@@ -35,14 +36,17 @@ namespace Logic.Player.ProjectileWeapon
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
         private float _startFire;
+        private readonly ITickHandler _tickHandler;
 
         public ProjectileWeaponPm(Ctx ctx, 
             [Inject] IPoolManager poolManager,
-            [Inject] IResourceLoader resourceLoader)
+            [Inject] IResourceLoader resourceLoader, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _poolManager = poolManager;
             _resourceLoader = resourceLoader;
+            _tickHandler = tickHandler;
             _spawnPosition = _ctx.playerView.ShootPoint;
             _projectileSettings = _ctx.projectileSettings;
             LoadPref();
@@ -85,7 +89,7 @@ namespace Logic.Player.ProjectileWeapon
                 entitiesController = _ctx.entitiesController
             };
 
-            var projectile = new ProjectilePm(projectileCtx);
+            var projectile = ProjectilePmFactory.CreateProjectilePm(projectileCtx);
             _ctx.entitiesController.AddEntity(model.Id, new EntityInfo
             {
                 Logic = projectile,
@@ -98,13 +102,13 @@ namespace Logic.Player.ProjectileWeapon
             _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Projectile, pref =>
             {
                 _projectilePref = pref;
-                _ctx.sceneContextView.OnUpdated += Fire;
+                _tickHandler.FrameUpdate += Fire;
             }, _ctx.cancellationToken);
         }
 
         protected override void OnDispose()
         {
-            _ctx.sceneContextView.OnUpdated -= Fire;
+            _tickHandler.FrameUpdate -= Fire;
             base.OnDispose();
         }
     }

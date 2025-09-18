@@ -9,6 +9,7 @@ using Logic.Entities;
 using Logic.Entities.Core;
 using Logic.Scene;
 using ResourceLoader;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Enemy.UFO
@@ -29,17 +30,19 @@ namespace Logic.Enemy.UFO
         private UFOView _view;
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
+        private readonly ITickHandler _tickHandler;
 
         public UFOPm(Ctx ctx, 
             [Inject] IPoolManager poolManager,
-            [Inject] IResourceLoader resourceLoader)
+            [Inject] IResourceLoader resourceLoader, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _poolManager = poolManager;
             _resourceLoader = resourceLoader;
+            _tickHandler = tickHandler;
             var baseCtx =  new EntityMoverPm.Ctx
             {
-                sceneContextView = _ctx.sceneContextView,
                 model = _ctx.ufoModel,
                 useAcceleration = true
             };
@@ -56,7 +59,7 @@ namespace Logic.Enemy.UFO
                 model = _ctx.ufoModel,
                 entitiesController = _ctx.entitiesController
             };
-            AddDispose(new BorderControllerPm(borderCtx));
+            AddDispose(BorderControllerPmFactory.CreateBorderControllerPm(borderCtx));
             
             _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.UFO, pref =>
             {
@@ -67,13 +70,13 @@ namespace Logic.Enemy.UFO
                 {
                     model = _ctx.ufoModel
                 });
-                _ctx.sceneContextView.OnUpdated += UpdateView;
+                _tickHandler.FrameUpdate += (UpdateView);
             }, _ctx.cancellationToken);
         }
 
         protected override void OnDispose()
         {
-            _ctx.sceneContextView.OnUpdated -= UpdateView;
+            _tickHandler.FrameUpdate -= (UpdateView);
             _poolManager.Return(_pref, _view.gameObject);
             base.OnDispose();
         }

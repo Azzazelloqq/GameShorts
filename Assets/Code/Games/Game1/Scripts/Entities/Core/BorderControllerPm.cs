@@ -1,7 +1,9 @@
 ﻿using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Entities.Core;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Scene
@@ -18,18 +20,21 @@ namespace Logic.Scene
         private readonly Ctx _ctx;
         private Camera _camera;
         private Rect _srceenRect;
+        private readonly ITickHandler _tickHandler;
 
-        public BorderControllerPm(Ctx ctx)
+        public BorderControllerPm(Ctx ctx, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             _camera = _ctx.sceneContextView.Camera;
-            _ctx.sceneContextView.OnFixedUpdated += CheckScreenPos;
+            _tickHandler.PhysicUpdate += (CheckScreenPos);
         }
 
         protected override void OnDispose()
         {
             base.OnDispose(); 
-            _ctx.sceneContextView.OnFixedUpdated -= CheckScreenPos;
+            _tickHandler.PhysicUpdate -= (CheckScreenPos);
         }
         
         private void CheckScreenPos(float deltaTime)

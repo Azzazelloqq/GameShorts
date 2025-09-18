@@ -2,9 +2,11 @@
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Entities.Core;
 using Logic.Scene;
+using TickHandler;
 
 namespace Logic.Player.ProjectileWeapon
 {
@@ -23,16 +25,18 @@ namespace Logic.Player.ProjectileWeapon
         private readonly Ctx _ctx;
         private ProjectileView _view;
         private ProjectileModel _projectileModel;
+        private readonly ITickHandler _tickHandler;
 
-        public ProjectilePm(Ctx ctx)
+        public ProjectilePm(Ctx ctx, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             _view = _ctx.view;
             _projectileModel = _ctx.projectileModel;
             
             EntityMoverPm.Ctx entityMoverCtx = new EntityMoverPm.Ctx
             {
-                sceneContextView = _ctx.sceneContextView,
                 model = _ctx.projectileModel,
                 useAcceleration = false
             };
@@ -44,11 +48,11 @@ namespace Logic.Player.ProjectileWeapon
                 model = _ctx.projectileModel,
                 entitiesController = _ctx.entitiesController
             };
-            AddDispose(new BorderControllerPm(borderCtx));
+            AddDispose( BorderControllerPmFactory.CreateBorderControllerPm(borderCtx));
             
             //_ctx.projectileModel.OnDestroy += DestroyMe;
             _view.Collided += OnCollided;
-            _ctx.sceneContextView.OnUpdated += UpdateMe;
+            _tickHandler.FrameUpdate += (UpdateMe);
         }
         private void DestroyMe(int? killerId)
         {
@@ -75,9 +79,8 @@ namespace Logic.Player.ProjectileWeapon
         
         protected override void OnDispose()
         {
-            //_ctx.projectileModel.OnDestroy -= DestroyMe;
+            _tickHandler.FrameUpdate -= (UpdateMe);
             _view.Collided -= OnCollided;
-            _ctx.sceneContextView.OnUpdated -= UpdateMe;
             _ctx.returnView?.Invoke();
             base.OnDispose();
         }

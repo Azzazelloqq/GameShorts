@@ -3,8 +3,10 @@ using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Settings;
+using TickHandler;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -24,19 +26,22 @@ namespace Logic.Enemy
         private GameSettings _gameSettings;
         private Camera _camera;
         private PlayerModel _playerModel;
+        private readonly ITickHandler _tickHandler;
 
-        public EnemyCoutControllerPm(Ctx ctx)
+        public EnemyCoutControllerPm(Ctx ctx, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             _gameSettings = _ctx.sceneContextView.GameSettings;
             _camera = _ctx.sceneContextView.Camera;
             _playerModel = _ctx.entitiesController.GetPlayerModel();
-            _ctx.sceneContextView.OnUpdated += Tick;
+            _tickHandler.FrameUpdate += (Tick);
         }
 
         protected override void OnDispose()
         {
-            _ctx.sceneContextView.OnUpdated -= Tick;
+            _tickHandler.FrameUpdate -= (Tick);
             base.OnDispose();
         }
 

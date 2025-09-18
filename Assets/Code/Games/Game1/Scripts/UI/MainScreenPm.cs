@@ -12,6 +12,7 @@ using LightDI.Runtime;
 using Logic.Entities;
 using R3;
 using ResourceLoader;
+using TickHandler;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -33,16 +34,19 @@ namespace Logic.UI
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
         private readonly IInGameLogger _logger;
+        private readonly ITickHandler _tickHandler;
 
         public MainScreenPm(Ctx ctx,
             [Inject] IPoolManager poolManager,
             [Inject] IInGameLogger logger, 
-            [Inject] IResourceLoader resourceLoader)
+            [Inject] IResourceLoader resourceLoader, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _poolManager = poolManager;
             _resourceLoader = resourceLoader;
             _logger = logger;
+            _tickHandler = tickHandler;
             _playerModel = _ctx.entitiesController.GetPlayerModel();
 
             Load();
@@ -50,7 +54,7 @@ namespace Logic.UI
 
         protected override void OnDispose()
         {
-            _ctx.mainSceneContextView.OnUpdated -= OnUpdated;
+            _tickHandler.FrameUpdate -= (OnUpdated);
             base.OnDispose();
         }
 
@@ -95,7 +99,7 @@ namespace Logic.UI
 
         private void InitSubscribes()
         {
-            _ctx.mainSceneContextView.OnUpdated += OnUpdated;
+            _tickHandler.FrameUpdate += (OnUpdated);
             AddDispose(_playerModel.Position.Subscribe(UpdatePos));
             AddDispose(_playerModel.Score.Subscribe(ScoreOnChanged));
             AddDispose(_playerModel.CurrentSpeed.Subscribe(UpdateCurSpeed));

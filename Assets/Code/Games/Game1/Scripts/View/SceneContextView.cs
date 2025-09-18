@@ -11,8 +11,6 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.View
         [SerializeField] private Camera _camera;
         public Camera Camera => _camera;
 		
-        public event Action<float> OnUpdated;
-        public event Action<float>  OnFixedUpdated;
         [SerializeField]
         private Canvas mainCanvas;
         [SerializeField]
@@ -22,16 +20,5 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.View
             => uiParent;
         public Canvas MainCanvas
             => mainCanvas;
-		
-		
-        private void Update()
-        {
-            OnUpdated?.Invoke(Time.deltaTime);
-        }
-
-        private void FixedUpdate()
-        {
-            OnFixedUpdated?.Invoke(Time.fixedDeltaTime);
-        }
     }
 }

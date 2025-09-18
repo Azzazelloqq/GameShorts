@@ -10,6 +10,7 @@ using Logic.Entities;
 using Logic.Entities.Core;
 using Logic.Scene;
 using ResourceLoader;
+using TickHandler;
 using UnityEngine;
 
 namespace Logic.Enemy.Asteroid
@@ -34,17 +35,19 @@ namespace Logic.Enemy.Asteroid
         private float _rotateSide;
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
+        private readonly ITickHandler _tickHandler;
 
         public AsteroidPm(Ctx ctx,
-        [Inject] IPoolManager poolManager,
-        [Inject] IResourceLoader resourceLoader)
+            [Inject] IPoolManager poolManager,
+            [Inject] IResourceLoader resourceLoader, 
+            [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _poolManager = poolManager;
             _resourceLoader = resourceLoader;
+            _tickHandler = tickHandler;
             EntityMoverPm.Ctx entityMoverCtx = new EntityMoverPm.Ctx
             {
-                sceneContextView = _ctx.sceneContextView,
                 model = _ctx.asteroidModel,
                 useAcceleration = false
             };
@@ -55,7 +58,7 @@ namespace Logic.Enemy.Asteroid
                 model = _ctx.asteroidModel,
                 entitiesController = _ctx.entitiesController
             };
-            AddDispose(new BorderControllerPm(borderCtx));
+            AddDispose(BorderControllerPmFactory.CreateBorderControllerPm(borderCtx));
             
             _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Asteroid, pref =>
             {
@@ -68,7 +71,7 @@ namespace Logic.Enemy.Asteroid
                 });
                 
                 _ctx.asteroidModel.OnDestroy += TryCollapse;
-                _ctx.sceneContextView.OnUpdated += UpdateView;
+                _tickHandler.FrameUpdate += UpdateView;
             }, _ctx.cancellationToken);
         }
         
@@ -82,9 +85,8 @@ namespace Logic.Enemy.Asteroid
 
         protected override void OnDispose()
         {
-            
             _ctx.asteroidModel.OnDestroy -= TryCollapse;
-            _ctx.sceneContextView.OnUpdated -= UpdateView;
+            _tickHandler.FrameUpdate -= UpdateView;
             _poolManager.Return(_pref, _view.gameObject);
             base.OnDispose();
         }

@@ -13,7 +13,7 @@ namespace Logic.Player.LaserWeapon
         public LaserBattery(float rechargeCooldown)
         {
             Charge = new ReactiveProperty<float>(100);
-            LastShot = new ReactiveProperty<float>();
+            LastShot = new ReactiveProperty<float>(Time.time);
             RechargeCooldown = new ReactiveProperty<float>(rechargeCooldown);
         }
 
