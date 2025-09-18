@@ -13,9 +13,9 @@ using UnityEngine;
 
 namespace Logic.Enemy.UFO
 {
-    public class UFOPm : BaseDisposable
+    internal class UFOPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public MainSceneContextView sceneContextView;

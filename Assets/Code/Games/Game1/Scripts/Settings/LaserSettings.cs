@@ -3,7 +3,7 @@
 namespace Logic.Settings
 {
     [CreateAssetMenu(fileName = "LaserSettings", menuName = "MyAsteroids/Settings/Create laser settings")]
-    public class LaserSettings : ScriptableObject
+    internal class LaserSettings : ScriptableObject
     {
         [Header( "Laser Settings" )]
         public float LaserLength;

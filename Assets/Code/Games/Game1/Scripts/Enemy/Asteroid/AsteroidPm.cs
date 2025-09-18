@@ -14,9 +14,9 @@ using UnityEngine;
 
 namespace Logic.Enemy.Asteroid
 {
-    public class AsteroidPm : BaseDisposable
+    internal class AsteroidPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public MainSceneContextView sceneContextView;

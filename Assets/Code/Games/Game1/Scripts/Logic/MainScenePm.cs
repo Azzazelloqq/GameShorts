@@ -10,7 +10,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
 {
 	internal class MainScenePm : BaseDisposable
 	{
-		public struct Ctx
+		internal struct Ctx
 		{
 			public CancellationToken cancellationToken;
 			public MainSceneContextView sceneContextView;

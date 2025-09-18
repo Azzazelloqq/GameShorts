@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Logic.Entities
 {
-    public class BaseView : BaseMonoBehaviour, IEntityView
+    internal class BaseView : BaseMonoBehaviour, IEntityView
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public BaseModel model;
         }

@@ -10,10 +10,10 @@ using Random = UnityEngine.Random;
 
 namespace Logic.Enemy
 {
-    public class EnemyCoutControllerPm : BaseDisposable
+    internal class EnemyCoutControllerPm : BaseDisposable
     {
         public event Action<EnemySpawnInfo> SpawnEnemy;
-        public struct Ctx
+        internal struct Ctx
         {
             public MainSceneContextView sceneContextView;
             public IEntitiesController entitiesController;

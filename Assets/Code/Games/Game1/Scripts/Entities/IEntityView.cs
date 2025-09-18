@@ -3,7 +3,7 @@ using Logic.Entities.Core;
 
 namespace Logic.Entities
 {
-	public interface IEntityView
+	internal interface IEntityView
 	{
 		public event Action<CollidedInfo> Collided;
 		public BaseModel Model { get; }

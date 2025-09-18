@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
 {
-    public class LaserBattery
+    internal class LaserBattery
     {
         public ReactiveProperty<float> Charge; // 0-1
         public ReactiveProperty<float> LastShot;

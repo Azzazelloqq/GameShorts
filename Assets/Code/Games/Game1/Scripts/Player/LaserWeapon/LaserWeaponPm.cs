@@ -11,19 +11,17 @@ using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Settings;
 using ResourceLoader;
-using Root.Inputs;
 using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
 {
-    public class LaserWeaponPm : BaseDisposable
+    internal class LaserWeaponPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public PlayerModel playerModel;
             public PlayerView playerView;
-            public PlayerController PlayerController;
             public MainSceneContextView sceneContextView;
             public LaserSettings laserSettings;
             public IEntitiesController entitiesController;
@@ -37,6 +35,7 @@ namespace Logic.Player.LaserWeapon
         private GameObject _laserPref;
         private readonly IPoolManager _poolManager;
         private readonly IResourceLoader _resourceLoader;
+        private bool _isInited;
 
         public LaserWeaponPm(Ctx ctx,
             [Inject] IPoolManager poolManager,
@@ -64,6 +63,9 @@ namespace Logic.Player.LaserWeapon
 
         private void Fire()
         {
+            if (!_isInited)
+                return;
+            
             LaserBattery readyBattary = _ctx.playerModel.Charges.FirstOrDefault(battary => battary.IsReady);
             if (readyBattary == null)
                 return;
@@ -101,6 +103,7 @@ namespace Logic.Player.LaserWeapon
             };
 
             var laser = new LaserPm(laserCtx);
+            AddDispose(laser);
             _ctx.entitiesController.AddEntity(model.Id, new EntityInfo
             {
                 Logic = laser,
@@ -111,12 +114,20 @@ namespace Logic.Player.LaserWeapon
         private void LoadPref()
         {
             _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Laser,
-                pref => { _laserPref = pref; }, _ctx.cancellationToken);
+                pref =>
+                {
+                    _isInited = true;
+                    _laserPref = pref;
+                }, _ctx.cancellationToken);
         }
 
 
         protected override void OnDispose()
         {
+            foreach (var entitiesControllerAllEntity in _ctx.entitiesController.AllEntities)
+            {
+                entitiesControllerAllEntity.Value.Logic?.Dispose();
+            }
             _ctx.sceneContextView.OnUpdated -= OnUpdated;
             base.OnDispose();
         }

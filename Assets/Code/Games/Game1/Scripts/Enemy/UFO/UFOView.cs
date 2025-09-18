@@ -2,7 +2,7 @@
 
 namespace Logic.Enemy.UFO
 {
-    public class UFOView : BaseView
+    internal class UFOView : BaseView
     {
         
     }

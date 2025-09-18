@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Logic.Scene
 {
-    public class BorderControllerPm : BaseDisposable
+    internal class BorderControllerPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public SceneContextView sceneContextView;
             public BaseModel model;

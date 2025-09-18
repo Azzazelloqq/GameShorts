@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Logic.UI
 {
-    public class MainScreenView : BaseMonoBehaviour
+    internal class MainScreenView : BaseMonoBehaviour
     {
         [SerializeField]
         private TextMeshProUGUI _score;

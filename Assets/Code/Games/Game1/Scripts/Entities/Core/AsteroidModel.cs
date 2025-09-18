@@ -4,7 +4,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 {
-    public class AsteroidModel : BaseModel
+    internal class AsteroidModel : BaseModel
     {
         public ReactiveProperty<bool> CanCollapse;
 

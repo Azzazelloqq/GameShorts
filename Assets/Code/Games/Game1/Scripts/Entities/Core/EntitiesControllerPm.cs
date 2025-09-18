@@ -9,7 +9,7 @@ namespace Logic.Scene
 {
     internal class EntitiesControllerPm : BaseDisposable, IEntitiesController
     {
-        public struct Ctx
+        internal struct Ctx
         {
         }
 

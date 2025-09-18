@@ -1,6 +1,6 @@
 ﻿namespace Logic.Entities.Core
 {
-    public class UFOModel : BaseModel
+    internal class UFOModel : BaseModel
     {
     }
 }

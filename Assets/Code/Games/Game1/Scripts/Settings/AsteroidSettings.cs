@@ -3,7 +3,7 @@
 namespace Logic.Settings
 {
     [CreateAssetMenu(fileName = "AsteroidSettings", menuName = "MyAsteroids/Settings/Create asteroid settings")]
-    public class AsteroidSettings  : ScriptableObject
+    internal class AsteroidSettings  : ScriptableObject
     {
         [Header("Big asteroid")]
         public float MaxSpeed;

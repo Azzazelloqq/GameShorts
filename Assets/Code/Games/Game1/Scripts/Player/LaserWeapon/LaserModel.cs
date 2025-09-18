@@ -3,7 +3,7 @@ using R3;
 
 namespace Logic.Player.LaserWeapon
 {
-    public class LaserModel : BaseModel
+    internal class LaserModel : BaseModel
     {
         public int OwnerId;
         public ReactiveProperty<float> Duration;

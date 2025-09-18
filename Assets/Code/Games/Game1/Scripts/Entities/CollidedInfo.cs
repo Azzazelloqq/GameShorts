@@ -1,6 +1,6 @@
 ﻿namespace Logic.Entities
 {
-    public struct CollidedInfo
+    internal struct CollidedInfo
     {
         public int ownerId;
         public int defenderId;

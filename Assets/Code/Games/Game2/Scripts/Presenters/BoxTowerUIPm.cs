@@ -184,6 +184,10 @@ namespace Code.Core.ShortGamesCore.Game2
         // Button event handlers
         private void OnRestartClicked()
         {
+            // First restart the game model to trigger tower clearing
+            _ctx.gameModel.RestartGame();
+            
+            // Then restart the entire game system
             _ctx.restartGame?.Invoke();
         }
 

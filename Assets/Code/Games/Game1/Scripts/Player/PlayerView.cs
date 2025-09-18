@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Logic.Player
 {
-	public class PlayerView : BaseView
+	internal class PlayerView : BaseView
 	{
 		public Transform ShootPoint => _shootPoint;
 		[SerializeField]

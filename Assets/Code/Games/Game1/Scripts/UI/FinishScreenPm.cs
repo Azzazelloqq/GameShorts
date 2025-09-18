@@ -13,9 +13,9 @@ using Object = UnityEngine.Object;
 
 namespace Logic.UI
 {
-    public class FinishScreenPm : BaseDisposable
+    internal class FinishScreenPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public Action restartGame;

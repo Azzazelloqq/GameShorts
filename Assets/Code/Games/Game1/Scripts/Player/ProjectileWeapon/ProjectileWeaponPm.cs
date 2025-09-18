@@ -8,23 +8,19 @@ using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
 using LightDI.Runtime;
 using Logic.Entities;
-using Logic.Entities.Core;
-using Logic.Scene;
 using Logic.Settings;
 using ResourceLoader;
-using Root.Inputs;
 using UnityEngine;
 
 namespace Logic.Player.ProjectileWeapon
 {
-    public class ProjectileWeaponPm : BaseDisposable
+    internal class ProjectileWeaponPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public PlayerModel playerModel;
             public PlayerView playerView;
-            public PlayerController PlayerController;
             public MainSceneContextView sceneContextView;
             public ProjectileSettings projectileSettings;
             public IEntitiesController entitiesController;

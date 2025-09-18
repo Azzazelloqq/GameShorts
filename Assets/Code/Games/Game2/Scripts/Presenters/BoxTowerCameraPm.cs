@@ -32,11 +32,12 @@ namespace Code.Core.ShortGamesCore.Game2
                 var camera = _ctx.sceneContextView.MainCamera;
                 
                 // Set camera position for 45-degree diagonal view
-                Vector3 cameraOffset = new Vector3(3f, 5f, 3f); // Diagonal position
+                Vector3 cameraOffset = new Vector3(4f, 6f, 4f); // Diagonal position, a bit further and higher
                 camera.transform.position = cameraOffset;
                 
-                // Rotate camera to look at center (0,0,0) at 45-degree angle
-                camera.transform.LookAt(Vector3.zero);
+                // Look at a point slightly below center to see the tower better
+                Vector3 lookAtPoint = new Vector3(0f, -1f, 0f);
+                camera.transform.LookAt(lookAtPoint);
                 
                 _initialCameraPosition = camera.transform.position;
                 _initialCameraRotation = camera.transform.rotation;
@@ -63,8 +64,10 @@ namespace Code.Core.ShortGamesCore.Game2
         {
             if (_ctx.sceneContextView.MainCamera == null) return;
 
-            // Calculate desired camera position based on tower height
+            var camera = _ctx.sceneContextView.MainCamera;
             float towerHeight = _ctx.towerModel.TowerHeight.Value;
+            
+            // Calculate desired camera position based on tower height
             float targetY = _initialCameraPosition.y + towerHeight;
             
             // Keep the diagonal offset while following tower height
@@ -73,20 +76,14 @@ namespace Code.Core.ShortGamesCore.Game2
                 targetY, 
                 _initialCameraPosition.z);
             
-            // Smooth follow position
-            var camera = _ctx.sceneContextView.MainCamera;
+            // Smooth follow position only - keep rotation fixed
             camera.transform.position = Vector3.Lerp(
                 camera.transform.position, 
                 targetPosition, 
                 _followSpeed * Time.deltaTime);
             
-            // Update look-at target to follow tower top
-            Vector3 lookAtTarget = new Vector3(0f, towerHeight, 0f);
-            Quaternion targetRotation = Quaternion.LookRotation(lookAtTarget - camera.transform.position);
-            camera.transform.rotation = Quaternion.Slerp(
-                camera.transform.rotation, 
-                targetRotation, 
-                _followSpeed * Time.deltaTime);
+            // Keep the initial rotation fixed - no dynamic LookAt
+            camera.transform.rotation = _initialCameraRotation;
         }
 
         private void ResetCameraPosition()

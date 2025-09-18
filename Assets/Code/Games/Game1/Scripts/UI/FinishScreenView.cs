@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 namespace Logic.UI
 {
-    public class FinishScreenView : BaseMonoBehaviour
+    internal class FinishScreenView : BaseMonoBehaviour
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public Action reloadClicked;
         }

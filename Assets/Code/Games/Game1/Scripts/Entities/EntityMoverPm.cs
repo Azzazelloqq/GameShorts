@@ -1,17 +1,15 @@
 ﻿using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
-using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using Logic.Entities.Core;
-using Root.Inputs;
 using UnityEngine;
 
 namespace Logic.Entities
 {
-    public class EntityMoverPm : BaseDisposable
+    internal class EntityMoverPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public BaseModel model;
             public SceneContextView sceneContextView;

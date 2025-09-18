@@ -11,7 +11,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
 {
     internal class EntitiesControllerPm : BaseDisposable, IEntitiesController
     {
-        public struct Ctx
+        internal struct Ctx
         {
         }
 
@@ -30,6 +30,12 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
         
         public bool TryDestroyEntity(int id, int? killer = null)
         {
+            // Check if this controller is disposed
+            if (isDisposed)
+            {
+                return false;
+            }
+            
             if (!TryGetEntityInfo(id, out var entityInfo))
             {
                 Debug.LogError($"Dont find entity with id = {id}");

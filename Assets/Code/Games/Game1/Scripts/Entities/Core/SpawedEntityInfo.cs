@@ -1,6 +1,6 @@
 ﻿namespace Logic.Entities.Core
 {
-    public struct SpawedEntityInfo
+    internal struct SpawedEntityInfo
     {
         
     }

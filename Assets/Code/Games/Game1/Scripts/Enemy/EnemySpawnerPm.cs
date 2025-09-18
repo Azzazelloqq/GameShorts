@@ -18,9 +18,9 @@ using Random = UnityEngine.Random;
 
 namespace Logic.Enemy
 {
-	public class EnemySpawnerPm : BaseDisposable
+	internal class EnemySpawnerPm : BaseDisposable
 	{
-		public struct Ctx
+		internal struct Ctx
 		{
 			public CancellationToken cancellationToken;
 			public MainSceneContextView sceneContextView;

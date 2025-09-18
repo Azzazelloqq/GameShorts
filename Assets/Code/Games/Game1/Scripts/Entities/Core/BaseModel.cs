@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Logic.Entities.Core
 {
-    public class BaseModel
+    internal class BaseModel
     {
         public event Action<int?> OnDestroy;
         public int Id;

@@ -98,6 +98,20 @@ namespace Code.Core.ShortGamesCore.Game2
             // Return all active chunks to pool
             ReturnAllChunks();
             
+            // Force clear any remaining children in TowerRoot (safety cleanup)
+            if (_ctx.sceneContextView.TowerRoot != null)
+            {
+                for (int i = _ctx.sceneContextView.TowerRoot.childCount - 1; i >= 0; i--)
+                {
+                    var child = _ctx.sceneContextView.TowerRoot.GetChild(i);
+                    if (child != null)
+                    {
+                        // Try to return to pool first
+                        _poolManager.Return(_ctx.sceneContextView.BlockPrefab, child.gameObject);
+                    }
+                }
+            }
+            
             // Reset background color
             if (_ctx.sceneContextView.ColorManager != null)
             {

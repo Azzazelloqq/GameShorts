@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.View
 {
-    public class MainSceneContextView: SceneContextView
+    internal class MainSceneContextView: SceneContextView
     {
         public PlayerSettings PlayerSettings;
         public GameSettings GameSettings;

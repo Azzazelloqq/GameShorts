@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
 {
-    public class LaserView : BaseView
+    internal class LaserView : BaseView
     {
         [SerializeField]
         private LineRenderer _laser;

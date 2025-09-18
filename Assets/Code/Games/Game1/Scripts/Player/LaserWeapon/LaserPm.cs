@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
 {
-    public class LaserPm : BaseDisposable
+    internal class LaserPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public LaserView view;
             public LaserModel laserModel;
@@ -51,12 +51,19 @@ namespace Logic.Player.LaserWeapon
         }
         private void OnOnUpdated(float deltaTime)
         {
+            if (isDisposed || _ctx.entitiesController == null)
+                return;
+                
             _timer -= deltaTime;
             if (_timer <= 0)
                 DestroyMe(null);
         }
         private void OnFixedUpdated(float deltaTime)
         {
+            // Exit early if disposed or entities controller is null
+            if (isDisposed || _ctx.entitiesController == null)
+                return;
+                
             // Update rotation angle (clockwise rotation in world space)
             _currentRotationAngle += _laserModel.RotationSpeed.Value * deltaTime;
             
@@ -83,7 +90,7 @@ namespace Logic.Player.LaserWeapon
             _view.Laser.SetPosition(2, endPosition);    // End point
 
             // Perform raycast for collision detection in both directions
-            var collisions1 = Physics2D.Raycast(_view.transform.position, directionVector, _contactFilter.NoFilter(), _hits, halfLength);
+            var collisions1 = Physics2D.Raycast(_view.transform.position, directionVector, ContactFilter2D.noFilter, _hits, halfLength);
             
             // Process collisions in positive direction
             for (int i = 0; i < collisions1; i++)
@@ -95,7 +102,7 @@ namespace Logic.Player.LaserWeapon
             }
             
             // Raycast in opposite direction
-            var collisions2 = Physics2D.Raycast(_view.transform.position, oppositeDirection, _contactFilter.NoFilter(), _hits, halfLength);
+            var collisions2 = Physics2D.Raycast(_view.transform.position, oppositeDirection, ContactFilter2D.noFilter, _hits, halfLength);
             
             // Process collisions in negative direction
             for (int i = 0; i < collisions2; i++)
@@ -108,7 +115,8 @@ namespace Logic.Player.LaserWeapon
         }
         private void DestroyMe(int? killerId)
         {
-            _ctx.entitiesController.TryDestroyEntity(_ctx.laserModel.Id);
+            if (!isDisposed && _ctx.entitiesController != null)
+                _ctx.entitiesController.TryDestroyEntity(_ctx.laserModel.Id);
         }
 
         protected override void OnDispose()

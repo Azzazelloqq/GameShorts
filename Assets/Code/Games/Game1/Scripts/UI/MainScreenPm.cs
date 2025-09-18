@@ -17,9 +17,9 @@ using Object = UnityEngine.Object;
 
 namespace Logic.UI
 {
-    public class MainScreenPm : BaseDisposable
+    internal class MainScreenPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public IEntitiesController entitiesController;

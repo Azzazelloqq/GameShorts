@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace Logic.Enemy.UFO
 {
-    public class UFOMoverPm : EntityMoverPm
+    internal class UFOMoverPm : EntityMoverPm
 {
-        public struct UFOMoverCtx
+        internal struct UFOMoverCtx
         {
             public PlayerModel playerModel;
         }

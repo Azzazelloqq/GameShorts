@@ -3,7 +3,7 @@
 namespace Logic.Settings
 {
     [CreateAssetMenu(fileName = "UFOSettings", menuName = "MyAsteroids/Settings/Create UFO settings")]
-    public class UFOSettings  : ScriptableObject
+    internal class UFOSettings  : ScriptableObject
     {
         public float MaxSpeed;
         public float Acceleration;

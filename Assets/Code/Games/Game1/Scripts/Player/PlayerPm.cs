@@ -11,19 +11,17 @@ using Logic.Entities.Core;
 using Logic.Player.LaserWeapon;
 using Logic.Player.ProjectileWeapon;
 using ResourceLoader;
-using Root.Inputs;
 using UnityEngine;
 
 namespace Logic.Player
 {
-    public class PlayerPm : BaseDisposable
+    internal class PlayerPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public MainSceneContextView sceneContextView;
             public PlayerModel playerModel;
-            public PlayerController PlayerController;
             public Action Dead;
             public IEntitiesController entitiesController;
         }
@@ -83,7 +81,6 @@ namespace Logic.Player
             {
                 sceneContextView = _ctx.sceneContextView,
                 playerModel = _ctx.playerModel,
-                PlayerController = _ctx.PlayerController,
                 playerView = _view,
                 projectileSettings = _ctx.sceneContextView.ProjectileSettings,
                 entitiesController = _ctx.entitiesController,
@@ -95,7 +92,6 @@ namespace Logic.Player
             {
                 sceneContextView = _ctx.sceneContextView,
                 playerModel = _ctx.playerModel,
-                PlayerController = _ctx.PlayerController,
                 playerView = _view,
                 entitiesController = _ctx.entitiesController,
                 laserSettings = _ctx.sceneContextView.laserSettings,

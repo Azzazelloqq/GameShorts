@@ -8,9 +8,9 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
 {
-    public class CorePm: BaseDisposable
+    internal class CorePm: BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public MainSceneContextView sceneContextView;

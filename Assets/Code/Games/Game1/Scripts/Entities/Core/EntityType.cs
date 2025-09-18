@@ -1,6 +1,6 @@
 ﻿namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 {
-	public enum EntityType
+	internal enum EntityType
 	{
 		PlayerShip = 0,
 		Projectile = 1,

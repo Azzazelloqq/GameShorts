@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 namespace Logic.Settings
 {
 	[CreateAssetMenu(fileName = "PlayerSettings", menuName = "MyAsteroids/Settings/Create player settings")]
-	public class PlayerSettings : ScriptableObject
+	internal class PlayerSettings : ScriptableObject
 	{
 
 		[Space]

@@ -5,7 +5,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 {
-	public class PlayerModel : BaseModel
+	internal class PlayerModel : BaseModel
 	{
 		public ReactiveProperty<float> LaserLength;
 		public ReactiveProperty<float> LaserThickness;

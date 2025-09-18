@@ -5,7 +5,7 @@ using Logic.Entities.Core;
 
 namespace Logic.Entities
 {
-    public interface IEntitiesController
+    internal interface IEntitiesController
     {
         public int GenerateId();
         public void AddEntity(int Id, EntityInfo entityInfo);

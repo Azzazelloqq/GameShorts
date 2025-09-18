@@ -8,9 +8,9 @@ using ResourceLoader;
 
 namespace Logic.Enemy
 {
-    public class EnemyManagerPm : BaseDisposable
+    internal class EnemyManagerPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public MainSceneContextView sceneContextView;
             public IEntitiesController entitiesController;

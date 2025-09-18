@@ -7,14 +7,13 @@ using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using Logic.Entities;
-using Root.Inputs;
 using UnityEngine;
 
 namespace Logic.Player
 {
-    public class PlayerSpawnerPm : BaseDisposable
+    internal class PlayerSpawnerPm : BaseDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public MainSceneContextView sceneContextView;
             public IEntitiesController entitiesController;
@@ -29,8 +28,6 @@ namespace Logic.Player
         {
             _ctx = ctx;
             _poolManager = poolManager;
-            var playerController = AddDispose(
-                PlayerControllerFactory.CreatePlayerController(new PlayerController.Ctx()));
             
             var screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
             var startPos = _ctx.sceneContextView.Camera.ScreenToWorldPoint(screenCenter);
@@ -51,7 +48,6 @@ namespace Logic.Player
             PlayerPm.Ctx playerCtx = new PlayerPm.Ctx
             {
                 playerModel = playerModel,
-                PlayerController = playerController,
                 sceneContextView = _ctx.sceneContextView,
                 entitiesController = _ctx.entitiesController,
                 Dead = _ctx.playerDead,

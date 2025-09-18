@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Logic.Enemy
 {
-    public struct EnemySpawnInfo
+    internal struct EnemySpawnInfo
     {
         public EntityType entityType;
         public Vector2 SpawnPosition;

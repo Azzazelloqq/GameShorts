@@ -5,7 +5,7 @@ using Image = UnityEngine.UI.Image;
 
 namespace Logic.UI
 {
-    public class LaserChargeUiView : BaseMonoBehaviour
+    internal class LaserChargeUiView : BaseMonoBehaviour
     {
         [SerializeField]
         private Slider _slider;

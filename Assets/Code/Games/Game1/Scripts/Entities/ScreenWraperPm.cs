@@ -8,7 +8,7 @@ namespace Logic.Entities
 {
 	internal class ScreenWraperPm : BaseDisposable
 	{
-		public struct Ctx
+		internal struct Ctx
 		{
 			public MainSceneContextView sceneContextView;
 			public PlayerModel playerModel;

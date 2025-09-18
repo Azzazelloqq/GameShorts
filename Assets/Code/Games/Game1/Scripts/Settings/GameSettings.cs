@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 namespace Logic.Settings
 {
     [CreateAssetMenu(fileName = "GameSettings", menuName = "MyAsteroids/Settings/Create game settings")]
-    public class GameSettings : ScriptableObject
+    internal class GameSettings : ScriptableObject
     {
         public float SpawnEnemyCooldown;
         [FormerlySerializedAs("MaxCountEnemyes")]
