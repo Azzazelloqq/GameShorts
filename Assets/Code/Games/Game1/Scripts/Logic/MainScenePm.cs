@@ -39,7 +39,6 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
 		_entitiesController = new EntitiesControllerPm(new EntitiesControllerPm.Ctx());
 		AddDispose(_entitiesController);
 		
-		// Start with the start screen
 		ShowStartScreen();
 	}
 
