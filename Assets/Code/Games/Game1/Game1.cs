@@ -86,7 +86,7 @@ namespace Code.Core.ShortGamesCore.Game1
                 cancellationToken = _cancellationTokenSource.Token,
                 restartGame = RestartGame
             };
-            _core = new CorePm(rootCtx);
+            _core = CorePmFactory.CreateCorePm(rootCtx);
         }
     }
 }

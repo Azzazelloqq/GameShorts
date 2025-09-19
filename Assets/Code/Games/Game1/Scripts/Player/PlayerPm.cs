@@ -74,14 +74,7 @@ namespace Logic.Player
                 isPlayer = true
             };
             AddDispose(EntityMoverPmFactory.CreateEntityMoverPm(entityMoverCtx));
-
-            ScreenWraperPm.Ctx screenWraperCtx = new ScreenWraperPm.Ctx
-            {
-                sceneContextView = _ctx.sceneContextView,
-                playerModel = _ctx.playerModel
-            };
-            AddDispose(ScreenWraperPmFactory.CreateScreenWraperPm(screenWraperCtx));
-
+            
             ProjectileWeaponPm.Ctx projectileWeaponCtx = new ProjectileWeaponPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
@@ -102,10 +95,21 @@ namespace Logic.Player
                 cancellationToken = _ctx.cancellationToken
             };
             AddDispose(LaserWeaponPmFactory.CreateLaserWeaponPm(laserWeaponCtx));
+            
+            ScreenWraperPm.Ctx screenWraperCtx = new ScreenWraperPm.Ctx
+            {
+                sceneContextView = _ctx.sceneContextView,
+                playerModel = _ctx.playerModel
+            };
+            AddDispose(ScreenWraperPmFactory.CreateScreenWraperPm(screenWraperCtx));
         }
 
         private void Collided(CollidedInfo collidedInfo)
         {
+            // Проверяем, что EntitiesController еще существует
+            if (_ctx.entitiesController == null)
+                return;
+                
             if (!_ctx.entitiesController.TryGetEntityInfo(collidedInfo.defenderId, out var entityInfo))
                 return;
 

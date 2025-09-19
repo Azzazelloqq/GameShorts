@@ -15,8 +15,12 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
         {
         }
 
+        private readonly Ctx _ctx;
         public IReadOnlyDictionary<int, EntityInfo> AllEntities => _entities;
         public PlayerModel _playerModel;
+        
+        private readonly Dictionary<int, EntityInfo> _entities;
+        private int _indexator;
         
         public EntitiesControllerPm(Ctx ctx)
         {
@@ -53,10 +57,11 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
             return _playerModel;
         }
 
-        private readonly Ctx _ctx;
-        private readonly Dictionary<int, EntityInfo> _entities;
-        private int _indexator;
-
+        public void Clear()
+        {
+            foreach (var entity in _entities)
+                entity.Value.Logic?.Dispose();
+        }
 
         public int GenerateId()
         {
@@ -68,11 +73,10 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
             if (entityInfo.Model.EntityType is EntityType.PlayerShip)
                 _playerModel = (PlayerModel) entityInfo.Model;
         }
+        
         protected override void OnDispose()
         {
-            foreach (var entity in _entities)
-                entity.Value.Logic?.Dispose();
-            
+            Clear();
             base.OnDispose();
         }
 

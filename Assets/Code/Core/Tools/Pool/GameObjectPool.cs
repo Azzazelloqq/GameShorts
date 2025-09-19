@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace Code.Core.Tools.Pool
 {
-	public class GameObjectPool : IBasePool<GameObject>
+	public class GameObjectPool : IBasePool<GameObject>, IDisposable
 	{
 		public struct Ctx
 		{
@@ -13,6 +14,7 @@ namespace Code.Core.Tools.Pool
 
 		private readonly Ctx _ctx;
 		private ObjectPool<GameObject> _pool;
+		private bool _disposed = false;
 		
 		public GameObjectPool(Ctx ctx)
 		{
@@ -42,12 +44,18 @@ namespace Code.Core.Tools.Pool
 
 		public GameObject Get()
 		{
+			if (_disposed)
+				return null;
+				
 			var gameObject = _pool.Get();
 			gameObject.gameObject.SetActive(true);
 			return gameObject;
 		}
 		public GameObject Get(Vector3 position)
 		{
+			if (_disposed)
+				return null;
+				
 			var gameObject = _pool.Get();
 			gameObject.transform.position = position;
 			gameObject.gameObject.SetActive(true);
@@ -55,6 +63,9 @@ namespace Code.Core.Tools.Pool
 		}
 		public GameObject Get(Transform parent)
 		{
+			if (_disposed)
+				return null;
+				
 			var gameObject = _pool.Get();
 			gameObject.transform.SetParent(parent);
 			gameObject.transform.localPosition = Vector3.zero;
@@ -65,6 +76,9 @@ namespace Code.Core.Tools.Pool
 		}
 		public GameObject Get(Vector3 position, float rotateDig)
 		{
+			if (_disposed)
+				return null;
+				
 			var gameObject = _pool.Get();
 			gameObject.transform.position = position;
 			gameObject.transform.rotation = Quaternion.Euler(0, 0, rotateDig );
@@ -74,8 +88,28 @@ namespace Code.Core.Tools.Pool
 		}
 		public void Return(GameObject element)
 		{
-			 element.transform.SetParent(_ctx.parrent);
+			if (_disposed)
+				return;
+				
+			element.transform.SetParent(_ctx.parrent);
 			_pool.Release(element);
+		}
+
+		public void Clear()
+		{
+			if (_disposed)
+				return;
+				
+			_pool?.Clear();
+		}
+
+		public void Dispose()
+		{
+			if (_disposed)
+				return;
+				
+			_disposed = true;
+			_pool?.Dispose();
 		}
 	}
 }

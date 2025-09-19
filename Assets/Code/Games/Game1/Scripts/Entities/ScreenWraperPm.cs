@@ -31,12 +31,18 @@ namespace Logic.Entities
 
 		protected override void OnDispose()
 		{
-			base.OnDispose(); 
 			_tickHandler.PhysicUpdate -= (CheckScreenPos);
+			base.OnDispose(); 
 		}
 
 		private void CheckScreenPos(float deltaTime)
 		{
+			// Проверяем, что камера еще существует
+			if (_camera == null || !_camera)
+			{
+				return;
+			}
+			
 			var playerPos = _ctx.playerModel.Position.Value;
 			Vector3 viewPosition = _camera.WorldToViewportPoint(playerPos);
 
@@ -44,28 +50,40 @@ namespace Logic.Entities
 			if (viewPosition.x < 0)
 			{
 				// Игрок вышел за левый край - телепортируем на правый край
-				Vector3 rightEdge = _camera.ViewportToWorldPoint(new Vector3(1, viewPosition.y, viewPosition.z));
-				playerPos.x = rightEdge.x;
+				if (_camera != null && _camera)
+				{
+					Vector3 rightEdge = _camera.ViewportToWorldPoint(new Vector3(1, viewPosition.y, viewPosition.z));
+					playerPos.x = rightEdge.x;
+				}
 			}
 			else if (viewPosition.x > 1)
 			{
 				// Игрок вышел за правый край - телепортируем на левый край
-				Vector3 leftEdge = _camera.ViewportToWorldPoint(new Vector3(0, viewPosition.y, viewPosition.z));
-				playerPos.x = leftEdge.x;
+				if (_camera != null && _camera)
+				{
+					Vector3 leftEdge = _camera.ViewportToWorldPoint(new Vector3(0, viewPosition.y, viewPosition.z));
+					playerPos.x = leftEdge.x;
+				}
 			}
 
 			// Телепортация по Y оси
 			if (viewPosition.y < 0)
 			{
 				// Игрок вышел за нижний край - телепортируем на верхний край
-				Vector3 topEdge = _camera.ViewportToWorldPoint(new Vector3(viewPosition.x, 1, viewPosition.z));
-				playerPos.y = topEdge.y;
+				if (_camera != null && _camera)
+				{
+					Vector3 topEdge = _camera.ViewportToWorldPoint(new Vector3(viewPosition.x, 1, viewPosition.z));
+					playerPos.y = topEdge.y;
+				}
 			}
 			else if (viewPosition.y > 1)
 			{
 				// Игрок вышел за верхний край - телепортируем на нижний край
-				Vector3 bottomEdge = _camera.ViewportToWorldPoint(new Vector3(viewPosition.x, 0, viewPosition.z));
-				playerPos.y = bottomEdge.y;
+				if (_camera != null && _camera)
+				{
+					Vector3 bottomEdge = _camera.ViewportToWorldPoint(new Vector3(viewPosition.x, 0, viewPosition.z));
+					playerPos.y = bottomEdge.y;
+				}
 			}
 
 			_ctx.playerModel.Position.Value = playerPos;

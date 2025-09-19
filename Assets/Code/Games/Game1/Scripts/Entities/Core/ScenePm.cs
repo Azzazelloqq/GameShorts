@@ -29,7 +29,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
                 cancellationToken = _ctx.cancellationToken,
                 restartGame = _ctx.restartGame
             };
-            MainScenePm mainScenePm = new MainScenePm(mainSceneCtx);
+            MainScenePm mainScenePm = MainScenePmFactory.CreateMainScenePm(mainSceneCtx);
             AddDispose(mainScenePm);
         }
     }

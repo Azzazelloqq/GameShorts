@@ -47,6 +47,12 @@ namespace Logic.Enemy
 
         private void Tick(float deltaTime)
         {
+            // Проверяем, что камера еще существует
+            if (_camera == null || !_camera)
+            {
+                return;
+            }
+            
             if (_ctx.entitiesController.AllEntities.Count >= _gameSettings.MaxCountEnemies)
             {
                 _lastTimeSpawn = Time.time;
@@ -71,6 +77,12 @@ namespace Logic.Enemy
         
         (Vector2 pos, float angle) GetPositionAndDirOutsideScreen(bool dirToPlayer)
         {
+            // Проверяем, что камера еще существует
+            if (_camera == null || !_camera)
+            {
+                return (Vector2.zero, 0f);
+            }
+            
             int sideScreen =  Random.Range(0, 4);
             var angle = Random.Range(-25, 25f);
             float randomPos = Random.Range(0.1f, .9f);

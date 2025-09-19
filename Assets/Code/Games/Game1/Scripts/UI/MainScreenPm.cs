@@ -108,16 +108,27 @@ namespace Logic.UI
 
         private void ScoreOnChanged(int score)
         {
+            if (isDisposed || _view == null || _view.Score == null)
+                return;
+                
             _view.Score.text = $"Score: {score}";
         }
 
         private void OnUpdated(float deltaTime)
         {
+            // Check if this instance is disposed or objects are null
+            if (isDisposed || _playerModel == null || _battaries == null || _playerModel.Charges == null)
+                return;
+                
             if (_playerModel.Charges.Count == 0)
                 return;
 
-            for (int i = 0; i < _battaries.Count; i++)
+            for (int i = 0; i < _battaries.Count && i < _playerModel.Charges.Count; i++)
             {
+                // Additional null checks for safety
+                if (_battaries[i] == null || _playerModel.Charges[i] == null || _playerModel.Charges[i].Charge == null)
+                    continue;
+                    
                 var valueCharge = _playerModel.Charges[i].Charge.Value;
                 _battaries[i].Slider.value = valueCharge;
                 _battaries[i].FillImage.color = valueCharge < 1f ? Color.yellow : Color.green;
@@ -126,16 +137,25 @@ namespace Logic.UI
 
         private void UpdateCurAngle(float angle)
         {
+            if (isDisposed || _view == null || _view.Angle == null)
+                return;
+                
             _view.Angle.text = $"Angle: {Mathf.Abs(Mathf.Floor(angle))}";
         }
 
         private void UpdateCurSpeed(float speed)
         {
+            if (isDisposed || _view == null || _view.Speed == null)
+                return;
+                
             _view.Speed.text = $"Speed: {Mathf.Floor(speed)}";
         }
 
         private void UpdatePos(Vector2 position)
         {
+            if (isDisposed || _view == null || _view.PosX == null || _view.PosY == null)
+                return;
+                
             _view.PosX.text = $"X: {position.x:N0}";
             _view.PosY.text = $"X: {position.y:N0}";
         }

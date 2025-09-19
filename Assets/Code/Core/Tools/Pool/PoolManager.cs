@@ -73,6 +73,21 @@ namespace Code.Core.Tools.Pool
 			pool?.Return(obj);
 		}
 		
+		public void Clear()
+		{
+			if (isDisposed)
+				return;
+				
+			// Clear all pools but keep the pools themselves
+			if (_pools != null)
+			{
+				foreach (var pool in _pools.Values)
+				{
+					pool?.Clear();
+				}
+			}
+		}
+		
 		protected TObject AddComponent<TObject>(TObject obj) where TObject : Object
 		{
 			if (_unityObjects == null)
@@ -83,7 +98,31 @@ namespace Code.Core.Tools.Pool
 
 		public void Dispose()
 		{
+			if (isDisposed)
+				return;
+				
+			isDisposed = true;
 			
+			// Dispose all pools
+			if (_pools != null)
+			{
+				foreach (var pool in _pools.Values)
+				{
+					pool?.Dispose();
+				}
+				_pools.Clear();
+			}
+			
+			// Destroy all Unity objects
+			if (_unityObjects != null)
+			{
+				foreach (var unityObject in _unityObjects)
+				{
+					if (unityObject != null)
+						Object.Destroy(unityObject);
+				}
+				_unityObjects.Clear();
+			}
 		}
 	}
 }

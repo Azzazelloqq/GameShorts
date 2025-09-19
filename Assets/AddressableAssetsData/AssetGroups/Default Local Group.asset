@@ -15,8 +15,8 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 8869bcab39b870b438a6bf9db715abec
   m_SerializeEntries:
-  - m_GUID: b44eedb105dc6a74d8779b9575af3915
-    m_Address: GameSwiper
+  - m_GUID: 7fff6dbf4fd31224c89d6cdf3354da35
+    m_Address: StartScreen
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

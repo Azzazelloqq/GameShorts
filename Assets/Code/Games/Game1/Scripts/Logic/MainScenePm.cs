@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
+using Code.Core.InputManager;
+using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using LightDI.Runtime;
 using Logic.Enemy;
 using Logic.Player;
 using Logic.UI;
@@ -17,58 +20,111 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
 			public Action restartGame;
 		}
 
-		private readonly Ctx _ctx;
-		private EntitiesControllerPm _entitiesController;
-		private IDisposable _enemyManager;
-		private IDisposable _mainScreen;
+	private readonly Ctx _ctx;
+	private EntitiesControllerPm _entitiesController;
+	private IDisposable _enemyManager;
+	private IDisposable _mainScreen;
+	private IDisposable _startScreen;
+	private PlayerSpawnerPm _playerSpawnerPm;
+	private GameState _currentState;
+	private readonly IInputManager _inputManager;
 
-		public MainScenePm(Ctx ctx)
+	public MainScenePm(Ctx ctx,
+		[Inject] IInputManager inputManager)
+	{
+		_ctx = ctx;
+		_inputManager = inputManager;
+		_inputManager.Initialize(_ctx.sceneContextView.Joystick);
+		_currentState = GameState.WaitingToStart;
+		_entitiesController = new EntitiesControllerPm(new EntitiesControllerPm.Ctx());
+		AddDispose(_entitiesController);
+		
+		// Start with the start screen
+		ShowStartScreen();
+	}
+
+	private void ShowStartScreen()
+	{
+		if (_currentState != GameState.WaitingToStart)
+			return;
+
+		_currentState = GameState.WaitingToStart;
+		_inputManager?.SetJoystickOptions(AxisOptions.None);
+
+		StartScreenPm.Ctx startScreenCtx = new StartScreenPm.Ctx
 		{
-			_ctx = ctx;
-			_entitiesController = new EntitiesControllerPm(new EntitiesControllerPm.Ctx());
-			AddDispose(new EntitiesControllerPm(new EntitiesControllerPm.Ctx()));
-			
-			PlayerSpawnerPm.Ctx playerSpawnerCtx = new PlayerSpawnerPm.Ctx
-			{
-					sceneContextView = _ctx.sceneContextView,
-					entitiesController = _entitiesController,
-					playerDead = ShowFinishScreen,
-					cancellationToken = _ctx.cancellationToken
-			};
-			AddDispose( PlayerSpawnerPmFactory.CreatePlayerSpawnerPm(playerSpawnerCtx));
+			mainSceneContextView = _ctx.sceneContextView,
+			startGameClicked = StartGame,
+			cancellationToken = _ctx.cancellationToken
+		};
+		_startScreen = StartScreenPmFactory.CreateStartScreenPm(startScreenCtx);
+		AddDispose(_startScreen);
+	}
 
-			EnemyManagerPm.Ctx enemyManagerCtx = new EnemyManagerPm.Ctx
-			{
-				sceneContextView = _ctx.sceneContextView,
-				entitiesController = _entitiesController,
-				cancellationToken = _ctx.cancellationToken
-			};
-			_enemyManager = new EnemyManagerPm(enemyManagerCtx);
-			AddDispose(_enemyManager);
+	private void StartGame()
+	{
+		if (_currentState != GameState.WaitingToStart)
+			return;
 
-			MainScreenPm.Ctx mainScreenCtx = new MainScreenPm.Ctx
-			{
-				entitiesController = _entitiesController,
-				mainSceneContextView = _ctx.sceneContextView,
-				cancellationToken = _ctx.cancellationToken
-			};
-			_mainScreen =  MainScreenPmFactory.CreateMainScreenPm(mainScreenCtx);
-			AddDispose(_mainScreen);
-		}
+		_inputManager.SetJoystickOptions(AxisOptions.Both);
+		
+		_currentState = GameState.Playing;
+		
+		// Dispose start screen
+		_startScreen?.Dispose();
+		_startScreen = null;
 
-		private void ShowFinishScreen()
+		// Initialize game components
+		PlayerSpawnerPm.Ctx playerSpawnerCtx = new PlayerSpawnerPm.Ctx
 		{
-			_enemyManager?.Dispose();
-			_mainScreen?.Dispose();
-			FinishScreenPm.Ctx FinishScreenCtx = new FinishScreenPm.Ctx
-			{
-				entitiesController = _entitiesController,
-				mainSceneContextView = _ctx.sceneContextView,
-				restartGame = _ctx.restartGame,
-				cancellationToken = _ctx.cancellationToken
-			};
-			AddDispose(FinishScreenPmFactory.CreateFinishScreenPm(FinishScreenCtx));
-			_entitiesController?.Dispose();
-		}
+			sceneContextView = _ctx.sceneContextView,
+			entitiesController = _entitiesController,
+			playerDead = ShowFinishScreen,
+			cancellationToken = _ctx.cancellationToken
+		};
+		_playerSpawnerPm = PlayerSpawnerPmFactory.CreatePlayerSpawnerPm(playerSpawnerCtx);
+		AddDispose(_playerSpawnerPm);
+
+		EnemyManagerPm.Ctx enemyManagerCtx = new EnemyManagerPm.Ctx
+		{
+			sceneContextView = _ctx.sceneContextView,
+			entitiesController = _entitiesController,
+			cancellationToken = _ctx.cancellationToken
+		};
+		_enemyManager = new EnemyManagerPm(enemyManagerCtx);
+		AddDispose(_enemyManager);
+
+		MainScreenPm.Ctx mainScreenCtx = new MainScreenPm.Ctx
+		{
+			entitiesController = _entitiesController,
+			mainSceneContextView = _ctx.sceneContextView,
+			cancellationToken = _ctx.cancellationToken
+		};
+		_mainScreen = MainScreenPmFactory.CreateMainScreenPm(mainScreenCtx);
+		AddDispose(_mainScreen);
+	}
+
+	private void ShowFinishScreen()
+	{
+		if (_currentState != GameState.Playing)
+			return;
+
+		_currentState = GameState.Finished;
+		
+		_enemyManager?.Dispose();
+		_mainScreen?.Dispose();
+		_playerSpawnerPm?.Dispose();
+		_entitiesController.Clear();
+		_inputManager?.SetJoystickOptions(AxisOptions.None);
+		
+		FinishScreenPm.Ctx FinishScreenCtx = new FinishScreenPm.Ctx
+		{
+			entitiesController = _entitiesController,
+			mainSceneContextView = _ctx.sceneContextView,
+			restartGame = _ctx.restartGame,
+			cancellationToken = _ctx.cancellationToken
+		};
+		AddDispose(FinishScreenPmFactory.CreateFinishScreenPm(FinishScreenCtx));
+	}
 	}
 }

@@ -30,7 +30,9 @@ namespace Logic.Player
             _poolManager = poolManager;
             
             var screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
-            var startPos = _ctx.sceneContextView.Camera.ScreenToWorldPoint(screenCenter);
+            var startPos = _ctx.sceneContextView.Camera != null && _ctx.sceneContextView.Camera 
+                ? _ctx.sceneContextView.Camera.ScreenToWorldPoint(screenCenter) 
+                : Vector3.zero;
             
             var playerSettings = _ctx.sceneContextView.PlayerSettings;
             var playerModel = new PlayerModel

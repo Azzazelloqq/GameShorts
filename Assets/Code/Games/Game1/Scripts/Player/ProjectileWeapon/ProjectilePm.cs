@@ -56,7 +56,9 @@ namespace Logic.Player.ProjectileWeapon
         }
         private void DestroyMe(int? killerId)
         {
-            _ctx.entitiesController.TryDestroyEntity(_ctx.projectileModel.Id);
+            // Проверяем, что EntitiesController еще существует
+            if (_ctx.entitiesController != null)
+                _ctx.entitiesController.TryDestroyEntity(_ctx.projectileModel.Id);
         }
         private void UpdateMe(float obj)
         {
@@ -64,6 +66,10 @@ namespace Logic.Player.ProjectileWeapon
         }
         private void OnCollided(CollidedInfo collidedInfo)
         {
+            // Проверяем, что EntitiesController еще существует
+            if (_ctx.entitiesController == null)
+                return;
+                
             if (!_ctx.entitiesController.TryGetEntityInfo(collidedInfo.defenderId, out var entityInfo))
                 return;
             

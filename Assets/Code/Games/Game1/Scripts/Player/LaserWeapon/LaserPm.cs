@@ -102,7 +102,11 @@ namespace Logic.Player.LaserWeapon
                 IEntityView entityView = _hits[i].transform != null ? _hits[i].transform.GetComponent<IEntityView>() : null;
 
                 if (entityView?.Model.EntityType != EntityType.PlayerShip)
-                    _ctx.entitiesController.TryDestroyEntity(entityView.Model.Id, _playerModel.Id);
+                {
+                    // Проверяем, что EntitiesController еще существует
+                    if (_ctx.entitiesController != null)
+                        _ctx.entitiesController.TryDestroyEntity(entityView.Model.Id, _playerModel.Id);
+                }
             }
             
             // Raycast in opposite direction
@@ -114,7 +118,11 @@ namespace Logic.Player.LaserWeapon
                 IEntityView entityView = _hits[i].transform != null ? _hits[i].transform.GetComponent<IEntityView>() : null;
 
                 if (entityView?.Model.EntityType != EntityType.PlayerShip)
-                    _ctx.entitiesController.TryDestroyEntity(entityView.Model.Id, _playerModel.Id);
+                {
+                    // Проверяем, что EntitiesController еще существует
+                    if (_ctx.entitiesController != null)
+                        _ctx.entitiesController.TryDestroyEntity(entityView.Model.Id, _playerModel.Id);
+                }
             }
         }
         private void DestroyMe(int? killerId)

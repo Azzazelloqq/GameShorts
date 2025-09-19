@@ -75,6 +75,10 @@ namespace Logic.Enemy
 		}
 		private void SpawnUFO(EnemySpawnInfo spawninfo)
 		{
+			// Проверяем, что EntitiesController еще существует
+			if (_ctx.entitiesController == null)
+				return;
+				
 			var model = new UFOModel()
 			{
 				Id = _ctx.entitiesController.GenerateId(),
@@ -95,14 +99,23 @@ namespace Logic.Enemy
 			};
 
 			var ufo = UFOPmFactory.CreateUFOPm(ufoCtx);
-			_ctx.entitiesController.AddEntity(model.Id, new EntityInfo
+			
+			// Проверяем, что EntitiesController еще существует
+			if (_ctx.entitiesController != null)
 			{
-				Logic = ufo,
-				Model = model,
-			});
+				_ctx.entitiesController.AddEntity(model.Id, new EntityInfo
+				{
+					Logic = ufo,
+					Model = model,
+				});
+			}
 		}
 		private void SpawnBigAsteroid(EnemySpawnInfo spawninfo)
 		{
+			// Проверяем, что EntitiesController еще существует
+			if (_ctx.entitiesController == null)
+				return;
+				
 			var rotateSide = Random.Range(0, 2) == 0 ? -1 : 1;
 			var model = new AsteroidModel
 			{
@@ -132,15 +145,24 @@ namespace Logic.Enemy
 			};
 			
 			var asteroid = AsteroidPmFactory.CreateAsteroidPm(asteroidCtx);
-			_ctx.entitiesController.AddEntity(model.Id, new EntityInfo
+			
+			// Проверяем, что EntitiesController еще существует
+			if (_ctx.entitiesController != null)
 			{
-				Logic = asteroid,
-				Model = model,
-			});
+				_ctx.entitiesController.AddEntity(model.Id, new EntityInfo
+				{
+					Logic = asteroid,
+					Model = model,
+				});
+			}
 		}
 		
 		private void SpawnSmallAsteroid(EnemySpawnInfo spawninfo)
 		{
+			// Проверяем, что EntitiesController еще существует
+			if (_ctx.entitiesController == null)
+				return;
+				
 			var rotateSide = Random.Range(0, 2) == 0 ? -1 : 1;
 			var model = new AsteroidModel
 			{
@@ -170,11 +192,16 @@ namespace Logic.Enemy
 			};
 
 			var asteroid = AsteroidPmFactory.CreateAsteroidPm(asteroidCtx);
-			_ctx.entitiesController.AddEntity(model.Id, new EntityInfo
+			
+			// Проверяем, что EntitiesController еще существует
+			if (_ctx.entitiesController != null)
 			{
-				Logic = asteroid,
-				Model = model,
-			});
+				_ctx.entitiesController.AddEntity(model.Id, new EntityInfo
+				{
+					Logic = asteroid,
+					Model = model,
+				});
+			}
 			
 		}
 	}

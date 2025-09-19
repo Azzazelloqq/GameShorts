@@ -62,6 +62,10 @@ namespace Logic.Player.ProjectileWeapon
         }
         private void CreateProjectile()
         { 
+            // Проверяем, что EntitiesController еще существует
+            if (_ctx.entitiesController == null)
+                return;
+                
             var position = _spawnPosition.position;
             var model = new ProjectileModel
             {

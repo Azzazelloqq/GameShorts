@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
@@ -7,8 +7,6 @@ using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
-using Logic.Entities;
-using Logic.Scene;
 using ResourceLoader;
 using TickHandler;
 using UnityEngine;
@@ -16,24 +14,23 @@ using Object = UnityEngine.Object;
 
 namespace Logic.UI
 {
-    internal class FinishScreenPm : BaseDisposable
+    internal class StartScreenPm : BaseDisposable
     {
         internal struct Ctx
         {
             public CancellationToken cancellationToken;
-            public Action restartGame;
-            public IEntitiesController entitiesController;
+            public Action startGameClicked;
             public MainSceneContextView mainSceneContextView;
         }
 
         private readonly Ctx _ctx;
-        private FinishScreenView _view;
+        private StartScreenView _view;
         private readonly IResourceLoader _resourceLoader;
         private readonly IPoolManager _poolManager;
         private readonly IInGameLogger _logger;
         private readonly ITickHandler _tickHandler;
 
-        public FinishScreenPm(Ctx ctx,
+        public StartScreenPm(Ctx ctx,
             [Inject] IPoolManager poolManager,
             [Inject] IInGameLogger logger, 
             [Inject] IResourceLoader resourceLoader, 
@@ -55,7 +52,7 @@ namespace Logic.UI
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to load MainScreen: {ex.Message}");
+                _logger.LogError($"Failed to load StartScreen: {ex.Message}");
                 throw;
             }
         }
@@ -63,16 +60,19 @@ namespace Logic.UI
         private async Task LoadBaseUI()
         {
             var prefab =
-                await _resourceLoader.LoadResourceAsync<GameObject>(ResourceIdsContainer.GameAsteroids.FinishScreen,
+                await _resourceLoader.LoadResourceAsync<GameObject>(ResourceIdsContainer.GameAsteroids.StartScreen,
                     _ctx.cancellationToken);
             var objView = AddComponent(Object.Instantiate(prefab, _ctx.mainSceneContextView.UiParent, false));
-            _view = objView.GetComponent<FinishScreenView>();
-            var player = _ctx.entitiesController.GetPlayerModel();
-            _view.SetCtx(new FinishScreenView.Ctx
+            _view = objView.GetComponent<StartScreenView>();
+            
+            _view.SetCtx(new StartScreenView.Ctx
             {
-                reloadClicked = _ctx.restartGame
+                startGameClicked = _ctx.startGameClicked
             });
-            _view.ScoreLabel.text = $"YOUR SCORE: {player.Score.Value}";
+            
+            // Set initial text
+            _view.TitleLabel.text = "ASTEROIDS";
+            _view.InstructionLabel.text = "TAP TO START";
         }
     }
 }

@@ -78,6 +78,10 @@ namespace Logic.Player.LaserWeapon
 
         private void CreateLaser()
         {
+            // Проверяем, что EntitiesController еще существует
+            if (_ctx.entitiesController == null)
+                return;
+                
             var model = new LaserModel()
             {
                 EntityType = EntityType.Laser,

@@ -10,5 +10,6 @@ namespace Code.Core.Tools.Pool
 		GameObject Get(GameObject prefab, Transform parent);
 		GameObject Get(GameObject prefab, Vector3 position, float rotateDig);
 		void Return(GameObject prefab, GameObject obj);
+		void Clear();
 	}
 }

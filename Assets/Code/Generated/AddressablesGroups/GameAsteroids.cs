@@ -5,6 +5,7 @@ namespace Code.Generated.Addressables
     public class GameAsteroids
     {
         public string FinishScreen = "FinishScreen";
+        public string StartScreen = "StartScreen";
         public string UFO = "UFO";
         public string Player = "Player";
         public string Asteroid = "Asteroid";

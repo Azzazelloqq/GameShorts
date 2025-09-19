@@ -1,5 +1,5 @@
 ﻿{
-  "name": "Game2_test",
+  "name": "Game2",
   "rootNamespace": "",
   "references": [
     "Core.ShortGame",

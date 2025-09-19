@@ -16,5 +16,7 @@ namespace Logic.Entities
         public bool TryDestroyEntity(int id, int? killer = null);
 
         public PlayerModel GetPlayerModel();
+
+        void Clear();
     }
 }

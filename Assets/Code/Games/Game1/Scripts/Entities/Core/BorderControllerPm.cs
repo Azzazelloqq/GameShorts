@@ -33,17 +33,27 @@ namespace Logic.Scene
 
         protected override void OnDispose()
         {
-            base.OnDispose(); 
             _tickHandler.PhysicUpdate -= (CheckScreenPos);
+            base.OnDispose(); 
         }
         
         private void CheckScreenPos(float deltaTime)
         {
+            // Проверяем, что камера еще существует
+            if (_camera == null || !_camera)
+            {
+                return;
+            }
+            
             var playerPos = _ctx.model.Position.Value;
             Vector3 viewPosition = _camera.WorldToViewportPoint(playerPos);
 
             if ((viewPosition.x is < -0.5f or > 1.5f) || (viewPosition.y is < -0.5f or > 1.5f))
-                _ctx.entitiesController.TryDestroyEntity(_ctx.model.Id);
+            {
+                // Проверяем, что EntitiesController еще существует
+                if (_ctx.entitiesController != null)
+                    _ctx.entitiesController.TryDestroyEntity(_ctx.model.Id);
+            }
         }
         
     }
