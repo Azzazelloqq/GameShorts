@@ -27,7 +27,6 @@ namespace Code.Core.ShortGamesCore.Game2
         [SerializeField] private TextMeshProUGUI finalScoreText;
         [SerializeField] private TextMeshProUGUI finalBestScoreText;
         [SerializeField] private Button restartButton;
-        [SerializeField] private Button homeButton;
 
         [Header("Tap to Play")]
         [SerializeField] private GameObject tapToPlayPanel;
@@ -56,7 +55,6 @@ namespace Code.Core.ShortGamesCore.Game2
         public TextMeshProUGUI FinalScoreText => finalScoreText;
         public TextMeshProUGUI FinalBestScoreText => finalBestScoreText;
         public Button RestartButton => restartButton;
-        public Button HomeButton => homeButton;
         
         public GameObject TapToPlayPanel => tapToPlayPanel;
         public Button TapToPlayButton => tapToPlayButton;

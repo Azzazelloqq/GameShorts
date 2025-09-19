@@ -39,8 +39,6 @@ namespace Code.Core.ShortGamesCore.Game2
             if (_ctx.sceneContextView.RestartButton != null)
                 _ctx.sceneContextView.RestartButton.onClick.AddListener(OnRestartClicked);
                 
-            if (_ctx.sceneContextView.HomeButton != null)
-                _ctx.sceneContextView.HomeButton.onClick.AddListener(OnHomeClicked);
                 
             if (_ctx.sceneContextView.TapToPlayButton != null)
                 _ctx.sceneContextView.TapToPlayButton.onClick.AddListener(OnTapToPlayClicked);
@@ -191,11 +189,6 @@ namespace Code.Core.ShortGamesCore.Game2
             _ctx.restartGame?.Invoke();
         }
 
-        private void OnHomeClicked()
-        {
-            // Home functionality if needed
-        }
-
         private void OnTapToPlayClicked()
         {
             _ctx.gameModel.StartNewGame();
@@ -212,9 +205,6 @@ namespace Code.Core.ShortGamesCore.Game2
             // Cleanup button listeners
             if (_ctx.sceneContextView.RestartButton != null)
                 _ctx.sceneContextView.RestartButton.onClick.RemoveListener(OnRestartClicked);
-                
-            if (_ctx.sceneContextView.HomeButton != null)
-                _ctx.sceneContextView.HomeButton.onClick.RemoveListener(OnHomeClicked);
                 
             if (_ctx.sceneContextView.TapToPlayButton != null)
                 _ctx.sceneContextView.TapToPlayButton.onClick.RemoveListener(OnTapToPlayClicked);

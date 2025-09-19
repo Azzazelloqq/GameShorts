@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
+using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 
 namespace Code.Core.ShortGamesCore.Game2
@@ -17,10 +18,12 @@ namespace Code.Core.ShortGamesCore.Game2
         private readonly Ctx _ctx;
         private IDisposable _gameScene;
         private readonly IDiContainer _diContainer;
+        private readonly IPoolManager _poolManager;
 
-        public BoxTowerCorePm(Ctx ctx)
+        public BoxTowerCorePm(Ctx ctx, [Inject] IPoolManager poolManager)
         {
             _ctx = ctx;
+            _poolManager = poolManager;
             _diContainer = DiContainerFactory.CreateContainer();
             AddDispose(_diContainer);
             
@@ -38,6 +41,7 @@ namespace Code.Core.ShortGamesCore.Game2
         protected override void OnDispose()
         {
             _gameScene?.Dispose();
+            _poolManager.Clear();
             base.OnDispose();
         }
     }

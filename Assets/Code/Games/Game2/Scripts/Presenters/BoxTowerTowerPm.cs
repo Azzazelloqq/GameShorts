@@ -24,6 +24,7 @@ namespace Code.Core.ShortGamesCore.Game2
 
         private List<GameObject> _placedBlocks = new List<GameObject>();
         private List<GameObject> _activeChunks = new List<GameObject>();
+        private List<GameObject> _fallingBlocks = new List<GameObject>(); // Track falling blocks for cleanup
         private GameObject _currentMovingBlock;
         private BlockMover _currentMover;
 
@@ -95,6 +96,9 @@ namespace Code.Core.ShortGamesCore.Game2
                 _currentMover = null;
             }
 
+            // Return all falling blocks to pool immediately
+            ReturnAllFallingBlocks();
+
             // Return all active chunks to pool
             ReturnAllChunks();
             
@@ -111,6 +115,9 @@ namespace Code.Core.ShortGamesCore.Game2
                     }
                 }
             }
+
+            // Also clean up any falling objects in the scene that might not be children of TowerRoot
+            ClearAllFallingObjects();
             
             // Reset background color
             if (_ctx.sceneContextView.ColorManager != null)
@@ -295,13 +302,14 @@ namespace Code.Core.ShortGamesCore.Game2
                 _currentMover = null;
             }
             
+            // Track falling block for cleanup
+            _fallingBlocks.Add(_currentMovingBlock);
+            
             // Return to pool after some time
+            var fallingBlock = _currentMovingBlock;
             AddDispose(Observable.Timer(TimeSpan.FromSeconds(3f)).Subscribe(_ => 
             {
-                if (_currentMovingBlock != null)
-                {
-                    _poolManager.Return(_ctx.sceneContextView.BlockPrefab, _currentMovingBlock);
-                }
+                ReturnFallingBlock(fallingBlock);
             }));
             
             _currentMovingBlock = null;
@@ -379,6 +387,56 @@ namespace Code.Core.ShortGamesCore.Game2
                     }
                 }
                 _ctx.towerModel.TowerHeight.Value = maxHeight;
+            }
+        }
+
+        private void ReturnFallingBlock(GameObject fallingBlock)
+        {
+            if (fallingBlock == null || !_fallingBlocks.Contains(fallingBlock)) return;
+
+            _fallingBlocks.Remove(fallingBlock);
+            _poolManager.Return(_ctx.sceneContextView.BlockPrefab, fallingBlock);
+        }
+
+        private void ReturnAllFallingBlocks()
+        {
+            var blocksToReturn = new List<GameObject>(_fallingBlocks);
+            foreach (var block in blocksToReturn)
+            {
+                if (block != null)
+                {
+                    _poolManager.Return(_ctx.sceneContextView.BlockPrefab, block);
+                }
+            }
+            _fallingBlocks.Clear();
+        }
+
+        private void ClearAllFallingObjects()
+        {
+            // Find all objects with Rigidbody that are not kinematic (falling objects)
+            var allRigidbodies = UnityEngine.Object.FindObjectsOfType<Rigidbody>();
+            
+            foreach (var rb in allRigidbodies)
+            {
+                if (rb != null && !rb.isKinematic && rb.gameObject != null)
+                {
+                    // Check if it's a block or chunk object that should be returned to pool
+                    var gameObj = rb.gameObject;
+                    
+                    // Try to return as block prefab first
+                    if (_ctx.sceneContextView.BlockPrefab != null)
+                    {
+                        _poolManager.Return(_ctx.sceneContextView.BlockPrefab, gameObj);
+                        continue;
+                    }
+                    
+                    // Try to return as chunk prefab
+                    if (_ctx.sceneContextView.ChunkPrefab != null)
+                    {
+                        _poolManager.Return(_ctx.sceneContextView.ChunkPrefab, gameObj);
+                        continue;
+                    }
+                }
             }
         }
 
