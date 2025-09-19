@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Code.Core.GamesLoader;
+using Code.Core.GamesLoader.TestHelpers;
 using Code.Core.ShotGamesCore.Tests.Mocks;
 using InGameLogger;
 using NUnit.Framework;

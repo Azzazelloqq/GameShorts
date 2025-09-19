@@ -1,279 +1,259 @@
-# GameSwiper Integration - MVC Architecture
+# GameSwiper - UI Module with Modular Input System
 
-## Overview
+## Architecture
 
-GameSwiper is a system for managing switching between mini-games, built using the MVC pattern. The system ensures clear separation of responsibilities between components.
+GameSwiper is a pure UI component with a modular input handling system. 
+It separates visual presentation from input processing through pluggable handlers.
 
-**Key Features:**
-- **TikTok-style swipe navigation** with real-time preview
-- **Interactive gestures** - change direction mid-swipe or cancel
-- **RenderTexture-based transitions** for smooth animations
-- **Async initialization pattern** to avoid constructor deadlocks
-- **Full MVC architecture** with clear separation of concerns
+```
+GameSwiper (UI Component)
+├── Handles visual carousel (3 RawImages)
+├── Delegates input to handlers (modular)
+├── Fires events when user wants to switch games
+└── Updates display when told by controller
 
-## MVC Architecture
+Input Handlers (Pluggable)
+├── GameSwiperInputHandler (base contract)
+├── SwipeInputHandler (touch/mouse swipes)
+└── ButtonInputHandler (UI buttons)
 
-### Model - GameSwiper
-**Business logic** for game switching:
-- Implements `ISwiperGame` interface
-- Uses `IShortGameLifeCycleService` to manage games
-- Handles async loading operations
-- Logs all operations
+GameSwiperController (Mediator)
+├── Creates and manages GameSwiper
+├── Listens to GameSwiper events
+├── Calls IGameProvider methods
+└── Updates GameSwiper display
+```
 
-### View - GameSwiperView
-**Pure View** without business logic:
-- Contains only UI elements and input handling
-- Generates reactive events: `OnNextGameRequested`, `OnPreviousGameRequested`
-- Supports various input methods (buttons, swipes, keyboard)
-- Manages visual state (loading, button activity)
+## Input Handler System
 
-### Controller - GameSwiperController
-**Bridge** between Model and View:
-- Subscribes to View events
-- Calls Model methods
-- Manages View state (loading indicator)
-- Handles errors and operation cancellations
-
-## System Components
-
-### 1. InteractiveSwipeHandler (New!)
-**Advanced swipe gesture handling** with TikTok-like behavior:
-- **Direction Change Support**: Can start swiping down, then change to up mid-gesture
-- **Cancellation Support**: Release before threshold to cancel swipe
-- **Visual Feedback**: Real-time preview of next/previous games during swipe
-- **Rubber Band Effect**: Elastic feedback when swiping to unavailable game
-- **Progress Tracking**: Events for swipe progress (0-100%)
-
-Key features:
-- `OnSwipeProgress` - Tracks swipe direction and progress in real-time
-- `OnSwipeComplete` - Triggered when swipe passes threshold
-- `OnSwipeCancelled` - Triggered when user releases before threshold
-- Supports both up (previous) and down (next) swipe directions
-- Configurable thresholds, deadzones, and visual feedback
-
-### 2. ISwiperGame (Interface)
+### Base Contract (GameSwiperInputHandler)
+Abstract base class that all input handlers must extend:
 ```csharp
-public interface ISwiperGame
+public abstract class GameSwiperInputHandler : MonoBehaviour
 {
-    Task<bool> SwipeToNextGameAsync(CancellationToken cancellationToken = default);
-    Task<bool> SwipeToPreviousGameAsync(CancellationToken cancellationToken = default);
-    (RenderTexture current, RenderTexture next, RenderTexture previous) GetRenderTextures();
-    bool CanSwipeNext { get; }
-    bool CanSwipePrevious { get; }
+    // Events for game navigation
+    public event Action OnNextGameRequested;
+    public event Action OnPreviousGameRequested;
+    
+    // Event for real-time interaction progress
+    public event Action<float> OnDragProgress;  // -1 to 1, negative=previous, positive=next
+    
+    // Enable/disable the handler
+    public abstract bool IsEnabled { get; set; }
+    
+    // Update navigation availability
+    public abstract void SetNavigationAvailability(bool canGoNext, bool canGoPrevious);
+    
+    // Reset any ongoing input state
+    public abstract void ResetInputState();
 }
 ```
 
-### 3. GameSwiper (Model)
-- Core business logic
-- Integration with `GameSwiperService`
-- Wraps service functionality for interface implementation
-- Manages async operations
+### SwipeInputHandler
+Handles vertical swipe gestures with visual feedback:
+- **Swipe Up**: Request previous game
+- **Swipe Down**: Request next game
+- **Drag Preview**: Real-time visual feedback during drag
+- **Rubber Band**: Elastic effect at boundaries
+- **Configurable**: Threshold, sensitivity, invert option
 
-### 4. GameSwiperView (View)
-**Reactive events:**
-- `OnNextGameRequested` - request next game
-- `OnPreviousGameRequested` - request previous game
-- `OnGameChanged` - game change notification
+### ButtonInputHandler  
+Manages UI button navigation:
+- **Next Button**: Navigate to next game
+- **Previous Button**: Navigate to previous game
+- **Auto-disable**: Grays out unavailable directions
+- **Auto-hide**: Optionally hides unavailable buttons
+- **Quick Progress**: Sends instant OnDragProgress (1 or -1) on button click
 
-**State management methods:**
-- `SetLoadingState(bool)` - show/hide loading indicator
-- `SetPreviewTextures(next, previous)` - set textures for swipe preview
-- `UpdateNavigationButtons(hasNext, hasPrevious)` - update button states
-- **NEW**: Interactive swipe integration with `InteractiveSwipeHandler`
+## Separation of Concerns
 
-**Interactive Swipe Features:**
-- Real-time preview during swipe
-- Support for direction changes mid-gesture
-- Cancellation when released before threshold
-- Visual feedback with rubber band effect
+### GameSwiper (Pure UI)
+- **Responsibility**: Visual presentation and input coordination
+- **Does**: Animation, delegates to input handlers, fires events
+- **Does NOT**: Game logic, queue management, loading, direct input handling
+- **Communication**: Events only (OnNextGameRequested, OnPreviousGameRequested)
 
-### 5. GameSwiperController (Controller)
-- Manages connection between Model and View
-- Handles View events (buttons and swipe gestures)
-- Updates preview textures for next/previous games
-- Coordinates with GameProvider for game transitions
-- Manages async initialization pattern
+### Input Handlers (Modular Input)
+- **Responsibility**: Process specific input types
+- **Does**: Detect user input, validate actions, fire navigation events
+- **Does NOT**: Animate UI, manage games, know about business logic
+- **Communication**: Events to GameSwiper
 
-### 6. GameSwiperService
-**Core service** for game transition orchestration:
-- Manages transition states (Idle, Preparing, Animating, Completing)
-- Handles RenderTexture coordination
-- Synchronizes game lifecycle (pause, stop, start)
-- Manages preloading of adjacent games
-- Provides swipe availability checks
+### GameSwiperController (Mediator)
+- **Responsibility**: Connect UI with business logic
+- **Does**: Subscribe to UI events, call provider methods, update UI state, manage loading
+- **Loading Management**: Shows loading indicator while waiting for games to be ready
+- **Does NOT**: Direct game management or input processing
+- **Communication**: Uses IGameProvider interface
 
-### 7. GameSwiperFactory
-Factory for creating GameSwiper with dependencies:
-```csharp
-public static GameSwiper CreateGameSwiper(
-    IShortGameLifeCycleService lifeCycleService, 
-    IInGameLogger logger)
-```
+### IGameProvider (Business Logic)
+- **Responsibility**: Game management and queue logic
+- **Does**: Switch games, manage queue, handle loading
+- **Does NOT**: Know about UI, swipes, or visual presentation
+- **Communication**: Provides game state and textures
 
 ## Data Flow
 
 ```
-User Input (View) 
-    → Event (OnNextGameRequested)
-    → Controller (HandleNextGameRequested)
-    → Model (NextGameAsync)
-    → Controller (HandleResponse)
-    → View (SetLoadingState, OnGameChanged)
+User interacts (swipe/button/keyboard/etc)
+    ↓
+InputHandler detects input
+    ↓
+InputHandler.OnDragProgress event (visual feedback)
+    ↓
+GameSwiper updates visual preview
+    ↓
+InputHandler.OnNextGameRequested/OnPreviousGameRequested event
+    ↓
+GameSwiper receives event from handler
+    ↓
+GameSwiper.OnNextGameRequested/OnPreviousGameRequested event
+    ↓
+GameSwiperController handles event
+    ↓
+Controller checks if game is ready (IsNextGameReady/IsPreviousGameReady)
+    ↓
+If not ready: Show loading indicator and wait
+    ↓
+Once ready: Animate transition
+    ↓
+Controller calls gameProvider.SwipeToNextGameAsync()
+    ↓
+Provider switches game (business logic)
+    ↓
+Controller updates GameSwiper textures
+    ↓
+GameSwiper displays new state
 ```
 
-## GameEntryPoint Integration
+## Unity Setup
 
-### ⚠️ IMPORTANT: Async Initialization Pattern
+### GameSwiper Prefab Structure:
+```
+GameSwiperPrefab
+├── GameSwiper (Component)
+│   ├── Input Handlers (List)
+│   │   ├── SwipeInputHandler
+│   │   └── ButtonInputHandler
+│   └── Settings
+├── Visual Elements
+│   ├── TopImage (RawImage, Y: 1080)
+│   ├── CenterImage (RawImage, Y: 0)
+│   └── BottomImage (RawImage, Y: -1080)
+├── Input Components
+│   ├── SwipeInputHandler (Component)
+│   └── ButtonInputHandler (Component)
+│       ├── NextButton (Button reference)
+│       └── PreviousButton (Button reference)
+└── UI Elements
+    ├── NextButton (Button)
+    ├── PreviousButton (Button)
+    └── LoadingIndicator (GameObject)
+```
 
-**Never call async methods in constructors!** This can lead to deadlocks and unpredictable behavior.
+### Configuration
 
-### Correct initialization approach:
+**GameSwiper Settings:**
+- Animation Duration: 0.3s
+- Animation Ease: OutQuad
+- Image Spacing: 1080
+- Input Handlers: [List of handlers]
+
+**SwipeInputHandler Settings:**
+- Swipe Threshold: 100
+- Drag Sensitivity: 1.0
+- Invert Swipe: false
+- Max Rubber Band: 100
+- Rubber Band Resistance: 0.5
+
+**ButtonInputHandler Settings:**
+- Next Button: (Button reference)
+- Previous Button: (Button reference)
+- Auto Hide Unavailable: true
+- Auto Disable Unavailable: true
+
+## Adding Custom Input Handlers
+
+Create a new handler by extending the base class:
 
 ```csharp
-// 1. Create components WITHOUT async calls
-var gameProvider = new GameProvider(logger);
-var controller = new GameSwiperController(ctx, logger, resourceLoader);
-
-// 2. Async initialization through ValueTask methods
-await gameProvider.InitializeAsync(registry, queue, loader, cancellationToken);
-await controller.InitializeAsync(cancellationToken);
-
-// 3. Now components are ready to use
+public class KeyboardInputHandler : GameSwiperInputHandler
+{
+    [SerializeField] private KeyCode _nextKey = KeyCode.N;
+    [SerializeField] private KeyCode _previousKey = KeyCode.P;
+    
+    private void Update()
+    {
+        if (!IsEnabled) return;
+        
+        if (Input.GetKeyDown(_nextKey))
+        {
+            ReportDragProgress(1f);  // Instant full progress
+            RequestNextGame();
+            ReportDragProgress(0f);  // Reset
+        }
+            
+        if (Input.GetKeyDown(_previousKey))
+        {
+            ReportDragProgress(-1f); // Instant full progress
+            RequestPreviousGame();
+            ReportDragProgress(0f);  // Reset
+        }
+    }
+    
+    // Implement abstract members...
+}
 ```
 
-### Integration steps:
+Then add it to GameSwiper's input handlers list in the Inspector.
 
-1. **Create GameProvider** - `new GameProvider(logger)`
-2. **Initialize Provider** - `await gameProvider.InitializeAsync(...)`
-3. **Create Controller** - `new GameSwiperController(ctx, logger, resourceLoader)`  
-4. **Initialize Controller** - `await controller.InitializeAsync(cancellationToken)`
-5. **View loads automatically** - in controller's `InitializeAsync` method
+## API Reference
 
-## Configuration
+### GameSwiper Public Methods:
+- `UpdateTextures(prev, curr, next)` - Update all displays
+- `UpdateNavigationStates(canNext, canPrev)` - Update all input handlers
+- `SetLoadingState(bool)` - Show/hide loading
+- `AnimateToNext()` - Play next animation
+- `AnimateToPrevious()` - Play previous animation
+- `AddInputHandler(handler)` - Add handler at runtime
+- `RemoveInputHandler(handler)` - Remove handler at runtime
 
-### GameSwiperView settings:
-- `_swipeThreshold` - swipe sensitivity (50px)
-- `_enableSwipeGestures` - enable swipe gestures
-- `_enableKeyboardInput` - enable keyboard input
-- `_loadingIndicator` - loading indicator
+### GameSwiper Events:
+- `OnNextGameRequested` - User wants next game
+- `OnPreviousGameRequested` - User wants previous game
 
-### GameEntryPoint settings:
-- `_uiParent` - parent object for UI
-- `_gameSwiperViewPrefabPath` - path to prefab
+## Loading Management
 
-## Rapid Consecutive Swipes Support
+The system automatically handles game loading states:
 
-### Current Limitation (Default Behavior)
-⚠️ **By default, rapid consecutive swipes are BLOCKED**:
-- Only one transition can happen at a time
-- Additional swipes during transition are ignored
-- User must wait for current transition to complete
+- **Initial Load**: Waits for current game to be ready on startup
+- **Pre-transition Check**: Checks if next/previous game is ready before switching
+- **Loading Indicator**: Shows loading UI while waiting for games
+- **Timeout Protection**: 10-second timeout prevents infinite waiting
+- **Automatic Updates**: Loading state updates when game readiness changes
 
-### SwipeQueueManager (Optional Enhancement)
-To support TikTok-style rapid swipes with queuing:
+## Benefits
+
+- **Unified API**: All input handlers share the same interface
+- **Consistent Behavior**: Visual feedback works the same for all input types
+- **Smart Loading**: Automatic loading management with visual feedback
+- **Modular Input**: Easy to add/remove input methods
+- **Testable**: Each handler can be tested independently
+- **Flexible**: Mix and match input methods per platform
+- **Maintainable**: Clear separation of concerns
+- **Extensible**: Add custom input handlers without modifying core
+- **Reusable**: Input handlers can be reused in other projects
+
+## Example: Multiple Input Methods
 
 ```csharp
-// Create queue manager with the swiper service
-var queueManager = new SwipeQueueManager(_swiperService, _logger, maxQueueSize: 3);
+// Setup GameSwiper with multiple input handlers
+gameSwiper.AddInputHandler(swipeHandler);    // Touch/mouse swipes
+gameSwiper.AddInputHandler(buttonHandler);   // UI buttons
+gameSwiper.AddInputHandler(keyboardHandler); // Keyboard shortcuts
+gameSwiper.AddInputHandler(gamepadHandler);  // Gamepad support
 
-// Enqueue swipes (they will be processed sequentially)
-await queueManager.EnqueueSwipeAsync(SwipeQueueManager.SwipeType.Next);
-await queueManager.EnqueueSwipeAsync(SwipeQueueManager.SwipeType.Next);
-await queueManager.EnqueueSwipeAsync(SwipeQueueManager.SwipeType.Previous);
-
-// Monitor queue
-queueManager.OnQueueSizeChanged += (size) => {
-    _logger.Log($"Queue size: {size}");
-};
-
-// Get queue info
-string info = queueManager.GetQueueInfo(); // "Queue (3): Next -> Next -> Previous"
+// Enable/disable specific input methods
+swipeHandler.IsEnabled = Application.isMobilePlatform;
+keyboardHandler.IsEnabled = Application.isEditor;
 ```
-
-**Features:**
-- **Queue Size Limit**: Max 3 swipes queued (configurable)
-- **Automatic Processing**: Swipes execute sequentially
-- **Timeout Protection**: Old requests expire after 10s
-- **Visual Feedback**: Shows queue size indicator
-- **Cancellable**: Can clear queue anytime
-
-**Benefits:**
-- ✅ User can swipe multiple times rapidly
-- ✅ All swipes are processed in order
-- ✅ No swipes are lost
-- ✅ Prevents memory issues with queue limit
-
-## Interaction Methods
-
-### 1. UI Buttons
-- "Next Game" / "Previous Game"
-- Automatically disabled during loading
-
-### 2. Swipe Gestures (Enhanced with InteractiveSwipeHandler)
-- **Swipe up** → previous game
-- **Swipe down** → next game  
-- **Interactive Features:**
-  - Start swiping, see preview of target game
-  - Change direction mid-swipe (e.g., start down, go back up)
-  - Release before threshold to cancel
-  - Rubber band effect at boundaries
-  - Real-time visual feedback
-- **Configurable:**
-  - Swipe threshold (default 50px)
-  - Dead zone (default 10px)
-  - Maximum swipe time
-  - Preview scale and animations
-
-### 3. Keyboard Input (Editor)
-- ↑ / ↓ - navigate between games
-- Unity editor only
-
-### 4. Programmatic Control
-```csharp
-var gameSwiper = container.GetInstance<ISwiperGame>();
-await gameSwiper.NextGameAsync();
-```
-
-## Testing
-
-**GameSwiperTester** for system verification:
-- N/P keys - navigation testing
-- C key - controller verification
-- Automatic connection on initialization
-
-## Architecture Advantages
-
-1. **Separation of Concerns** - clear boundaries between components
-2. **Testability** - each component can be tested in isolation
-3. **Extensibility** - easy to add new input methods or logic
-4. **Reusability** - View can be used with different controllers
-5. **Clean Code** - View contains only UI logic, Model contains only business logic
-
-## File Structure
-
-```
-Assets/Code/Core/GameSwiper/
-├── ISwiperGame.cs              # Interface
-├── GameSwiper.cs               # Model (business logic)
-├── GameSwiperView.cs           # View (pure UI)
-├── GameSwiperController.cs     # Controller (bridge)
-├── GameSwiperService.cs        # Service (transition orchestration)
-├── InteractiveSwipeHandler.cs  # Interactive swipe gestures (TikTok-style)
-├── SwipeQueueManager.cs        # Queue system for rapid consecutive swipes (NEW!)
-└── README.md                   # Documentation
-```
-
-## Lifecycle Management
-
-1. **Creation**: GameEntryPoint creates components (constructors)
-2. **Initialization**: Call `InitializeAsync()` methods for async operations
-3. **Binding**: Controller connects to View (in `InitializeAsync`)
-4. **Operation**: Events View → Controller → Model → Controller → View
-5. **Cleanup**: Controller unsubscribes from View, releases resources
-
-### Async Best Practices:
-
-- **Use ValueTask** for initialization methods (more efficient for sync operations)
-- **Check initialization state** via `_isInitialized` flag
-- **Support CancellationToken** in all async operations
-- **Prevent double initialization** - check flag at method start

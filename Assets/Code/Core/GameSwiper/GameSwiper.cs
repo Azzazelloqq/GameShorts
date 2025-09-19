@@ -1,137 +1,346 @@
 using System;
-using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Code.Core.GamesLoader;
-using Code.Core.ShortGamesCore.Source.GameCore;
-using InGameLogger;
-using LightDI.Runtime;
+using Code.Core.GameSwiper.InputHandlers;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Code.Core.GameSwiper
 {
 /// <summary>
-/// Implementation of ISwiperGame interface for managing game switching
+/// Pure UI component for vertical carousel animation
+/// Only handles visual presentation and delegates input to handlers
+/// Notifies about user actions via events
 /// </summary>
-public class GameSwiper : ISwiperGame
+internal class GameSwiper : MonoBehaviour
 {
-	private readonly GameSwiperService _swiperService;
-	private readonly IInGameLogger _logger;
-	private bool _disposed;
+	[Header("Carousel Images")]
+	[SerializeField]
+	private RawImage _topImage; // Previous game (Y: +1080)
 
-	public event Action<GameSwiperService.TransitionState> OnTransitionStateChanged
+	[SerializeField]
+	private RawImage _centerImage; // Current game (Y: 0, visible)
+
+	[SerializeField]
+	private RawImage _bottomImage; // Next game (Y: -1080)
+
+	[Header("Input Handlers")]
+	[SerializeField]
+	private List<GameSwiperInputHandler> _inputHandlers = new();
+
+	[Header("UI Elements")]
+	[SerializeField]
+	private GameObject _loadingIndicator;
+
+	[Header("Settings")]
+	[SerializeField]
+	private float _animationDuration = 0.3f;
+
+	[SerializeField]
+	private Ease _animationEase = Ease.OutQuad;
+
+	[SerializeField]
+	private float _imageSpacing = 1080f;
+
+	// Events for external communication
+	public event Action OnNextGameRequested;
+	public event Action OnPreviousGameRequested;
+
+	// State
+	private bool _isAnimating;
+	private bool _canGoNext = true;
+	private bool _canGoPrevious = true;
+
+	private void Awake()
 	{
-		add => _swiperService.OnTransitionStateChanged += value;
-		remove => _swiperService.OnTransitionStateChanged -= value;
+		SetupInitialPositions();
+		SetupInputHandlers();
 	}
 
-	public event Action<Type, Type> OnGameChanged
+	private void SetupInitialPositions()
 	{
-		add => _swiperService.OnGameChanged += value;
-		remove => _swiperService.OnGameChanged -= value;
+		if (_topImage)
+		{
+			_topImage.rectTransform.anchoredPosition = new Vector2(0, _imageSpacing);
+		}
+
+		if (_centerImage)
+		{
+			_centerImage.rectTransform.anchoredPosition = Vector2.zero;
+		}
+
+		if (_bottomImage)
+		{
+			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -_imageSpacing);
+		}
 	}
 
-	public bool CanSwipeNext => _swiperService.CanSwipeNext;
-	public bool CanSwipePrevious => _swiperService.CanSwipePrevious;
-	public bool IsTransitioning => _swiperService.IsTransitioning;
+	private void SetupInputHandlers()
+	{
+		foreach (var handler in _inputHandlers)
+		{
+			if (handler != null)
+			{
+				// Subscribe to all events - common API
+				handler.OnNextGameRequested += HandleNextGameRequest;
+				handler.OnPreviousGameRequested += HandlePreviousGameRequest;
+				handler.OnDragProgress += HandleSwipeProgress;
+			}
+		}
+	}
 
 	/// <summary>
-	/// GameSwiper constructor
+	/// Update all three textures at once
+	/// Called externally when game state changes
 	/// </summary>
-	/// <param name="gameProvider">Game provider</param>
-	/// <param name="logger">Logger for operation tracking</param>
-	public GameSwiper(
-		[Inject] IGameProvider gameProvider,
-		[Inject] IInGameLogger logger)
+	public void UpdateTextures(RenderTexture previous, RenderTexture current, RenderTexture next)
 	{
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		_swiperService = new GameSwiperService(gameProvider, logger);
-	}
-
-	public (RenderTexture current, RenderTexture next, RenderTexture previous) GetRenderTextures()
-	{
-		return _swiperService.GetRenderTextures();
-	}
-
-	/// <summary>
-	/// Switch to the next game
-	/// </summary>
-	/// <param name="cancellationToken">Operation cancellation token</param>
-	/// <returns>true if switch successful, false otherwise</returns>
-	public async Task<bool> SwipeToNextGameAsync(CancellationToken cancellationToken = default)
-	{
-		try
+		if (_topImage)
 		{
-			_logger.Log("GameSwiper: Switching to next game");
-			var success = await _swiperService.SwipeToNextGameAsync(cancellationToken);
-
-			if (success)
-			{
-				_logger.Log("GameSwiper: Successfully switched to next game");
-			}
-			else
-			{
-				_logger.LogWarning("GameSwiper: Failed to switch to next game");
-			}
-
-			return success;
+			_topImage.texture = previous;
 		}
-		catch (Exception ex)
+
+		if (_centerImage)
 		{
-			_logger.LogError($"GameSwiper: Error switching to next game: {ex.Message}");
-			return false;
+			_centerImage.texture = current;
+		}
+
+		if (_bottomImage)
+		{
+			_bottomImage.texture = next;
 		}
 	}
 
 	/// <summary>
-	/// Switch to the previous game
+	/// Update navigation availability
 	/// </summary>
-	/// <param name="cancellationToken">Operation cancellation token</param>
-	/// <returns>true if switch successful, false otherwise</returns>
-	public async Task<bool> SwipeToPreviousGameAsync(CancellationToken cancellationToken = default)
+	public void UpdateNavigationStates(bool canGoNext, bool canGoPrevious)
 	{
-		try
-		{
-			_logger.Log("GameSwiper: Switching to previous game");
-			var success = await _swiperService.SwipeToPreviousGameAsync(cancellationToken);
+		_canGoNext = canGoNext;
+		_canGoPrevious = canGoPrevious;
 
-			if (success)
-			{
-				_logger.Log("GameSwiper: Successfully switched to previous game");
-			}
-			else
-			{
-				_logger.LogWarning("GameSwiper: Failed to switch to previous game");
-			}
-
-			return success;
-		}
-		catch (Exception ex)
+		// Update all input handlers
+		foreach (var handler in _inputHandlers)
 		{
-			_logger.LogError($"GameSwiper: Error switching to previous game: {ex.Message}");
-			return false;
+			if (handler != null)
+			{
+				handler.SetNavigationAvailability(canGoNext && !_isAnimating, canGoPrevious && !_isAnimating);
+			}
 		}
 	}
 
-	public void PauseAll()
+	/// <summary>
+	/// Show/hide loading indicator
+	/// </summary>
+	public void SetLoadingState(bool isLoading)
 	{
-		_swiperService.PauseAll();
+		_loadingIndicator.SetActive(isLoading);
 	}
 
-	public void ResumeCurrent()
+	/// <summary>
+	/// Animate transition to next game (swipe up)
+	/// </summary>
+	public async Task AnimateToNext()
 	{
-		_swiperService.ResumeCurrent();
-	}
-
-	public void Dispose()
-	{
-		if (_disposed)
+		if (_isAnimating)
 		{
 			return;
 		}
 
-		_disposed = true;
-		_logger.Log("Disposing GameSwiper");
-		_swiperService?.Dispose();
+		_isAnimating = true;
+
+		// Disable all inputs during animation
+		SetInputHandlersEnabled(false);
+
+		try
+		{
+			await AnimateUp();
+		}
+		finally
+		{
+			_isAnimating = false;
+			SetInputHandlersEnabled(true);
+		}
+	}
+
+	/// <summary>
+	/// Animate transition to previous game (swipe down)
+	/// </summary>
+	public async Task AnimateToPrevious()
+	{
+		if (_isAnimating)
+		{
+			return;
+		}
+
+		_isAnimating = true;
+
+		// Disable all inputs during animation
+		SetInputHandlersEnabled(false);
+
+		try
+		{
+			await AnimateDown();
+		}
+		finally
+		{
+			_isAnimating = false;
+			SetInputHandlersEnabled(true);
+		}
+	}
+
+	private void HandleNextGameRequest()
+	{
+		if (_isAnimating || !_canGoNext)
+		{
+			return;
+		}
+
+		OnNextGameRequested?.Invoke();
+	}
+
+	private void HandlePreviousGameRequest()
+	{
+		if (_isAnimating || !_canGoPrevious)
+		{
+			return;
+		}
+
+		OnPreviousGameRequested?.Invoke();
+	}
+
+	private void HandleSwipeProgress(float progress)
+	{
+		// Visual feedback during swipe
+		if (_isAnimating)
+		{
+			return;
+		}
+
+		var offset = progress * _imageSpacing * 0.3f; // 30% of full distance for preview
+
+		if (_topImage)
+		{
+			_topImage.rectTransform.anchoredPosition = new Vector2(0, _imageSpacing - offset);
+		}
+
+		if (_centerImage)
+		{
+			_centerImage.rectTransform.anchoredPosition = new Vector2(0, -offset);
+		}
+
+		if (_bottomImage)
+		{
+			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -_imageSpacing - offset);
+		}
+
+		// If progress returns to 0 (drag ended), reset positions
+		if (Mathf.Approximately(progress, 0f))
+		{
+			ResetPositions();
+		}
+	}
+
+	private void SetInputHandlersEnabled(bool enabled)
+	{
+		foreach (var handler in _inputHandlers)
+		{
+			if (handler != null)
+			{
+				handler.IsEnabled = enabled;
+				if (!enabled)
+				{
+					handler.ResetInputState();
+				}
+			}
+		}
+	}
+
+	private async Task AnimateUp()
+	{
+		var sequence = DOTween.Sequence();
+
+		sequence.Append(_topImage.rectTransform
+			.DOAnchorPos(new Vector2(0, _imageSpacing * 2), _animationDuration)
+			.SetEase(_animationEase));
+		sequence.Join(_centerImage.rectTransform
+			.DOAnchorPos(new Vector2(0, _imageSpacing), _animationDuration)
+			.SetEase(_animationEase));
+		sequence.Join(_bottomImage.rectTransform
+			.DOAnchorPos(Vector2.zero, _animationDuration)
+			.SetEase(_animationEase));
+
+		await sequence.AsyncWaitForCompletion();
+
+		// Rotate references
+		var temp = _topImage;
+		_topImage = _centerImage;
+		_centerImage = _bottomImage;
+		_bottomImage = temp;
+
+		// Reset position
+		_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -_imageSpacing);
+	}
+
+	private async Task AnimateDown()
+	{
+		var sequence = DOTween.Sequence();
+
+		sequence.Append(_topImage.rectTransform
+			.DOAnchorPos(Vector2.zero, _animationDuration)
+			.SetEase(_animationEase));
+		sequence.Join(_centerImage.rectTransform
+			.DOAnchorPos(new Vector2(0, -_imageSpacing), _animationDuration)
+			.SetEase(_animationEase));
+		sequence.Join(_bottomImage.rectTransform
+			.DOAnchorPos(new Vector2(0, -_imageSpacing * 2), _animationDuration)
+			.SetEase(_animationEase));
+
+		await sequence.AsyncWaitForCompletion();
+
+		// Rotate references
+		var temp = _bottomImage;
+		_bottomImage = _centerImage;
+		_centerImage = _topImage;
+		_topImage = temp;
+
+		// Reset position
+		_topImage.rectTransform.anchoredPosition = new Vector2(0, _imageSpacing);
+	}
+
+	private void ResetPositions()
+	{
+		if (_topImage)
+		{
+			_topImage.rectTransform.DOAnchorPos(new Vector2(0, _imageSpacing), 0.2f);
+		}
+
+		if (_centerImage)
+		{
+			_centerImage.rectTransform.DOAnchorPos(Vector2.zero, 0.2f);
+		}
+
+		if (_bottomImage)
+		{
+			_bottomImage.rectTransform.DOAnchorPos(new Vector2(0, -_imageSpacing), 0.2f);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		// Unsubscribe from all handlers
+		foreach (var handler in _inputHandlers)
+		{
+			if (handler != null)
+			{
+				handler.OnNextGameRequested -= HandleNextGameRequest;
+				handler.OnPreviousGameRequested -= HandlePreviousGameRequest;
+				handler.OnDragProgress -= HandleSwipeProgress;
+			}
+		}
+
+		_inputHandlers.Clear();
 	}
 }
 }

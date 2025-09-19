@@ -3,11 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.GamesLoader;
-using Code.Core.Tools;
 using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
-using R3;
 using ResourceLoader;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -15,81 +13,88 @@ using Object = UnityEngine.Object;
 namespace Code.Core.GameSwiper
 {
 /// <summary>
-/// Controller for managing the connection between GameSwiper and GameSwiperView
+/// Controller that connects GameSwiper UI with IGameProvider business logic
+/// Handles communication between visual component and game system
 /// </summary>
-public struct Ctx
+public class GameSwiperController : IDisposable
 {
-	public Transform PlaceForAllUi;
-	public IGameProvider GameProvider; // Game provider reference
-}
-
-public class GameSwiperController : BaseDisposable
-{
-	private readonly IGameProvider _gameProvider;
-	private readonly GameSwiperService _swiperService;
+	private readonly IShortGameServiceProvider _shortGameServiceProvider;
 	private readonly IInGameLogger _logger;
-	private CancellationTokenSource _cancellationTokenSource;
 	private readonly IResourceLoader _resourceLoader;
-	private readonly Ctx _ctx;
-	private GameSwiperView _gameSwiperView;
-	private readonly ReactiveTrigger _onPreviewGame;
-	private readonly ReactiveTrigger _onNextGame;
+	private readonly Transform _uiRoot;
+	private GameSwiper _gameSwiper;
 	private bool _isInitialized;
+	private bool _isTransitioning;
 
-	public GameSwiperController(Ctx ctx, [Inject] IInGameLogger logger, [Inject] IResourceLoader resourceLoader)
+	public GameSwiperController(
+		Transform uiRoot,
+		IShortGameServiceProvider shortGameServiceProvider,
+		[Inject] IInGameLogger logger,
+		[Inject] IResourceLoader resourceLoader)
 	{
-		_ctx = ctx;
-		_gameProvider = ctx.GameProvider ?? throw new ArgumentNullException(nameof(ctx.GameProvider));
-		_cancellationTokenSource = new CancellationTokenSource();
-		_logger = logger;
-		_resourceLoader = resourceLoader;
-
-		// Create the swipe management service
-		_swiperService = new GameSwiperService(_gameProvider, _logger);
-		_swiperService.OnTransitionStateChanged += HandleTransitionStateChanged;
-		_swiperService.OnGameChanged += HandleGameChanged;
-
-		_onNextGame = new ReactiveTrigger();
-		_onPreviewGame = new ReactiveTrigger();
-
-		// Subscriptions will be set up after initialization
+		_uiRoot = uiRoot ?? throw new ArgumentNullException(nameof(uiRoot));
+		_shortGameServiceProvider = shortGameServiceProvider ?? throw new ArgumentNullException(nameof(shortGameServiceProvider));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		_resourceLoader = resourceLoader ?? throw new ArgumentNullException(nameof(resourceLoader));
 	}
 
 	/// <summary>
-	/// Async initialization of the controller
+	/// Load UI and setup connections
 	/// </summary>
 	public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
 	{
 		if (_isInitialized)
 		{
-			_logger.LogWarning("GameSwiperController is already initialized");
+			_logger.LogWarning("GameSwiperController already initialized");
 			return;
 		}
 
 		try
 		{
-			_logger.Log("Initializing GameSwiperController");
+			// Load the GameSwiper prefab
+			var prefab = await _resourceLoader.LoadResourceAsync<GameObject>(
+				ResourceIdsContainer.DefaultLocalGroup.GameSwiper,
+				cancellationToken);
 
-			// Load UI
-			await LoadGameSwiperViewAsync(cancellationToken);
-
-			// Set up event subscriptions
-			AddDispose(_onNextGame.Subscribe(HandleNextGameRequested));
-			AddDispose(_onPreviewGame.Subscribe(HandlePreviousGameRequested));
-
-			// Update navigation button states
-			if (_gameSwiperView != null && _gameProvider?.QueueService != null)
+			if (prefab == null)
 			{
-				_gameSwiperView.UpdateNavigationButtons(
-					_gameProvider.QueueService.HasNext,
-					_gameProvider.QueueService.HasPrevious);
-
-				// Set initial preview textures
-				UpdatePreviewTextures();
+				_logger.LogError("GameSwiper prefab not found");
+				return;
 			}
 
+			// Instantiate and get component
+			var instance = Object.Instantiate(prefab, _uiRoot);
+			_gameSwiper = instance.GetComponent<GameSwiper>();
+
+			if (_gameSwiper == null)
+			{
+				_logger.LogError("GameSwiper component not found on prefab");
+				Object.Destroy(instance);
+				return;
+			}
+
+			_gameSwiper.OnNextGameRequested += HandleNextGameRequested;
+			_gameSwiper.OnPreviousGameRequested += HandlePreviousGameRequested;
+
+			// Wait for current game to be ready
+			if (!_shortGameServiceProvider.IsCurrentGameReady)
+			{
+				_logger.Log("Waiting for initial game to be ready...");
+				_gameSwiper.SetLoadingState(true);
+
+				while (!_shortGameServiceProvider.IsCurrentGameReady)
+				{
+					await Task.Delay(100, cancellationToken);
+				}
+			}
+
+			UpdateSwiperState();
+
 			_isInitialized = true;
-			_logger.Log("GameSwiperController initialized successfully");
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
 		}
 		catch (Exception ex)
 		{
@@ -97,213 +102,152 @@ public class GameSwiperController : BaseDisposable
 			throw;
 		}
 	}
-
-	private async ValueTask LoadGameSwiperViewAsync(CancellationToken cancellationToken)
+	
+	public void Dispose()
 	{
-		try
-		{
-			// Load GameSwiperView prefab
-			var swiperViewPrefab = await _resourceLoader.LoadResourceAsync<GameObject>(
-				ResourceIdsContainer.DefaultLocalGroup.GameSwiper, cancellationToken);
-
-			if (swiperViewPrefab != null)
-			{
-				// Create UI instance
-				var disposables = new CompositeDisposable();
-				var swiperViewInstance = AddComponent(Object.Instantiate(swiperViewPrefab, _ctx.PlaceForAllUi));
-				_gameSwiperView = swiperViewInstance.GetComponent<GameSwiperView>();
-				_gameSwiperView.SetCtx(new GameSwiperView.Ctx
-				{
-					Disposables = disposables,
-					OnNextGameRequested = _onNextGame,
-					OnPreviousGameRequested = _onPreviewGame
-				});
-			}
-			else
-			{
-				_logger.LogWarning(
-					$"GameSwiperView prefab not found at path: {ResourceIdsContainer.DefaultLocalGroup.GameSwiper}");
-			}
-		}
-		catch (Exception ex)
-		{
-			_logger.LogError($"Failed to load GameSwiperView: {ex.Message}");
-		}
+		_gameSwiper.OnNextGameRequested -= HandleNextGameRequested;
+		_gameSwiper.OnPreviousGameRequested -= HandlePreviousGameRequested;
 	}
 
+	/// <summary>
+	/// Handle next game request from UI
+	/// </summary>
 	private async void HandleNextGameRequested()
 	{
-		if (!_isInitialized)
+		if (_isTransitioning)
 		{
-			_logger.LogWarning("GameSwiperController is not initialized");
 			return;
 		}
 
-		if (!_swiperService.CanSwipeNext)
-		{
-			return;
-		}
+		_isTransitioning = true;
 
 		try
 		{
-			_logger.Log("GameSwiperController: Next game requested");
-
-			// Get RenderTextures for animation
-			var (current, next, _) = _swiperService.GetRenderTextures();
-
-			// Start transition in a separate task
-			var transitionTask = Task.Run(async () =>
+			if (!_shortGameServiceProvider.HasNextGame)
 			{
-				await _swiperService.SwipeToNextGameAsync(_cancellationTokenSource.Token);
-			});
-
-			// Run animation in parallel with transition logic
-			if (_gameSwiperView != null && current != null && next != null)
-			{
-				await _gameSwiperView.AnimateTransition(
-					current,
-					next,
-					GameSwiperView.TransitionDirection.Next);
+				_logger.LogError("No next game available");
+				return;
 			}
 
-			// Wait for transition logic to complete
-			await transitionTask;
+			if (!_shortGameServiceProvider.IsNextGameReady)
+			{
+				_gameSwiper.SetLoadingState(true);
+				
+				var timeout = 10000; 
+				var elapsed = 0;
+				while (!_shortGameServiceProvider.IsNextGameReady && elapsed < timeout)
+				{
+					await Task.Delay(100);
+					elapsed += 100;
+				}
+				
+				if (!_shortGameServiceProvider.IsNextGameReady)
+				{
+					_logger.LogError($"Next game failed to be ready in {timeout}ms");
+					return;
+				}
+			}
 
-			// Update displayed texture
-			_gameSwiperView?.SetCurrentGameTexture(_gameProvider.CurrentGameRenderTexture);
+			// Animate UI transition
+			await _gameSwiper.AnimateToNext();
 
-			// Update preview textures for next swipe
-			UpdatePreviewTextures();
+			// Then switch game logic
+			await _shortGameServiceProvider.SwipeToNextGameAsync();
 
-			_logger.Log("GameSwiperController: Successfully switched to next game");
-		}
-		catch (OperationCanceledException)
-		{
-			_logger.Log("GameSwiperController: Next game operation was cancelled");
+			// Update UI with new textures
+			UpdateSwiperState();
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError($"GameSwiperController: Error switching to next game: {ex.Message}");
+			_logger.LogError($"Error switching to next game: {ex.Message}");
+		}
+		finally
+		{
+			_gameSwiper.SetLoadingState(false);
+			_isTransitioning = false;
 		}
 	}
 
+	/// <summary>
+	/// Handle previous game request from UI
+	/// </summary>
 	private async void HandlePreviousGameRequested()
 	{
-		if (!_isInitialized)
+		if (_isTransitioning)
 		{
-			_logger.LogWarning("GameSwiperController is not initialized");
 			return;
 		}
 
-		if (!_swiperService.CanSwipePrevious)
-		{
-			return;
-		}
+		_isTransitioning = true;
 
 		try
 		{
-			_logger.Log("GameSwiperController: Previous game requested");
-
-			// Get RenderTextures for animation
-			var (current, _, previous) = _swiperService.GetRenderTextures();
-
-			// Start transition in a separate task
-			var transitionTask = Task.Run(async () =>
+			if (!_shortGameServiceProvider.HasPreviousGame)
 			{
-				await _swiperService.SwipeToPreviousGameAsync(_cancellationTokenSource.Token);
-			});
-
-			// Run animation in parallel with transition logic
-			if (_gameSwiperView != null && current != null && previous != null)
-			{
-				await _gameSwiperView.AnimateTransition(
-					current,
-					previous,
-					GameSwiperView.TransitionDirection.Previous);
+				return;
 			}
 
-			// Wait for transition logic to complete
-			await transitionTask;
+			if (!_shortGameServiceProvider.IsPreviousGameReady)
+			{
+				_gameSwiper.SetLoadingState(true);
 
-			// Update displayed texture
-			_gameSwiperView?.SetCurrentGameTexture(_gameProvider.CurrentGameRenderTexture);
+				var timeout = 10000; // 10 seconds timeout
+				var elapsed = 0;
+				while (!_shortGameServiceProvider.IsPreviousGameReady && elapsed < timeout)
+				{
+					await Task.Delay(100);
+					elapsed += 100;
+				}
 
-			// Update preview textures for next swipe
-			UpdatePreviewTextures();
+				if (!_shortGameServiceProvider.IsPreviousGameReady)
+				{
+					_logger.LogError($"Previous game failed to be ready in {timeout}ms");
+					return;
+				}
+			}
 
-			_logger.Log("GameSwiperController: Successfully switched to previous game");
+			await _gameSwiper.AnimateToPrevious();
+
+			await _shortGameServiceProvider.SwipeToPreviousGameAsync();
+
+			UpdateSwiperState();
 		}
 		catch (OperationCanceledException)
 		{
-			_logger.Log("GameSwiperController: Previous game operation was cancelled");
+			throw;
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError($"GameSwiperController: Error switching to previous game: {ex.Message}");
+			_logger.LogError($"Error switching to previous game: {ex.Message}");
+		}
+		finally
+		{
+			_gameSwiper.SetLoadingState(false);
+			_isTransitioning = false;
 		}
 	}
 
-	private void HandleTransitionStateChanged(GameSwiperService.TransitionState state)
+	/// <summary>
+	/// Update swiper visual state from game provider
+	/// </summary>
+	private void UpdateSwiperState()
 	{
-		_logger.Log($"GameSwiperController: Transition state changed to {state}");
+		// Update textures
+		_gameSwiper.UpdateTextures(
+			_shortGameServiceProvider.PreviousGameRenderTexture,
+			_shortGameServiceProvider.CurrentGameRenderTexture,
+			_shortGameServiceProvider.NextGameRenderTexture
+		);
 
-		// Update UI based on state
-		switch (state)
-		{
-			case GameSwiperService.TransitionState.Preparing:
-			case GameSwiperService.TransitionState.Animating:
-			case GameSwiperService.TransitionState.Completing:
-				_gameSwiperView?.SetLoadingState(true);
-				break;
-			case GameSwiperService.TransitionState.Idle:
-				_gameSwiperView?.SetLoadingState(false);
-				_gameSwiperView?.UpdateNavigationButtons(
-					_gameProvider.QueueService.HasNext,
-					_gameProvider.QueueService.HasPrevious);
-				break;
-		}
-	}
-
-	private void HandleGameChanged(Type from, Type to)
-	{
-		_logger.Log($"GameSwiperController: Game changed from {from?.Name ?? "null"} to {to?.Name ?? "null"}");
-
-		// Update current texture
-		if (_gameProvider.CurrentGameRenderTexture != null)
-		{
-			_gameSwiperView?.SetCurrentGameTexture(_gameProvider.CurrentGameRenderTexture);
-		}
-
-		// Update preview textures when game changes
-		UpdatePreviewTextures();
-	}
-
-	private void UpdatePreviewTextures()
-	{
-		if (_gameSwiperView == null || _gameProvider == null)
-		{
-			return;
-		}
-
-		var nextTexture = _gameProvider.NextGameRenderTexture;
-		var previousTexture = _gameProvider.PreviousGameRenderTexture;
-
-		_gameSwiperView.SetPreviewTextures(nextTexture, previousTexture);
-	}
-
-	protected override void OnDispose()
-	{
-		_cancellationTokenSource?.Cancel();
-		_cancellationTokenSource?.Dispose();
-
-		if (_swiperService != null)
-		{
-			_swiperService.OnTransitionStateChanged -= HandleTransitionStateChanged;
-			_swiperService.OnGameChanged -= HandleGameChanged;
-			_swiperService.Dispose();
-		}
-
-		base.OnDispose();
+		// Update navigation states for all input handlers
+		_gameSwiper.UpdateNavigationStates(
+			_shortGameServiceProvider.HasNextGame,
+			_shortGameServiceProvider.HasPreviousGame
+		);
+		
+		// Update loading state based on current game readiness
+		var showLoading = !_shortGameServiceProvider.IsCurrentGameReady;
+		_gameSwiper.SetLoadingState(showLoading);
 	}
 }
 }

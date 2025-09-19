@@ -36,11 +36,7 @@ namespace Code.Core.GameEntryPoint
         [SerializeField]
         private GamePositioningConfig  _gamePositioningConfig;
         
-        private IGameRegistry _gameRegistry;
-        private IGameQueueService _queueService;
-        private IGamesLoader _gamesLoader;
-        private IGameProvider _gameProvider;
-        private GameSwiper.GameSwiper _gameSwiper;
+        private IShortGameServiceProvider _shortGameServiceProvider;
         private GameSwiperController _gameSwiperController;
         private CancellationTokenSource _cancellationTokenSource;
         private IDiContainer _globalGameDiContainer;
@@ -94,31 +90,19 @@ namespace Code.Core.GameEntryPoint
             var resourceMapping = GetResourceMapping();
             var factory = AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping, _gamePositioningConfig);
             _globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
-            
-            // Create new game system components
-            _gameRegistry = new GameRegistry(_logger);
-            var games = GetGameTypes();
-            _gameRegistry.RegisterGames(games);
-            _globalGameDiContainer.RegisterAsSingleton(_gameRegistry);
-            
-            _queueService = new GameQueueService(_logger);
-            _globalGameDiContainer.RegisterAsSingleton(_queueService);
-            
-            _gamesLoader = new QueueShortGamesLoader(factory, _queueService, _logger);
-            _globalGameDiContainer.RegisterAsSingleton(_gamesLoader);
-            
-            _gameProvider = new GameProvider(_logger);
-            await _gameProvider.InitializeAsync(_gameRegistry, _queueService, _gamesLoader, cancellationToken);
-            _globalGameDiContainer.RegisterAsSingleton(_gameProvider);
-            
-            // Создаем контроллер
-            
-            _gameSwiperController = GameSwiperControllerFactory.CreateGameSwiperController(new Ctx()
-            {
-                PlaceForAllUi = _uiParent,
-            });
-            _globalGameDiContainer.RegisterAsSingleton(_gameSwiperController);
 
+            var playableGames = GetPlayableGames();
+            _shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider(playableGames, factory);
+            await _shortGameServiceProvider.InitializeAsync(cancellationToken);
+            
+            _gameSwiperController = new GameSwiperController(
+                uiRoot: _uiParent,
+                shortGameServiceProvider: _shortGameServiceProvider,
+                logger: _logger,
+                resourceLoader: _resourceLoader
+            );
+            
+            await _gameSwiperController.InitializeAsync(cancellationToken);
         }
 
         private IReadOnlyList<Type> GetGameTypes()
@@ -142,8 +126,15 @@ namespace Code.Core.GameEntryPoint
                 { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
                 { typeof(Game2), ResourceIdsContainer.DefaultLocalGroup.Game2 }
             };
-           // return new Dictionary<Type, string>();
+        }
 
+        private IEnumerable<Type> GetPlayableGames()
+        {
+            return new[]
+            {
+                typeof(Game1),
+                typeof(Game2),
+            };
         }
         
         private void OnDestroy()
@@ -151,10 +142,7 @@ namespace Code.Core.GameEntryPoint
             _cancellationTokenSource?.Cancel();
             
             _gameSwiperController?.Dispose();
-            _gameProvider?.Dispose();
-            _gamesLoader?.Dispose();
-            _queueService?.Clear();
-            _gameRegistry?.Clear();
+            _shortGameServiceProvider?.Dispose();
             _cancellationTokenSource?.Dispose();
             _poolObjects?.Dispose();
             _globalGameDiContainer?.Dispose();

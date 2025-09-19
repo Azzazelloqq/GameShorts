@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Code.Core.GamesLoader;
+using Code.Core.GamesLoader.TestHelpers;
 using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShotGamesCore.Tests.Mocks;
 using NUnit.Framework;
@@ -50,22 +51,22 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 var loader = new QueueShortGamesLoader(factory, queueService, logger);
                 
                 // Create provider
-                var provider = new GameProvider(logger);
+                var provider = new TestableShortGameServiceProvider(logger, factory);
                 
                 // Act
-                await provider.InitializeAsync(registry, queueService, loader);
+                await provider.InitializeAsync();
                 
                 // Assert
-                Assert.IsNotNull(provider.GameRegistry, "Registry should be set");
-                Assert.IsNotNull(provider.QueueService, "QueueService should be set");
-                Assert.IsNotNull(provider.GamesLoader, "Loader should be set");
+                Assert.IsNotNull(provider.TestGameRegistry, "Registry should be set");
+                Assert.IsNotNull(provider.TestQueueService, "QueueService should be set");
+                Assert.IsNotNull(provider.TestGamesLoader, "Loader should be set");
                 
                 // Check queue was initialized
-                Assert.AreEqual(1, queueService.TotalGamesCount, "Should have 1 game in queue");
+                Assert.AreEqual(1, provider.TestQueueService.TotalGamesCount, "Should have 1 game in queue");
                 
                 // Move to first game
-                queueService.MoveNext();
-                Assert.AreEqual(typeof(MockShortGame), queueService.CurrentGameType, "Should be at MockShortGame");
+                provider.TestQueueService.MoveNext();
+                Assert.AreEqual(typeof(MockShortGame), provider.TestQueueService.CurrentGameType, "Should be at MockShortGame");
                 
                 // Try to load the game
                 var game = await loader.LoadGameAsync(typeof(MockShortGame));
@@ -140,10 +141,10 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 var loader = new QueueShortGamesLoader(factory, queueService, logger);
                 
                 // Create provider
-                var provider = new GameProvider(logger);
+                var provider = new TestableShortGameServiceProvider(logger, factory);
                 
                 // Act
-                await provider.InitializeAsync(registry, queueService, loader);
+                await provider.InitializeAsync();
                 
                 // Move to middle position
                 queueService.MoveToIndex(1); // MockPoolableShortGame
