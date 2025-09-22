@@ -7,6 +7,7 @@ using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using Logic.Entities;
+using R3;
 using UnityEngine;
 
 namespace Logic.Player
@@ -23,6 +24,10 @@ namespace Logic.Player
 
         private readonly Ctx _ctx;
         private readonly IPoolManager _poolManager;
+        private PlayerModel _playerModel;
+        private float _baseMaxSpeed;
+        private float _baseAcceleration;
+        private float _baseDeceleration;
 
         public PlayerSpawnerPm(Ctx ctx, [Inject] IPoolManager poolManager)
         {
@@ -35,21 +40,30 @@ namespace Logic.Player
                 : Vector3.zero;
             
             var playerSettings = _ctx.sceneContextView.PlayerSettings;
-            var playerModel = new PlayerModel
+            
+            // Сохраняем базовые значения скоростей
+            _baseMaxSpeed = playerSettings.MaxSpeed;
+            _baseAcceleration = playerSettings.Acceleration;
+            _baseDeceleration = playerSettings.Deceleration;
+            
+            _playerModel = new PlayerModel
             {
                 Id = _ctx.entitiesController.GenerateId(),
                 EntityType = EntityType.PlayerShip,
                 Position = {Value = startPos},
-                MaxSpeed = {Value = playerSettings.MaxSpeed},
-                AccelerationSpeed = {Value = playerSettings.Acceleration},
-                DecelerationSpeed = {Value = playerSettings.Deceleration},
+                MaxSpeed = {Value = _baseMaxSpeed},
+                AccelerationSpeed = {Value = _baseAcceleration},
+                DecelerationSpeed = {Value = _baseDeceleration},
                 MaxRotateSpeed = {Value = playerSettings.MaxRotationSpeed},
                 AccelerationRotateSpeed = {Value = playerSettings.RotationAcceleration},
                 DecelerationRotateSpeed = {Value = playerSettings.RotationDeceleration},
             };
+
+            // Подписываемся на изменения множителя скорости игрока
+            AddDispose(_playerModel.DifficultyScaler.PlayerSpeedMultiplier.Subscribe(OnPlayerSpeedMultiplierChanged));
             PlayerPm.Ctx playerCtx = new PlayerPm.Ctx
             {
-                playerModel = playerModel,
+                playerModel = _playerModel,
                 sceneContextView = _ctx.sceneContextView,
                 entitiesController = _ctx.entitiesController,
                 Dead = _ctx.playerDead,
@@ -57,11 +71,21 @@ namespace Logic.Player
             };
             var player = PlayerPmFactory.CreatePlayerPm(playerCtx);
             
-            _ctx.entitiesController.AddEntity(playerModel.Id, new EntityInfo
+            _ctx.entitiesController.AddEntity(_playerModel.Id, new EntityInfo
             {
                 Logic = player,
-                Model = playerModel,
+                Model = _playerModel,
             });
+        }
+
+        private void OnPlayerSpeedMultiplierChanged(float multiplier)
+        {
+            if (_playerModel == null) return;
+            
+            // Применяем множитель к базовым значениям скоростей
+            _playerModel.MaxSpeed.Value = _baseMaxSpeed * multiplier;
+            _playerModel.AccelerationSpeed.Value = _baseAcceleration * multiplier;
+            _playerModel.DecelerationSpeed.Value = _baseDeceleration * multiplier;
         }
 
     }

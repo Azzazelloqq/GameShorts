@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Logic.Entities.Core;
 using Logic.Player.LaserWeapon;
 using R3;
@@ -16,10 +17,12 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 		public ReactiveProperty<float> BulletMaxSpeed;
 		public ReactiveProperty<float> BulletRate;
 
-		public ReactiveProperty<int> Score;
-		
-		private List<LaserBattery> _charges;
-		public List<LaserBattery> Charges => _charges;
+	public ReactiveProperty<int> Score;
+	
+	private List<LaserBattery> _charges;
+	public List<LaserBattery> Charges => _charges;
+
+	public DifficultyScaler DifficultyScaler { get; private set; }
 
 		public PlayerModel()
 		{
@@ -32,6 +35,9 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 			LaserShotDuration = new ReactiveProperty<float>();
 			Score = new ReactiveProperty<int>();
 			_charges = new List<LaserBattery>();
+			
+			// Инициализируем систему масштабирования сложности
+			DifficultyScaler = new DifficultyScaler(Score);
 		}
 
 		public void InitLaserBattary(int countCharges, float rechargeCooldown)
@@ -40,6 +46,12 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
 			{
 				_charges.Add(new LaserBattery(rechargeCooldown));
 			}
+		}
+
+		public new void Destroy(int? killerId = null)
+		{
+			DifficultyScaler?.Dispose();
+			base.Destroy(killerId);
 		}
 	}
 }

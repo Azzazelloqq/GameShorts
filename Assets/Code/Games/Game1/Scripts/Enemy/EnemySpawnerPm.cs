@@ -13,6 +13,7 @@ using Logic.Entities;
 using Logic.Entities.Core;
 using Logic.Scene;
 using Logic.Settings;
+using R3;
 using ResourceLoader;
 using Random = UnityEngine.Random;
 
@@ -34,6 +35,9 @@ namespace Logic.Enemy
 		private UFOSettings _ufoSettings;
 		private readonly IPoolManager _poolManager;
 		private readonly IResourceLoader _resourceLoader;
+		private PlayerModel _playerModel;
+		private float _lastAsteroidMultiplier = 1.0f;
+		private float _lastUFOMultiplier = 1.0f;
 
 		public EnemySpawnerPm(Ctx ctx, 
 			[Inject] IPoolManager poolManager,
@@ -45,7 +49,15 @@ namespace Logic.Enemy
 			_asteroidSettings = _ctx.sceneContextView.AsteroidSettings;
 			_rewardSettings = _ctx.sceneContextView.RewardSettings;
 			_ufoSettings = _ctx.sceneContextView.UFOSettings;
+			_playerModel = _ctx.entitiesController.GetPlayerModel();
 			_ctx.enemyCoutController.SpawnEnemy += SpawnEnemy;
+			
+			// Подписываемся на изменения множителей скорости для обновления существующих врагов
+			if (_playerModel?.DifficultyScaler != null)
+			{
+				AddDispose(_playerModel.DifficultyScaler.AsteroidSpeedMultiplier.Subscribe(OnAsteroidSpeedMultiplierChanged));
+				AddDispose(_playerModel.DifficultyScaler.UFOSpeedMultiplier.Subscribe(OnUFOSpeedMultiplierChanged));
+			}
 		}
 
 		protected override void OnDispose()
@@ -79,14 +91,17 @@ namespace Logic.Enemy
 			if (_ctx.entitiesController == null)
 				return;
 				
+			// Получаем текущий множитель скорости UFO
+			float ufoSpeedMultiplier = _playerModel?.DifficultyScaler?.UFOSpeedMultiplier?.Value ?? 1.0f;
+			
 			var model = new UFOModel()
 			{
 				Id = _ctx.entitiesController.GenerateId(),
 				Position = {Value = spawninfo.SpawnPosition},
 				EntityType = EntityType.UFO,
 				CurrentAngle = {Value = spawninfo.Angle},
-				MaxSpeed = {Value = _ufoSettings.MaxSpeed},
-				AccelerationSpeed = {Value = _ufoSettings.Acceleration},
+				MaxSpeed = {Value = _ufoSettings.MaxSpeed * ufoSpeedMultiplier},
+				AccelerationSpeed = {Value = _ufoSettings.Acceleration * ufoSpeedMultiplier},
 				Reward = _rewardSettings.UFOReward
 			};
 			UFOPm.Ctx ufoCtx = new UFOPm.Ctx
@@ -116,6 +131,9 @@ namespace Logic.Enemy
 			if (_ctx.entitiesController == null)
 				return;
 				
+			// Получаем текущий множитель скорости астероидов
+			float asteroidSpeedMultiplier = _playerModel?.DifficultyScaler?.AsteroidSpeedMultiplier?.Value ?? 1.0f;
+			
 			var rotateSide = Random.Range(0, 2) == 0 ? -1 : 1;
 			var model = new AsteroidModel
 			{
@@ -124,7 +142,7 @@ namespace Logic.Enemy
 				EntityType = EntityType.Asteroid,
 				CurrentAngle = {Value = spawninfo.Angle},
 				CanCollapse = {Value = true},
-				MaxSpeed = {Value = Random.Range(_asteroidSettings.MinSpeed, _asteroidSettings.MaxSpeed)},
+				MaxSpeed = {Value = Random.Range(_asteroidSettings.MinSpeed, _asteroidSettings.MaxSpeed) * asteroidSpeedMultiplier},
 				MaxRotateSpeed = {Value = rotateSide * Random.Range(_asteroidSettings.MinRotateSpeed, _asteroidSettings.MaxRotateSpeed)},
 				Reward = _rewardSettings.AsteroidBigReward
 			};
@@ -163,6 +181,9 @@ namespace Logic.Enemy
 			if (_ctx.entitiesController == null)
 				return;
 				
+			// Получаем текущий множитель скорости астероидов
+			float asteroidSpeedMultiplier = _playerModel?.DifficultyScaler?.AsteroidSpeedMultiplier?.Value ?? 1.0f;
+			
 			var rotateSide = Random.Range(0, 2) == 0 ? -1 : 1;
 			var model = new AsteroidModel
 			{
@@ -171,7 +192,7 @@ namespace Logic.Enemy
 				EntityType = EntityType.AsteroidPart,
 				CurrentAngle = {Value =  Random.Range(0, 360)},
 				CanCollapse = {Value = false},
-				MaxSpeed = {Value = Random.Range(_asteroidSettings.MinSpeedSmall ,_asteroidSettings.MaxSpeedSmall)},
+				MaxSpeed = {Value = Random.Range(_asteroidSettings.MinSpeedSmall ,_asteroidSettings.MaxSpeedSmall) * asteroidSpeedMultiplier},
 				MaxRotateSpeed = {Value = rotateSide * Random.Range(_asteroidSettings.MinRotateSpeedSmall, _asteroidSettings.MaxRotateSpeedSmall)},
 				Reward = _rewardSettings.AsteroidSmallReward
 			};
@@ -203,6 +224,43 @@ namespace Logic.Enemy
 				});
 			}
 			
+		}
+
+		private void OnAsteroidSpeedMultiplierChanged(float newMultiplier)
+		{
+			if (_ctx.entitiesController == null) return;
+			
+			// Вычисляем коэффициент изменения скорости
+			float multiplierRatio = newMultiplier / _lastAsteroidMultiplier;
+			_lastAsteroidMultiplier = newMultiplier;
+			
+			// Обновляем скорости всех существующих астероидов
+			foreach (var entity in _ctx.entitiesController.AllEntities.Values)
+			{
+				if (entity.Model.EntityType == EntityType.Asteroid || entity.Model.EntityType == EntityType.AsteroidPart)
+				{
+					entity.Model.MaxSpeed.Value *= multiplierRatio;
+				}
+			}
+		}
+
+		private void OnUFOSpeedMultiplierChanged(float newMultiplier)
+		{
+			if (_ctx.entitiesController == null) return;
+			
+			// Вычисляем коэффициент изменения скорости
+			float multiplierRatio = newMultiplier / _lastUFOMultiplier;
+			_lastUFOMultiplier = newMultiplier;
+			
+			// Обновляем скорости всех существующих UFO
+			foreach (var entity in _ctx.entitiesController.AllEntities.Values)
+			{
+				if (entity.Model.EntityType == EntityType.UFO)
+				{
+					entity.Model.MaxSpeed.Value *= multiplierRatio;
+					entity.Model.AccelerationSpeed.Value *= multiplierRatio;
+				}
+			}
 		}
 	}
 }
