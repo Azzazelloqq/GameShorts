@@ -24,7 +24,7 @@ namespace Shooter1
         [SerializeField] private GameObject bulletPrefab;
 
         public int Id { get; private set; } = System.Guid.NewGuid().GetHashCode();
-        public bool IsPreloaded { get; }
+        public bool IsPreloaded => true;
         
         // Game objects
         private GameObject target;

@@ -17,13 +17,17 @@ internal class GameSwiper : MonoBehaviour
 {
 	[Header("Carousel Images")]
 	[SerializeField]
-	private RawImage _topImage; // Previous game (Y: +1080)
+	private RawImage _topImage; // Previous game (Y: +imageSpacing)
 
 	[SerializeField]
 	private RawImage _centerImage; // Current game (Y: 0, visible)
 
 	[SerializeField]
-	private RawImage _bottomImage; // Next game (Y: -1080)
+	private RawImage _bottomImage; // Next game (Y: -imageSpacing)
+	
+	private GameSwiperImageFitter _topImageFitter;
+	private GameSwiperImageFitter _centerImageFitter;
+	private GameSwiperImageFitter _bottomImageFitter;
 
 	[Header("Input Handlers")]
 	[SerializeField]
@@ -41,7 +45,12 @@ internal class GameSwiper : MonoBehaviour
 	private Ease _animationEase = Ease.OutQuad;
 
 	[SerializeField]
-	private float _imageSpacing = 1080f;
+	private bool _useScreenHeight = true; // Use actual screen height for spacing
+	
+	[SerializeField]
+	private float _imageSpacing = 1920f; // Default fallback if not using screen height
+	
+	private float ActualImageSpacing => _useScreenHeight ? Screen.height : _imageSpacing;
 
 	// Events for external communication
 	public event Action OnNextGameRequested;
@@ -54,26 +63,72 @@ internal class GameSwiper : MonoBehaviour
 
 	private void Awake()
 	{
+		SetupImageFitters();
 		SetupInitialPositions();
 		SetupInputHandlers();
+	}
+	
+	private void SetupImageFitters()
+	{
+		// Add aspect ratio fitters to all images
+		if (_topImage != null)
+		{
+			_topImageFitter = _topImage.GetComponent<GameSwiperImageFitter>();
+			if (_topImageFitter == null)
+			{
+				_topImageFitter = _topImage.gameObject.AddComponent<GameSwiperImageFitter>();
+			}
+		}
+		
+		if (_centerImage != null)
+		{
+			_centerImageFitter = _centerImage.GetComponent<GameSwiperImageFitter>();
+			if (_centerImageFitter == null)
+			{
+				_centerImageFitter = _centerImage.gameObject.AddComponent<GameSwiperImageFitter>();
+			}
+		}
+		
+		if (_bottomImage != null)
+		{
+			_bottomImageFitter = _bottomImage.GetComponent<GameSwiperImageFitter>();
+			if (_bottomImageFitter == null)
+			{
+				_bottomImageFitter = _bottomImage.gameObject.AddComponent<GameSwiperImageFitter>();
+			}
+		}
 	}
 
 	private void SetupInitialPositions()
 	{
+		// Ensure all images have proper size to fill the screen width/height
 		if (_topImage)
 		{
-			_topImage.rectTransform.anchoredPosition = new Vector2(0, _imageSpacing);
+			SetupImageSize(_topImage.rectTransform);
+			_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
 		}
 
 		if (_centerImage)
 		{
+			SetupImageSize(_centerImage.rectTransform);
 			_centerImage.rectTransform.anchoredPosition = Vector2.zero;
 		}
 
 		if (_bottomImage)
 		{
-			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -_imageSpacing);
+			SetupImageSize(_bottomImage.rectTransform);
+			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
 		}
+	}
+	
+	private void SetupImageSize(RectTransform rectTransform)
+	{
+		// Set anchors to center
+		rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+		rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+		
+		// Set size to match screen dimensions
+		rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
 	}
 
 	private void SetupInputHandlers()
@@ -96,19 +151,39 @@ internal class GameSwiper : MonoBehaviour
 	/// </summary>
 	public void UpdateTextures(RenderTexture previous, RenderTexture current, RenderTexture next)
 	{
+		// Always update textures in the correct positions
+		// Top = Previous, Center = Current, Bottom = Next
 		if (_topImage)
 		{
 			_topImage.texture = previous;
+			_topImage.enabled = previous != null;
+			// Update aspect ratio fitter when texture changes
+			if (_topImageFitter != null)
+			{
+				_topImageFitter.OnTextureChanged();
+			}
 		}
 
 		if (_centerImage)
 		{
 			_centerImage.texture = current;
+			_centerImage.enabled = current != null;
+			// Update aspect ratio fitter when texture changes
+			if (_centerImageFitter != null)
+			{
+				_centerImageFitter.OnTextureChanged();
+			}
 		}
 
 		if (_bottomImage)
 		{
 			_bottomImage.texture = next;
+			_bottomImage.enabled = next != null;
+			// Update aspect ratio fitter when texture changes
+			if (_bottomImageFitter != null)
+			{
+				_bottomImageFitter.OnTextureChanged();
+			}
 		}
 	}
 
@@ -218,11 +293,12 @@ internal class GameSwiper : MonoBehaviour
 			return;
 		}
 
-		var offset = progress * _imageSpacing * 0.3f; // 30% of full distance for preview
+		// Invert offset - positive progress should move up (to show next game from bottom)
+		var offset = -progress * ActualImageSpacing * 0.3f; // 30% of full distance for preview
 
 		if (_topImage)
 		{
-			_topImage.rectTransform.anchoredPosition = new Vector2(0, _imageSpacing - offset);
+			_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing - offset);
 		}
 
 		if (_centerImage)
@@ -232,7 +308,7 @@ internal class GameSwiper : MonoBehaviour
 
 		if (_bottomImage)
 		{
-			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -_imageSpacing - offset);
+			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing - offset);
 		}
 
 		// If progress returns to 0 (drag ended), reset positions
@@ -262,10 +338,10 @@ internal class GameSwiper : MonoBehaviour
 		var sequence = DOTween.Sequence();
 
 		sequence.Append(_topImage.rectTransform
-			.DOAnchorPos(new Vector2(0, _imageSpacing * 2), _animationDuration)
+			.DOAnchorPos(new Vector2(0, ActualImageSpacing * 2), _animationDuration)
 			.SetEase(_animationEase));
 		sequence.Join(_centerImage.rectTransform
-			.DOAnchorPos(new Vector2(0, _imageSpacing), _animationDuration)
+			.DOAnchorPos(new Vector2(0, ActualImageSpacing), _animationDuration)
 			.SetEase(_animationEase));
 		sequence.Join(_bottomImage.rectTransform
 			.DOAnchorPos(Vector2.zero, _animationDuration)
@@ -273,14 +349,11 @@ internal class GameSwiper : MonoBehaviour
 
 		await sequence.AsyncWaitForCompletion();
 
-		// Rotate references
-		var temp = _topImage;
-		_topImage = _centerImage;
-		_centerImage = _bottomImage;
-		_bottomImage = temp;
-
-		// Reset position
-		_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -_imageSpacing);
+		// After animation, reset positions without rotating references
+		// The textures will be updated by UpdateTextures call from controller
+		_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
+		_centerImage.rectTransform.anchoredPosition = Vector2.zero;
+		_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
 	}
 
 	private async Task AnimateDown()
@@ -291,29 +364,26 @@ internal class GameSwiper : MonoBehaviour
 			.DOAnchorPos(Vector2.zero, _animationDuration)
 			.SetEase(_animationEase));
 		sequence.Join(_centerImage.rectTransform
-			.DOAnchorPos(new Vector2(0, -_imageSpacing), _animationDuration)
+			.DOAnchorPos(new Vector2(0, -ActualImageSpacing), _animationDuration)
 			.SetEase(_animationEase));
 		sequence.Join(_bottomImage.rectTransform
-			.DOAnchorPos(new Vector2(0, -_imageSpacing * 2), _animationDuration)
+			.DOAnchorPos(new Vector2(0, -ActualImageSpacing * 2), _animationDuration)
 			.SetEase(_animationEase));
 
 		await sequence.AsyncWaitForCompletion();
 
-		// Rotate references
-		var temp = _bottomImage;
-		_bottomImage = _centerImage;
-		_centerImage = _topImage;
-		_topImage = temp;
-
-		// Reset position
-		_topImage.rectTransform.anchoredPosition = new Vector2(0, _imageSpacing);
+		// After animation, reset positions without rotating references
+		// The textures will be updated by UpdateTextures call from controller
+		_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
+		_centerImage.rectTransform.anchoredPosition = Vector2.zero;
+		_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
 	}
 
 	private void ResetPositions()
 	{
 		if (_topImage)
 		{
-			_topImage.rectTransform.DOAnchorPos(new Vector2(0, _imageSpacing), 0.2f);
+			_topImage.rectTransform.DOAnchorPos(new Vector2(0, ActualImageSpacing), 0.2f);
 		}
 
 		if (_centerImage)
@@ -323,7 +393,7 @@ internal class GameSwiper : MonoBehaviour
 
 		if (_bottomImage)
 		{
-			_bottomImage.rectTransform.DOAnchorPos(new Vector2(0, -_imageSpacing), 0.2f);
+			_bottomImage.rectTransform.DOAnchorPos(new Vector2(0, -ActualImageSpacing), 0.2f);
 		}
 	}
 

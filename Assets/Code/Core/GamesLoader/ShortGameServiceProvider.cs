@@ -53,11 +53,25 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		_gamesLoader = new QueueShortGamesLoader(gameFactory, _queueService, logger);
 
 		_queueService.Initialize(_gameRegistry.RegisteredGames);
+		
+		// Move to the first game in the queue
+		if (_queueService.TotalGamesCount > 0)
+		{
+			_queueService.MoveNext();
+			_logger.Log($"Moved to first game: {_queueService.CurrentGameType?.Name}");
+		}
 	}
 
 	public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
 	{
 		await UpdatePreloadedGamesAsync(cancellationToken);
+		
+		// Start the current game so it begins rendering
+		if (IsCurrentGameReady && CurrentGame != null)
+		{
+			_logger.Log("Starting current game after initialization");
+			CurrentGame.StartGame();
+		}
 	}
 	
 	public void Dispose()
@@ -222,14 +236,126 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		await _gamesLoader.PreloadGamesAsync(gamesToPreload, cancellationToken);
 	}
 
-	public Task<bool> SwipeToNextGameAsync(CancellationToken cancellationToken = default)
+	public async Task<bool> SwipeToNextGameAsync(CancellationToken cancellationToken = default)
 	{
-		throw new NotImplementedException();
+		try
+		{
+			// Check if can switch
+			if (!HasNextGame)
+			{
+				_logger.LogWarning("No next game available");
+				return false;
+			}
+
+			// Wait for next game to be ready
+			if (!IsNextGameReady)
+			{
+				_logger.Log("Waiting for next game to be ready");
+				var timeout = TimeSpan.FromSeconds(10);
+				var startTime = DateTime.UtcNow;
+				
+				while (!IsNextGameReady && DateTime.UtcNow - startTime < timeout)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+					await Task.Delay(100, cancellationToken);
+				}
+
+				if (!IsNextGameReady)
+				{
+					_logger.LogError("Next game failed to be ready in time");
+					return false;
+				}
+			}
+
+			// Pause current game
+			PauseCurrentGame();
+
+			// Move queue to next
+			_queueService.MoveNext();
+
+			// Stop old game
+			StopPreviousGame();
+
+			// Start new current game
+			StartCurrentGame();
+
+			// Update preloaded games for new position
+			await UpdatePreloadedGamesAsync(cancellationToken);
+
+			_logger.Log("Successfully switched to next game");
+			return true;
+		}
+		catch (OperationCanceledException)
+		{
+			_logger.Log("SwipeToNextGameAsync was cancelled");
+			throw;
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Error switching to next game: {ex.Message}");
+			return false;
+		}
 	}
 
-	public Task<bool> SwipeToPreviousGameAsync(CancellationToken cancellationToken = default)
+	public async Task<bool> SwipeToPreviousGameAsync(CancellationToken cancellationToken = default)
 	{
-		throw new NotImplementedException();
+		try
+		{
+			// Check if can switch
+			if (!HasPreviousGame)
+			{
+				_logger.LogWarning("No previous game available");
+				return false;
+			}
+
+			// Wait for previous game to be ready
+			if (!IsPreviousGameReady)
+			{
+				_logger.Log("Waiting for previous game to be ready");
+				var timeout = TimeSpan.FromSeconds(10);
+				var startTime = DateTime.UtcNow;
+				
+				while (!IsPreviousGameReady && DateTime.UtcNow - startTime < timeout)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+					await Task.Delay(100, cancellationToken);
+				}
+
+				if (!IsPreviousGameReady)
+				{
+					_logger.LogError("Previous game failed to be ready in time");
+					return false;
+				}
+			}
+
+			// Pause current game
+			PauseCurrentGame();
+
+			// Move queue to previous
+			_queueService.MovePrevious();
+
+			// Stop old game
+			StopNextGame();
+
+			// Start new current game
+			StartCurrentGame();
+
+			// Update preloaded games for new position
+			await UpdatePreloadedGamesAsync(cancellationToken);
+
+			_logger.Log("Successfully switched to previous game");
+			return true;
+		}
+		catch (OperationCanceledException)
+		{
+			_logger.Log("SwipeToPreviousGameAsync was cancelled");
+			throw;
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Error switching to previous game: {ex.Message}");
+			return false;
+		}
 	}
 
 	public ValueTask InitializeSwiperUIAsync(Transform uiRoot, CancellationToken cancellationToken = default)

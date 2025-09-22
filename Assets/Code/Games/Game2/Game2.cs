@@ -12,7 +12,7 @@ namespace Code.Core.ShortGamesCore.Game2
         [SerializeField] private Transform _circle;
         private IDisposable _root;
         public int Id => 1;
-        public bool IsPreloaded { get; }
+        public bool IsPreloaded => true;
         
         public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {

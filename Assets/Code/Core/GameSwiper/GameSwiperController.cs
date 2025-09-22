@@ -25,6 +25,8 @@ public class GameSwiperController : IDisposable
 	private GameSwiper _gameSwiper;
 	private bool _isInitialized;
 	private bool _isTransitioning;
+	private CancellationTokenSource _cancellationTokenSource;
+	private bool _disposed;
 
 	public GameSwiperController(
 		Transform uiRoot,
@@ -36,6 +38,7 @@ public class GameSwiperController : IDisposable
 		_shortGameServiceProvider = shortGameServiceProvider ?? throw new ArgumentNullException(nameof(shortGameServiceProvider));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		_resourceLoader = resourceLoader ?? throw new ArgumentNullException(nameof(resourceLoader));
+		_cancellationTokenSource = new CancellationTokenSource();
 	}
 
 	/// <summary>
@@ -82,13 +85,35 @@ public class GameSwiperController : IDisposable
 				_logger.Log("Waiting for initial game to be ready...");
 				_gameSwiper.SetLoadingState(true);
 
-				while (!_shortGameServiceProvider.IsCurrentGameReady)
+				int waitTime = 0;
+				const int maxWaitTime = 10000; // 10 seconds timeout
+				
+				while (!_shortGameServiceProvider.IsCurrentGameReady && waitTime < maxWaitTime)
 				{
 					await Task.Delay(100, cancellationToken);
+					waitTime += 100;
+				}
+				
+				if (waitTime >= maxWaitTime)
+				{
+					_logger.LogWarning("Timeout waiting for initial game to be ready");
 				}
 			}
 
+			// Force an initial update even if game is not ready
 			UpdateSwiperState();
+			
+			// Start the current game so it begins rendering
+			if (_shortGameServiceProvider.IsCurrentGameReady)
+			{
+				_shortGameServiceProvider.StartCurrentGame();
+				_logger.Log("Started current game");
+			}
+			
+			// Log the current state for debugging
+			_logger.Log($"Initial state - Current: {_shortGameServiceProvider.IsCurrentGameReady}, " +
+				$"Next: {_shortGameServiceProvider.IsNextGameReady}, " +
+				$"Previous: {_shortGameServiceProvider.IsPreviousGameReady}");
 
 			_isInitialized = true;
 		}
@@ -105,14 +130,37 @@ public class GameSwiperController : IDisposable
 	
 	public void Dispose()
 	{
-		_gameSwiper.OnNextGameRequested -= HandleNextGameRequested;
-		_gameSwiper.OnPreviousGameRequested -= HandlePreviousGameRequested;
+		if (_disposed)
+		{
+			return;
+		}
+
+		_disposed = true;
+
+		// Cancel any ongoing operations
+		_cancellationTokenSource?.Cancel();
+		_cancellationTokenSource?.Dispose();
+
+		if (_gameSwiper != null)
+		{
+			_gameSwiper.OnNextGameRequested -= HandleNextGameRequested;
+			_gameSwiper.OnPreviousGameRequested -= HandlePreviousGameRequested;
+		}
 	}
 
 	/// <summary>
 	/// Handle next game request from UI
 	/// </summary>
-	private async void HandleNextGameRequested()
+	private void HandleNextGameRequested()
+	{
+		// Fire and forget with proper error handling
+		_ = HandleNextGameRequestedAsync();
+	}
+
+	/// <summary>
+	/// Actual async implementation for next game switch
+	/// </summary>
+	private async Task HandleNextGameRequestedAsync()
 	{
 		if (_isTransitioning)
 		{
@@ -123,39 +171,43 @@ public class GameSwiperController : IDisposable
 
 		try
 		{
-			if (!_shortGameServiceProvider.HasNextGame)
+			using (var cts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token))
 			{
-				_logger.LogError("No next game available");
-				return;
-			}
+				cts.CancelAfter(TimeSpan.FromSeconds(15)); // Overall timeout
 
-			if (!_shortGameServiceProvider.IsNextGameReady)
-			{
-				_gameSwiper.SetLoadingState(true);
-				
-				var timeout = 10000; 
-				var elapsed = 0;
-				while (!_shortGameServiceProvider.IsNextGameReady && elapsed < timeout)
+				if (!_shortGameServiceProvider.HasNextGame)
 				{
-					await Task.Delay(100);
-					elapsed += 100;
-				}
-				
-				if (!_shortGameServiceProvider.IsNextGameReady)
-				{
-					_logger.LogError($"Next game failed to be ready in {timeout}ms");
+					_logger.LogWarning("No next game available");
 					return;
 				}
+
+				// Show loading if game is not ready
+				if (!_shortGameServiceProvider.IsNextGameReady)
+				{
+					_gameSwiper.SetLoadingState(true);
+				}
+
+				// Animate UI transition first
+				await _gameSwiper.AnimateToNext();
+
+				// Then switch game logic
+				var success = await _shortGameServiceProvider.SwipeToNextGameAsync(cts.Token);
+				
+				if (!success)
+				{
+					_logger.LogError("Failed to switch to next game");
+					// Rollback animation
+					await _gameSwiper.AnimateToPrevious();
+					return;
+				}
+
+				// Update UI with new textures
+				UpdateSwiperState();
 			}
-
-			// Animate UI transition
-			await _gameSwiper.AnimateToNext();
-
-			// Then switch game logic
-			await _shortGameServiceProvider.SwipeToNextGameAsync();
-
-			// Update UI with new textures
-			UpdateSwiperState();
+		}
+		catch (OperationCanceledException)
+		{
+			_logger.Log("Next game switch was cancelled");
 		}
 		catch (Exception ex)
 		{
@@ -171,7 +223,16 @@ public class GameSwiperController : IDisposable
 	/// <summary>
 	/// Handle previous game request from UI
 	/// </summary>
-	private async void HandlePreviousGameRequested()
+	private void HandlePreviousGameRequested()
+	{
+		// Fire and forget with proper error handling
+		_ = HandlePreviousGameRequestedAsync();
+	}
+
+	/// <summary>
+	/// Actual async implementation for previous game switch
+	/// </summary>
+	private async Task HandlePreviousGameRequestedAsync()
 	{
 		if (_isTransitioning)
 		{
@@ -182,39 +243,43 @@ public class GameSwiperController : IDisposable
 
 		try
 		{
-			if (!_shortGameServiceProvider.HasPreviousGame)
+			using (var cts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token))
 			{
-				return;
-			}
+				cts.CancelAfter(TimeSpan.FromSeconds(15)); // Overall timeout
 
-			if (!_shortGameServiceProvider.IsPreviousGameReady)
-			{
-				_gameSwiper.SetLoadingState(true);
-
-				var timeout = 10000; // 10 seconds timeout
-				var elapsed = 0;
-				while (!_shortGameServiceProvider.IsPreviousGameReady && elapsed < timeout)
+				if (!_shortGameServiceProvider.HasPreviousGame)
 				{
-					await Task.Delay(100);
-					elapsed += 100;
-				}
-
-				if (!_shortGameServiceProvider.IsPreviousGameReady)
-				{
-					_logger.LogError($"Previous game failed to be ready in {timeout}ms");
+					_logger.LogWarning("No previous game available");
 					return;
 				}
+
+				// Show loading if game is not ready
+				if (!_shortGameServiceProvider.IsPreviousGameReady)
+				{
+					_gameSwiper.SetLoadingState(true);
+				}
+
+				// Animate UI transition first
+				await _gameSwiper.AnimateToPrevious();
+
+				// Then switch game logic
+				var success = await _shortGameServiceProvider.SwipeToPreviousGameAsync(cts.Token);
+				
+				if (!success)
+				{
+					_logger.LogError("Failed to switch to previous game");
+					// Rollback animation
+					await _gameSwiper.AnimateToNext();
+					return;
+				}
+
+				// Update UI with new textures
+				UpdateSwiperState();
 			}
-
-			await _gameSwiper.AnimateToPrevious();
-
-			await _shortGameServiceProvider.SwipeToPreviousGameAsync();
-
-			UpdateSwiperState();
 		}
 		catch (OperationCanceledException)
 		{
-			throw;
+			_logger.Log("Previous game switch was cancelled");
 		}
 		catch (Exception ex)
 		{
@@ -232,12 +297,19 @@ public class GameSwiperController : IDisposable
 	/// </summary>
 	private void UpdateSwiperState()
 	{
+		// Get render textures
+		var previousRT = _shortGameServiceProvider.PreviousGameRenderTexture;
+		var currentRT = _shortGameServiceProvider.CurrentGameRenderTexture;
+		var nextRT = _shortGameServiceProvider.NextGameRenderTexture;
+		
+		// Log render texture states for debugging
+		_logger.Log($"UpdateSwiperState - RenderTextures: " +
+			$"Previous={previousRT != null}, " +
+			$"Current={currentRT != null}, " +
+			$"Next={nextRT != null}");
+		
 		// Update textures
-		_gameSwiper.UpdateTextures(
-			_shortGameServiceProvider.PreviousGameRenderTexture,
-			_shortGameServiceProvider.CurrentGameRenderTexture,
-			_shortGameServiceProvider.NextGameRenderTexture
-		);
+		_gameSwiper.UpdateTextures(previousRT, currentRT, nextRT);
 
 		// Update navigation states for all input handlers
 		_gameSwiper.UpdateNavigationStates(

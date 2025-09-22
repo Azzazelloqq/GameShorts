@@ -16,7 +16,7 @@ namespace Code.Core.ShortGamesCore.Game1
         private CancellationTokenSource _cancellationTokenSource;
         
         public int Id => 1;
-        public bool IsPreloaded { get; }
+        public bool IsPreloaded => true;
         
         private bool _isDisposed;
         

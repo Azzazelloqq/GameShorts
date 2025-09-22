@@ -89,8 +89,8 @@ public class SwipeInputHandler : GameSwiperInputHandler,
 		_currentDragDelta = deltaY * _dragSensitivity;
 
 		// Apply rubber band effect if at limits
-		if ((_currentDragDelta > 0 && !_canGoPrevious) ||
-			(_currentDragDelta < 0 && !_canGoNext))
+		if ((_currentDragDelta > 0 && !_canGoNext) ||
+			(_currentDragDelta < 0 && !_canGoPrevious))
 		{
 			_currentDragDelta *= _rubberBandResistance;
 			_currentDragDelta = Mathf.Clamp(_currentDragDelta,
@@ -114,15 +114,15 @@ public class SwipeInputHandler : GameSwiperInputHandler,
 		// Check if swipe threshold was met
 		if (Mathf.Abs(_currentDragDelta) >= _swipeThreshold)
 		{
-			if (_currentDragDelta > 0 && _canGoPrevious)
+			if (_currentDragDelta > 0 && _canGoNext)
 			{
-				// Swipe up - go to previous
-				RequestPreviousGame();
-			}
-			else if (_currentDragDelta < 0 && _canGoNext)
-			{
-				// Swipe down - go to next
+				// Swipe up - go to next (like TikTok/YouTube Shorts)
 				RequestNextGame();
+			}
+			else if (_currentDragDelta < 0 && _canGoPrevious)
+			{
+				// Swipe down - go to previous
+				RequestPreviousGame();
 			}
 		}
 

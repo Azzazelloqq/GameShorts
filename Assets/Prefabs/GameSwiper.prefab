@@ -217,6 +217,7 @@ GameObject:
   - component: {fileID: 6868776900286006698}
   - component: {fileID: 9129225237275319877}
   - component: {fileID: 4348960899372195221}
+  - component: {fileID: 6385754762699708886}
   m_Layer: 5
   m_Name: NextGame
   m_TagString: Untagged
@@ -264,7 +265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -278,6 +279,19 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &6385754762699708886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5392152774313530941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be3ca8cd04b760b4f9308f04a9017764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Code.Core.GameSwiper::Code.Core.GameSwiper.GameSwiperImageFitter
+  _scaleMode: 2
 --- !u!1 &6434661517195316765
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,6 +423,7 @@ GameObject:
   - component: {fileID: 7414824587031476659}
   - component: {fileID: 6333152716074022133}
   - component: {fileID: 7419794903486555610}
+  - component: {fileID: 6918846699930071720}
   m_Layer: 5
   m_Name: PreviousGame
   m_TagString: Untagged
@@ -456,7 +471,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 0.092196584, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -470,6 +485,19 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &6918846699930071720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8242833542508175853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be3ca8cd04b760b4f9308f04a9017764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Code.Core.GameSwiper::Code.Core.GameSwiper.GameSwiperImageFitter
+  _scaleMode: 2
 --- !u!1 &8667856617789390914
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,6 +679,7 @@ MonoBehaviour:
   _loadingIndicator: {fileID: 2993805290359252451}
   _animationDuration: 0.3
   _animationEase: 6
+  _useScreenHeight: 1
   _imageSpacing: 1080
 --- !u!1 &8973957117205393542
 GameObject:
@@ -663,6 +692,7 @@ GameObject:
   - component: {fileID: 7770235408375156039}
   - component: {fileID: 6970548887062961785}
   - component: {fileID: 6628499113210390850}
+  - component: {fileID: 4038548982898378814}
   m_Layer: 5
   m_Name: CurrentGame
   m_TagString: Untagged
@@ -710,7 +740,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.98470926, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -724,3 +754,16 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &4038548982898378814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8973957117205393542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be3ca8cd04b760b4f9308f04a9017764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Code.Core.GameSwiper::Code.Core.GameSwiper.GameSwiperImageFitter
+  _scaleMode: 2

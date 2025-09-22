@@ -8,11 +8,6 @@ namespace Code.Core.ShortGamesCore.Source.GameCore
     public interface IShortGame : IDisposable
     {
         /// <summary>
-        /// Unique identifier for the game instance
-        /// </summary>
-        public int Id { get; }
-        
-        /// <summary>
         /// Indicates whether the game has been preloaded and is ready to start
         /// </summary>
         public bool IsPreloaded { get; }

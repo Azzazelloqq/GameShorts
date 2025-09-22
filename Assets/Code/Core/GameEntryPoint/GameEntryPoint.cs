@@ -10,6 +10,7 @@ using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
+using Code.Games.TestGames;
 using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
@@ -105,17 +106,6 @@ namespace Code.Core.GameEntryPoint
             await _gameSwiperController.InitializeAsync(cancellationToken);
         }
 
-        private IReadOnlyList<Type> GetGameTypes()
-        {
-            var types = new[]
-            {
-                typeof(Game1), 
-                typeof(Game2)
-            };
-
-            return types;
-        }
-
         /// <summary>
         /// Override this method to provide resource mapping for your games
         /// </summary>
@@ -123,8 +113,9 @@ namespace Code.Core.GameEntryPoint
         {
             return new Dictionary<Type, string>
             {
-                { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
-                { typeof(Game2), ResourceIdsContainer.DefaultLocalGroup.Game2 }
+                { typeof(TestGame1), ResourceIdsContainer.TestGames.TestGame1 },
+                { typeof(TestGame2), ResourceIdsContainer.TestGames.TestGame2 },
+                { typeof(TestGame3), ResourceIdsContainer.TestGames.TestGame3 }
             };
         }
 
@@ -132,8 +123,9 @@ namespace Code.Core.GameEntryPoint
         {
             return new[]
             {
-                typeof(Game1),
-                typeof(Game2),
+                typeof(TestGame1), 
+                typeof(TestGame2),
+                typeof(TestGame3),
             };
         }
         

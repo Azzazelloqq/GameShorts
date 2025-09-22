@@ -51,8 +51,8 @@ public abstract class GameSwiperInputHandler : MonoBehaviour
 
 ### SwipeInputHandler
 Handles vertical swipe gestures with visual feedback:
-- **Swipe Up**: Request previous game
-- **Swipe Down**: Request next game
+- **Swipe Up**: Request next game (like TikTok/YouTube Shorts)
+- **Swipe Down**: Request previous game
 - **Drag Preview**: Real-time visual feedback during drag
 - **Rubber Band**: Elastic effect at boundaries
 - **Configurable**: Threshold, sensitivity, invert option
