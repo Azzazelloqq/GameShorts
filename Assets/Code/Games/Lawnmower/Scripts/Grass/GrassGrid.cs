@@ -186,20 +186,11 @@ public class GrassGrid : MonoBehaviour, IGrassGrid
     }
     
     /// <summary>
-    /// Обработка пользовательского ввода
+    /// Обработка пользовательского ввода отключена - трава стрижется только при движении игрока
     /// </summary>
     private void HandleInput()
     {
-        if (!isInitialized || mainCamera == null) return;
-        
-        // Обработка клика и удержания мыши
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-        {
-            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-            
-            HandleClick(mouseWorldPos);
-        }
+        // Ввод отключен
     }
     
     /// <summary>
@@ -377,18 +368,6 @@ public class GrassGrid : MonoBehaviour, IGrassGrid
     private void RegenerateGrid()
     {
         InitializeGrid();
-    }
-    
-    [ContextMenu("Restore All Grass")]
-    private void RestoreAllGrassEditor()
-    {
-        RestoreAllGrass();
-    }
-    
-    [ContextMenu("Cut All Grass")]
-    private void CutAllGrassEditor()
-    {
-        CutAllGrass();
     }
     
     [ContextMenu("Randomize Seeds")]

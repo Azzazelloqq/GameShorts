@@ -44,7 +44,7 @@ namespace Logic.UI
             _resourceLoader = resourceLoader;
             _logger = logger;
             _tickHandler = tickHandler;
-            Load();
+            _ = Load();
         }
         
         private async Task Load()

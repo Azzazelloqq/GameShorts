@@ -26,7 +26,6 @@ namespace Logic.Player.LaserWeapon
         private LaserModel _laserModel;
         private PlayerModel _playerModel;
         private float _timer;
-        private ContactFilter2D _contactFilter;
         private RaycastHit2D[] _hits;
         private float _currentRotationAngle;
         private readonly ITickHandler _tickHandler;
@@ -47,7 +46,6 @@ namespace Logic.Player.LaserWeapon
             _view.Laser.SetPosition(2, Vector3.right * halfLength); // End point
             _view.Laser.gameObject.SetActive(true);
             _timer = _laserModel.Duration.Value;
-            _contactFilter = new ContactFilter2D();
             _hits = new RaycastHit2D[10];
             _currentRotationAngle = _ctx.playerModel.CurrentAngle.Value; // Start from player's direction
             _tickHandler.PhysicUpdate += (OnFixedUpdated);

@@ -49,25 +49,9 @@ public class GrassController : MonoBehaviour
         Vector3 inputWorldPos = Vector3.zero;
         bool hasInput = false;
         
-        // Обработка мыши (клик и удержание)
-        if (enableMouseInput && (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
-        {
-            inputWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            inputWorldPos.z = 0f;
-            hasInput = true;
-        }
+        // Обработка мыши отключена - трава стрижется только при движении игрока
         
-        // Обработка тач-ввода (начало и движение)
-        if (enableTouchInput && Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
-            {
-                inputWorldPos = mainCamera.ScreenToWorldPoint(touch.position);
-                inputWorldPos.z = 0f;
-                hasInput = true;
-            }
-        }
+        // Обработка тач-ввода также отключена
         
         if (hasInput)
         {

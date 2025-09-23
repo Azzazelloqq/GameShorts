@@ -49,7 +49,7 @@ namespace Logic.UI
             _tickHandler = tickHandler;
             _playerModel = _ctx.entitiesController.GetPlayerModel();
 
-            Load();
+            _ = Load();
         }
 
         protected override void OnDispose()

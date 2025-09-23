@@ -7,12 +7,11 @@ using System.Collections.Generic;
 public class GrassGridInstanced : MonoBehaviour, IGrassGrid
 {
     [Header("Grid Settings")]
-    [SerializeField] private Material grassMaterial;
-    [SerializeField] private Mesh grassMesh;
     [SerializeField] private GameObject grassPrefab; // Альтернатива для извлечения меша и материала
     [SerializeField] private int gridWidth = 50;
     [SerializeField] private int gridHeight = 50;
-    [SerializeField] private Vector2 tileSize;
+    [SerializeField] private Vector2 _tileSize = new Vector2(1f, 1f);
+    public Vector2 tileSize => _tileSize;
     [SerializeField] private Vector2 gridOffset = Vector2.zero;
     [SerializeField] private float baseSeed = 1.0f;
     
@@ -29,6 +28,11 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
     
     [Header("Animation")]
     [SerializeField] private float shrinkDuration = 1f;
+    
+    [Header("Editor Preview")]
+    [SerializeField] private bool showGrassPreviewInEditor = true;
+    [SerializeField] private Color grassPreviewColor = Color.green;
+    [SerializeField] private Color cutGrassPreviewColor = Color.red;
     
     // GPU Instancing data
     private List<Matrix4x4> matrices;
@@ -55,11 +59,8 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
     private static readonly int GrassLengthPropertyID = Shader.PropertyToID("_InstanceGrassLength");
     private static readonly int GrassWidthPropertyID = Shader.PropertyToID("_InstanceGrassWidth");
     
-    private void Awake()
-    {
-        if (mainCamera == null)
-            mainCamera = Camera.main;
-    }
+    private Material grassMaterial;
+    private Mesh grassMesh;
     
     private void Start()
     {
@@ -70,7 +71,6 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
     {
         if (isInitialized)
         {
-            HandleInput();
             RenderInstances();
         }
     }
@@ -230,7 +230,7 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
                 
                 // Позиция тайла
                 Vector3 position = GetTileWorldPosition(x, y);
-                Vector3 scale = new Vector3(tileSize.x, tileSize.x, 1f); // Квадратный тайл по X, но может быть вытянут по Y для наложения травы
+                Vector3 scale = new Vector3(_tileSize.x, _tileSize.x, 1f); // Квадратный тайл по X, но может быть вытянут по Y для наложения травы
                 batchMatrices[i] = Matrix4x4.TRS(position, Quaternion.identity, scale);
                 
                 // Генерируем уникальные параметры
@@ -310,22 +310,6 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
     }
     
     /// <summary>
-    /// Обработка пользовательского ввода
-    /// </summary>
-    private void HandleInput()
-    {
-        if (!enableInput || mainCamera == null) return;
-        
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-        {
-            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-            
-            CutGrassAtPosition(mouseWorldPos);
-        }
-    }
-    
-    /// <summary>
     /// Убрать траву в позиции
     /// </summary>
     public void CutGrassAtPosition(Vector3 worldPosition)
@@ -390,20 +374,26 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
     /// <summary>
     /// Получить мировую позицию тайла
     /// </summary>
-    private Vector3 GetTileWorldPosition(int gridX, int gridY)
+    public Vector3 GetTileWorldPosition(int gridX, int gridY)
     {
-        float worldX = gridX * tileSize.x + gridOffset.x;
-        float worldY = gridY * tileSize.y + gridOffset.y;
-        return new Vector3(worldX, worldY, 0f);
+        float localX = gridX * _tileSize.x + gridOffset.x;
+        float localY = gridY * _tileSize.y + gridOffset.y;
+        Vector3 localPosition = new Vector3(localX, localY, 0f);
+        
+        // Преобразуем локальную позицию в мировую относительно позиции объекта
+        return transform.TransformPoint(localPosition);
     }
     
     /// <summary>
     /// Получить индексы сетки по мировой позиции
     /// </summary>
-    private Vector2Int GetGridIndices(Vector3 worldPosition)
+    public Vector2Int GetGridIndices(Vector3 worldPosition)
     {
-        int gridX = Mathf.FloorToInt((worldPosition.x - gridOffset.x) / tileSize.x);
-        int gridY = Mathf.FloorToInt((worldPosition.y - gridOffset.y) / tileSize.y);
+        // Преобразуем мировую позицию в локальную относительно объекта
+        Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
+        
+        int gridX = Mathf.FloorToInt((localPosition.x - gridOffset.x) / _tileSize.x);
+        int gridY = Mathf.FloorToInt((localPosition.y - gridOffset.y) / _tileSize.y);
         return new Vector2Int(gridX, gridY);
     }
     
@@ -459,6 +449,39 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
     public bool IsInitialized()
     {
         return isInitialized;
+    }
+    
+    /// <summary>
+    /// Получить процент скошенной травы
+    /// </summary>
+    public float GetCutPercentage()
+    {
+        if (!isInitialized) return 0f;
+        
+        int totalTiles = gridWidth * gridHeight;
+        int cutTiles = 0;
+        
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                if (tileStates[x, y] > 0.5f) // Трава срезана
+                {
+                    cutTiles++;
+                }
+            }
+        }
+        
+        return totalTiles > 0 ? (float)cutTiles / totalTiles : 0f;
+    }
+    
+    /// <summary>
+    /// Проверить, срезана ли трава в определенной позиции
+    /// </summary>
+    public bool IsGrassCutAt(int gridX, int gridY)
+    {
+        if (!IsValidGridPosition(gridX, gridY)) return false;
+        return tileStates[gridX, gridY] > 0.5f;
     }
     
     /// <summary>
@@ -524,4 +547,105 @@ public class GrassGridInstanced : MonoBehaviour, IGrassGrid
         }
         return 0f;
     }
+    
+#if UNITY_EDITOR
+    /// <summary>
+    /// Отрисовка предварительного просмотра сетки травы в редакторе
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        if (!showGrassPreviewInEditor) return;
+        
+        // Если сетка не инициализирована, показываем предварительный просмотр
+        if (!isInitialized || !Application.isPlaying)
+        {
+            DrawPreviewGrid();
+        }
+        else
+        {
+            // В режиме игры показываем текущее состояние
+            DrawRuntimeGrid();
+        }
+    }
+    
+    /// <summary>
+    /// Отрисовка предварительного просмотра сетки (в редакторе)
+    /// </summary>
+    private void DrawPreviewGrid()
+    {
+        Gizmos.color = grassPreviewColor;
+        
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                Vector3 tileCenter = GetTileWorldPosition(x, y);
+                Vector3 tileSize3D = new Vector3(_tileSize.x, _tileSize.y, 0.1f);
+                
+                // Отрисовываем куб для каждого тайла травы
+                Gizmos.DrawCube(tileCenter, tileSize3D * 0.8f); // Немного меньше для видимости границ
+                
+                // Отрисовываем рамку
+                Gizmos.color = Color.white * 0.5f;
+                Gizmos.DrawWireCube(tileCenter, tileSize3D);
+                Gizmos.color = grassPreviewColor;
+            }
+        }
+        
+        // Отрисовываем границы всей сетки
+        Vector3 localGridCenter = new Vector3(
+            (gridWidth - 1) * _tileSize.x * 0.5f + gridOffset.x,
+            (gridHeight - 1) * _tileSize.y * 0.5f + gridOffset.y,
+            0f
+        );
+        Vector3 worldGridCenter = transform.TransformPoint(localGridCenter);
+        Vector3 gridSize = new Vector3(gridWidth * _tileSize.x, gridHeight * _tileSize.y, 0.1f);
+        
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(worldGridCenter, gridSize);
+    }
+    
+    /// <summary>
+    /// Отрисовка сетки в режиме выполнения (показывает срезанную траву)
+    /// </summary>
+    private void DrawRuntimeGrid()
+    {
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                Vector3 tileCenter = GetTileWorldPosition(x, y);
+                Vector3 tileSize3D = new Vector3(_tileSize.x, _tileSize.y, 0.1f);
+                
+                // Выбираем цвет в зависимости от состояния травы
+                float grassState = tileStates[x, y];
+                if (grassState > 0.5f)
+                {
+                    // Трава срезана
+                    Gizmos.color = cutGrassPreviewColor;
+                }
+                else
+                {
+                    // Трава цела
+                    Gizmos.color = grassPreviewColor;
+                    
+                    // Если есть анимация сжатия, показываем промежуточный цвет
+                    var key = (x, y);
+                    if (activeAnimations.ContainsKey(key))
+                    {
+                        float currentShrink = GetCurrentShrinkValue(x, y);
+                        Gizmos.color = Color.Lerp(grassPreviewColor, cutGrassPreviewColor, currentShrink);
+                    }
+                }
+                
+                // Отрисовываем куб для каждого тайла
+                Gizmos.DrawCube(tileCenter, tileSize3D * 0.8f);
+                
+                // Отрисовываем рамку
+                Gizmos.color = Color.white * 0.3f;
+                Gizmos.DrawWireCube(tileCenter, tileSize3D);
+            }
+        }
+    }
+#endif
 }

@@ -1,3 +1,22 @@
 ﻿{
-  "name": "Lawnmower"
+    "name": "Lawnmower",
+    "rootNamespace": "",
+    "references": [
+        "Core.ShortGame",
+        "BaseDMDisposable",
+        "LightDI",
+        "Tools",
+        "Code.Core.InputManager",
+        "TickHandler",
+        "Assembly-CSharp"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
