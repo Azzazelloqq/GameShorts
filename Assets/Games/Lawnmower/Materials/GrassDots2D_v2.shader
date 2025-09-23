@@ -176,15 +176,16 @@ Shader "Custom/GrassDots2D_V2"
                     float currentLength = instanceGrassLength * (1.0 - instanceShrink);
                     currentLength *= (0.8 + 0.4 * random(float2(grassSeed, 3.0))); // Вариация длины
                     
-                    // Позиция основания с учетом длины стебля и покачивания
-                    float maxY = max(32.0 - currentLength, 0.0); // Максимальная Y позиция основания
+                    // Позиция основания с учетом длины стебля, покачивания и верхней обрезки
+                    float cutoffLinePixels = (1.0 - _TopCutoffHeight) * 32.0; // Линия обрезки в пикселях
+                    float maxY = min(max(32.0 - currentLength, 0.0), cutoffLinePixels); // Учитываем обрезку
                     float swayMargin = _SwayAmount + 2.0; // Запас для покачивания
                     float minX = swayMargin;
                     float maxX = 32.0 - swayMargin;
                     
                     float2 basePos = float2(
                         minX + random(float2(grassSeed, 1.0)) * (maxX - minX), // С учетом покачивания
-                        random(float2(grassSeed, 2.0)) * maxY  // Ограничиваем по высоте
+                        random(float2(grassSeed, 2.0)) * maxY  // Ограничиваем по высоте и обрезке
                     );
                     
                     // Рисуем точку только когда стебель полностью исчез (currentLength <= 0.1)

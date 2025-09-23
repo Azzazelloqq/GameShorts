@@ -19,5 +19,5 @@ MonoBehaviour:
   rotationSpeed: 180
   instantRotation: 1
   rotationSmoothness: 5
-  cuttingRadius: 2
+  cuttingRadius: 3
   cuttingInterval: 0.1
