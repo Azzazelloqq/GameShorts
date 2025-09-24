@@ -5,14 +5,14 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "18ab10dca3d31cbc19528227f5af9b659e6c2a66"
+      "hash": "3c440ae95d1f2e07046c205f1f7edb31a73e8152"
     },
     "com.azzazello.lightdi": {
       "version": "https://github.com/Azzazelloqq/LightDI.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "b6ed66bd2b163b90bbe5b9af72de97af60aa4a2e"
+      "hash": "40e7fd7a308ef9b00b247ae1767e194a54f63d5b"
     },
     "com.azzazello.localsavesystem": {
       "version": "https://github.com/Azzazelloqq/LocalSave.git",
