@@ -3,13 +3,14 @@ using System.Threading;
 using System.Collections.Generic;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.Tools.Pool;
+using Code.Games.Game2.Scripts.Core;
 using LightDI.Runtime;
 using UnityEngine;
 using R3;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BoxTowerTowerPm : BaseDisposable
+    internal class BoxTowerTowerPm : BaseDisposable
     {
         public struct Ctx
         {

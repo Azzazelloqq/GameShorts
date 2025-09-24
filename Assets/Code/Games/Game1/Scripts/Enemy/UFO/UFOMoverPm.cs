@@ -1,8 +1,7 @@
-﻿using Code.Core.InputManager;
-using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
+﻿using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
+using Code.Core.InputManager;
 using LightDI.Runtime;
 using Logic.Entities;
-using Logic.Entities.Core;
 using TickHandler;
 using UnityEngine;
 

@@ -1,7 +1,8 @@
-﻿using Logic.Settings;
+﻿using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using Logic.Settings;
 using UnityEngine;
 
-namespace Code.Core.ShortGamesCore.Game1.Scripts.View
+namespace Asteroids.Code.Games.Game1.Scripts.View
 {
     internal class MainSceneContextView: SceneContextView
     {

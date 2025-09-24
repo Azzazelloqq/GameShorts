@@ -3,10 +3,11 @@ using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using UnityEngine;
 using System.Collections.Generic;
+using Code.Games.Game2.Scripts.Core;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BlockSpawner : BaseMonoBehaviour
+    internal class BlockSpawner : BaseMonoBehaviour
     {
         [Header("Block Settings")]
         [SerializeField] private GameObject blockPrefab;

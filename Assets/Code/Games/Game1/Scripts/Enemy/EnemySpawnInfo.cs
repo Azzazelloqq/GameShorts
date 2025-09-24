@@ -1,8 +1,7 @@
-﻿using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
-using Logic.Entities.Core;
+﻿using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using UnityEngine;
 
-namespace Logic.Enemy
+namespace Asteroids.Code.Games.Game1.Scripts.Enemy
 {
     internal struct EnemySpawnInfo
     {

@@ -1,9 +1,10 @@
 using System;
+using Code.Games.Game2.Scripts.Core;
 using R3;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class GameModel
+    internal class GameModel
     {
         public ReactiveProperty<GameState> CurrentState { get; } = new ReactiveProperty<GameState>(GameState.Ready);
         public ReactiveProperty<int> Score { get; } = new ReactiveProperty<int>(0);

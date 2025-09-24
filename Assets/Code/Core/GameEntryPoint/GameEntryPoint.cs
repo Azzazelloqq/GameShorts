@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Asteroids.Code.Games.Game1;
 using Code.Core.GamesLoader;
 using Code.Core.GameSwiper;
 using Code.Core.ShortGamesCore.Game1;
@@ -118,7 +119,7 @@ namespace Code.Core.GameEntryPoint
         {
             var types = new[]
             {
-                typeof(Game1), 
+                typeof(AsteroidsGame), 
                 typeof(Game2)
             };
 
@@ -132,7 +133,7 @@ namespace Code.Core.GameEntryPoint
         {
             return new Dictionary<Type, string>
             {
-                { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
+                { typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.Game1MAIN },
                 { typeof(Game2), ResourceIdsContainer.GameBoxTower.Game2Main }
             };
            // return new Dictionary<Type, string>();

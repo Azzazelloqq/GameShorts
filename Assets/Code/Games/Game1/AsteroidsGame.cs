@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading;
+using Asteroids.Code.Games.Game1.Scripts.View;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using UnityEngine;
 
-namespace Code.Core.ShortGamesCore.Game1
+namespace Asteroids.Code.Games.Game1
 {
-    public class Game1 : BaseMonoBehaviour, IShortGame
+    public class AsteroidsGame : BaseMonoBehaviour, IShortGame
     {
         [SerializeField] private MainSceneContextView sceneContextView;
         private IDisposable _core;

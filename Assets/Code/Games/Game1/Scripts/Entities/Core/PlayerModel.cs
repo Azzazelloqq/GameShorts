@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Code.Core.ShortGamesCore.Game1.Scripts.Core;
+using Asteroids.Code.Games.Game1.Scripts.Core;
 using Logic.Entities.Core;
 using Logic.Player.LaserWeapon;
 using R3;
 
-namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
+namespace Asteroids.Code.Games.Game1.Scripts.Entities.Core
 {
 	internal class PlayerModel : BaseModel
 	{

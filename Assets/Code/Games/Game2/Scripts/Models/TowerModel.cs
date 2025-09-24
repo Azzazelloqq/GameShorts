@@ -1,10 +1,11 @@
 using System;
+using Code.Games.Game2.Scripts.Core;
 using R3;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class TowerModel
+    internal class TowerModel
     {
         public ReactiveProperty<BlockData> LastPlacedBlock { get; } = new ReactiveProperty<BlockData>();
         public ReactiveProperty<float> TowerHeight { get; } = new ReactiveProperty<float>(0f);

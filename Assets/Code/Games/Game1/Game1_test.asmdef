@@ -1,6 +1,6 @@
 {
-    "name": "Game1_test",
-    "rootNamespace": "",
+    "name": "Asteroids.Game",
+    "rootNamespace": "Asteroids",
     "references": [
         "Core.ShortGame",
         "BaseDMDisposable",

@@ -1,11 +1,12 @@
 using System;
 using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
+using Code.Games.Game2.Scripts.Core;
 using R3;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BoxTowerUIPm : BaseDisposable
+    internal class BoxTowerUIPm : BaseDisposable
     {
         public struct Ctx
         {

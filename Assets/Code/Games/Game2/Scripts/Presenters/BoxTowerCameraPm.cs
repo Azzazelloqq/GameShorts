@@ -6,7 +6,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BoxTowerCameraPm : BaseDisposable
+    internal class BoxTowerCameraPm : BaseDisposable
     {
         public struct Ctx
         {

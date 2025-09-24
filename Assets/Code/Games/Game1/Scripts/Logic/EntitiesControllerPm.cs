@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
+using Asteroids.Code.Games.Game1.Scripts.Entities;
+using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Code.Core.BaseDMDisposable.Scripts;
-using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
-using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
-using Logic.Entities;
-using Logic.Entities.Core;
 using UnityEngine;
 
-namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
+namespace Asteroids.Code.Games.Game1.Scripts.Logic
 {
     internal class EntitiesControllerPm : BaseDisposable, IEntitiesController
     {

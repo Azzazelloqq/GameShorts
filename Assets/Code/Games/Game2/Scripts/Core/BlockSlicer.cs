@@ -1,8 +1,9 @@
+using Code.Games.Game2.Scripts.Core;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public static class BlockSlicer
+    internal static class BlockSlicer
     {
         public static PlaceResult TryPlace(BlockData prev, BlockData curr)
         {

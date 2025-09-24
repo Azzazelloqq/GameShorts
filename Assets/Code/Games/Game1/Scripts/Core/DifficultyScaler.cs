@@ -1,7 +1,7 @@
 using Code.Core.BaseDMDisposable.Scripts;
 using R3;
 
-namespace Code.Core.ShortGamesCore.Game1.Scripts.Core
+namespace Asteroids.Code.Games.Game1.Scripts.Core
 {
     internal class DifficultyScaler : BaseDisposable
     {

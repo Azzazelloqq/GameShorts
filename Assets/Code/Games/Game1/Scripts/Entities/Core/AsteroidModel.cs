@@ -1,8 +1,7 @@
-﻿
-using Logic.Entities.Core;
+﻿using Logic.Entities.Core;
 using R3;
 
-namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
+namespace Asteroids.Code.Games.Game1.Scripts.Entities.Core
 {
     internal class AsteroidModel : BaseModel
     {

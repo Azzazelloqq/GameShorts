@@ -1,4 +1,4 @@
-﻿namespace Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core
+﻿namespace Asteroids.Code.Games.Game1.Scripts.Entities.Core
 {
 	internal enum EntityType
 	{

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.ShortGamesCore.Game1;
+using Asteroids.Code.Games.Game1;
 using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Lawnmower;
 using Code.Core.ShortGamesCore.Source.Factory;
@@ -120,7 +120,7 @@ namespace Code.Core.Tester
         {
             var types = new[]
             {
-                typeof(Game1),
+                typeof(AsteroidsGame),
                 typeof(Game2),
                 typeof(LawnmowerGame)
             };
@@ -133,7 +133,7 @@ namespace Code.Core.Tester
         {
             return new Dictionary<Type, string>
             {
-                { typeof(Game1), ResourceIdsContainer.GameAsteroids.Game1MAIN },
+                { typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.Game1MAIN },
                 { typeof(Game2), ResourceIdsContainer.GameBoxTower.Game2Main },
                 { typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
             };

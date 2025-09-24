@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace Code.Core.ShortGamesCore.Game2
+namespace Code.Games.Game2.Scripts.Core
 {
-    public enum Axis { X, Z }
+    internal enum Axis { X, Z }
 
-    public struct BlockData
+    internal struct BlockData
     {
         public Vector3 center;
         public Vector3 size;
@@ -18,7 +18,7 @@ namespace Code.Core.ShortGamesCore.Game2
         }
     }
 
-    public struct PlaceResult
+    internal struct PlaceResult
     {
         public bool success;
         public BlockData placedBlock;
@@ -36,7 +36,7 @@ namespace Code.Core.ShortGamesCore.Game2
         }
     }
 
-    public enum GameState
+    internal enum GameState
     {
         Ready,
         Running,

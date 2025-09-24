@@ -1,9 +1,8 @@
-﻿using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
+﻿using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Logic.Entities;
-using Logic.Entities.Core;
 using UnityEngine;
 
-namespace Logic.Enemy.Asteroid
+namespace Asteroids.Code.Games.Game1.Scripts.Enemy.Asteroid
 {
 	internal class AsteroidView : BaseView
 	{

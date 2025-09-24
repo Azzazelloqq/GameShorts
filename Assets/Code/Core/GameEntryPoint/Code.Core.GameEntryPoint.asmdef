@@ -14,7 +14,8 @@
     "Game1_test",
     "Game2",
     "Tools",
-    "Game2_test"
+    "Game2_test",
+    "Asteroids.Game"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

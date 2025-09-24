@@ -1,9 +1,8 @@
 ﻿using System;
-using Code.Core.ShortGamesCore.Game1.Scripts.Entities.Core;
 using R3;
 using UnityEngine;
 
-namespace Logic.Entities.Core
+namespace Asteroids.Code.Games.Game1.Scripts.Entities.Core
 {
     internal class BaseModel
     {
