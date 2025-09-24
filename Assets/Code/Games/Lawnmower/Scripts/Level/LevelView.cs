@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
-    public class LevelView : MonoBehaviour
+    internal class LevelView : MonoBehaviour
     {
         [Header("Level Info")]
         [SerializeField] private string levelName = "Level 1";
@@ -18,13 +18,17 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
         [Header("Level Bounds")]
         [SerializeField] private Collider2D levelBounds;
         
+        [SerializeField] private EmptyingZoneView emptyingZone;
+        
         // Properties
         public string LevelName => levelName;
         public int LevelIndex => levelIndex;
         public GrassFieldView[] GrassFields => grassFields;
         public Transform PlayerSpawnPoint => playerSpawnPoint;
         public Collider2D LevelBounds => levelBounds;
-        
+
+        public EmptyingZoneView EmptyingZone => emptyingZone;
+
         // Level completion tracking
         private int _completedFields = 0;
         public bool IsCompleted => _completedFields >= grassFields.Length;

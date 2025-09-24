@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 {
-    public class LawnmowerCameraPm : BaseDisposable
+    internal class LawnmowerCameraPm : BaseDisposable
     {
         public struct Ctx
         {

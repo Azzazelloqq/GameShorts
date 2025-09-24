@@ -8,7 +8,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 {
-    public class LawnmowerCameraController : BaseDisposable
+    internal class LawnmowerCameraController : BaseDisposable
     {
         public struct Ctx
         {

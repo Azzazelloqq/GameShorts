@@ -18,6 +18,15 @@ public class LawnmowerPlayerSettings : ScriptableObject
     [SerializeField] private float cuttingRadius = 1f;
     [SerializeField] private float cuttingInterval = 0.1f; // секунды между стрижками
     
+    [Header("Grass Container")]
+    [SerializeField] private float containerMaxCapacity = 100f; // максимальный объем контейнера
+    [SerializeField] private float emptyingTime = 3f; // время полного опустошения контейнера в секундах
+    [SerializeField] private float grassPerTile = 1f; // количество травы за один подстриженный тайл
+    
+    [Header("Farmer UI")]
+    [SerializeField] private GameObject farmerUIPrefab; // префаб фермера для UI
+    [SerializeField] private Vector2 farmerUIOffset = new Vector2(0, 50); // смещение относительно игрока
+    
     // Properties
     public float MaxSpeed => maxSpeed;
     public float Acceleration => acceleration;
@@ -27,6 +36,15 @@ public class LawnmowerPlayerSettings : ScriptableObject
     public bool InstantRotation => instantRotation;
     public float CuttingRadius => cuttingRadius;
     public float CuttingInterval => cuttingInterval;
+    
+    // Grass Container Properties
+    public float ContainerMaxCapacity => containerMaxCapacity;
+    public float EmptyingTime => emptyingTime;
+    public float GrassPerTile => grassPerTile;
+    
+    // Farmer UI Properties
+    public GameObject FarmerUIPrefab => farmerUIPrefab;
+    public Vector2 FarmerUIOffset => farmerUIOffset;
     
     private void OnValidate()
     {
@@ -38,5 +56,10 @@ public class LawnmowerPlayerSettings : ScriptableObject
         rotationSmoothness = Mathf.Max(0.1f, rotationSmoothness);
         cuttingRadius = Mathf.Max(0.1f, cuttingRadius);
         cuttingInterval = Mathf.Max(0.01f, cuttingInterval);
+        
+        // Validate grass container settings
+        containerMaxCapacity = Mathf.Max(1f, containerMaxCapacity);
+        emptyingTime = Mathf.Max(0.1f, emptyingTime);
+        grassPerTile = Mathf.Max(0.1f, grassPerTile);
     }
 }

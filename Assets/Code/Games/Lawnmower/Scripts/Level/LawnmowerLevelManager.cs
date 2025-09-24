@@ -5,7 +5,7 @@ using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
-    public class LawnmowerLevelManager : BaseDisposable
+    internal class LawnmowerLevelManager : BaseDisposable
     {
         public struct Ctx
         {

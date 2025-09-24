@@ -7,8 +7,8 @@
         "LightDI",
         "Tools",
         "Code.Core.InputManager",
-        "TickHandler",
-        "Assembly-CSharp"
+        "Unity.TextMeshPro",
+        "TickHandler"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

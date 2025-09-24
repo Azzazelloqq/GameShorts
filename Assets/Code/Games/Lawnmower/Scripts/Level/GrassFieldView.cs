@@ -1,12 +1,12 @@
+using Code.Games.Lawnmower.Scripts.Grass;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
-    public class GrassFieldView : MonoBehaviour
+    internal class GrassFieldView : MonoBehaviour
     {
         [Header("Field Info")]
         [SerializeField] private string fieldName = "Grass Field";
-        [SerializeField] private float completionThreshold = 0.8f; // 80% травы должно быть скошено
         
         [Header("Grass Grid")]
         [SerializeField] private GrassGridInstanced grassGrid;
@@ -22,7 +22,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
         // Properties
         public string FieldName => fieldName;
         public bool IsCompleted => _isCompleted;
-        public float CompletionThreshold => completionThreshold;
         public GrassGridInstanced GrassGrid => grassGrid;
         
         private void Update()
@@ -66,27 +65,33 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
             }
         }
         
-        public void CutGrassAtPosition(Vector3 worldPosition, float radius = 1f)
+        public int CutGrassAtPosition(Vector3 worldPosition, float radius = 1f)
         {
-            if (grassGrid == null || !grassGrid.IsInitialized()) return;
+            if (grassGrid == null || !grassGrid.IsInitialized()) return 0;
+            
+            int cutTilesCount = 0;
             
             // Используем радиус стрижки
             if (radius <= 0.5f)
             {
                 // Если радиус маленький, режем только одну точку
-                grassGrid.CutGrassAtPosition(worldPosition);
+                if (grassGrid.CutGrassAtPosition(worldPosition))
+                    cutTilesCount = 1;
             }
             else
             {
                 // Если радиус больше, режем в радиусе
-                CutGrassInRadius(worldPosition, radius);
+                cutTilesCount = CutGrassInRadius(worldPosition, radius);
             }
+            
+            return cutTilesCount;
         }
         
-        private void CutGrassInRadius(Vector3 centerPosition, float radius)
+        private int CutGrassInRadius(Vector3 centerPosition, float radius)
         {
-            if (grassGrid == null || !grassGrid.IsInitialized()) return;
+            if (grassGrid == null || !grassGrid.IsInitialized()) return 0;
             
+            int cutTilesCount = 0;
             Vector2Int gridSize = grassGrid.GetGridSize();
             
             // Получаем индексы центрального тайла
@@ -110,10 +115,13 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
                     
                     if (distance <= radius)
                     {
-                        grassGrid.CutGrassAt(x, y);
+                        if (grassGrid.CutGrassAt(x, y))
+                            cutTilesCount++;
                     }
                 }
             }
+            
+            return cutTilesCount;
         }
         
         private Vector3 GetTileWorldPosition(int gridX, int gridY)
@@ -128,7 +136,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
             
             float cutPercentage = CalculateCutPercentage();
             
-            if (cutPercentage >= completionThreshold && !_isCompleted)
+            if (cutPercentage >= 1 && !_isCompleted)
             {
                 _isCompleted = true;
                 OnFieldCompleted?.Invoke(this);

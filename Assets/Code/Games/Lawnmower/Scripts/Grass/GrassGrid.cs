@@ -1,3 +1,4 @@
+using Code.Games.Lawnmower.Scripts.Grass;
 using UnityEngine;
 
 public class GrassGrid : MonoBehaviour, IGrassGrid
@@ -214,12 +215,15 @@ public class GrassGrid : MonoBehaviour, IGrassGrid
     /// <summary>
     /// Убрать траву в определенной позиции сетки
     /// </summary>
-    public void CutGrassAt(int gridX, int gridY)
+    public bool CutGrassAt(int gridX, int gridY)
     {
         if (IsValidGridPosition(gridX, gridY) && grassTiles[gridX, gridY] != null)
         {
+            bool wasVisible = grassTiles[gridX, gridY].IsGrassVisible;
             grassTiles[gridX, gridY].CutGrass();
+            return wasVisible;
         }
+        return false;
     }
     
     /// <summary>
@@ -340,10 +344,10 @@ public class GrassGrid : MonoBehaviour, IGrassGrid
     /// <summary>
     /// Убрать траву в мировой позиции
     /// </summary>
-    public void CutGrassAtPosition(Vector3 worldPosition)
+    public bool CutGrassAtPosition(Vector3 worldPosition)
     {
         Vector2Int gridPos = GetGridIndices(worldPosition);
-        CutGrassAt(gridPos.x, gridPos.y);
+        return CutGrassAt(gridPos.x, gridPos.y);
     }
     
     /// <summary>

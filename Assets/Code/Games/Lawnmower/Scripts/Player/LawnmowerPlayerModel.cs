@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 {
-    public class LawnmowerPlayerModel
+    internal class LawnmowerPlayerModel
     {
         // Position and movement
         public ReactiveProperty<Vector2> Position;
@@ -29,6 +29,12 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
         // Level progress
         public ReactiveProperty<int> CurrentLevelIndex;
         public ReactiveProperty<float> TotalGrassCut;
+        
+        // Grass Container System
+        public ReactiveProperty<float> GrassContainerCurrentAmount;
+        public ReactiveProperty<float> GrassContainerMaxCapacity;
+        public ReactiveProperty<bool> IsInEmptyingZone;
+        public ReactiveProperty<float> EmptyingProgress; // 0-1, прогресс опустошения
 
         public LawnmowerPlayerModel()
         {
@@ -47,6 +53,12 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             IsMoving = new ReactiveProperty<bool>(false);
             CurrentLevelIndex = new ReactiveProperty<int>(0);
             TotalGrassCut = new ReactiveProperty<float>(0f);
+            
+            // Initialize grass container system
+            GrassContainerCurrentAmount = new ReactiveProperty<float>(0f);
+            GrassContainerMaxCapacity = new ReactiveProperty<float>(100f);
+            IsInEmptyingZone = new ReactiveProperty<bool>(false);
+            EmptyingProgress = new ReactiveProperty<float>(0f);
         }
     }
 }

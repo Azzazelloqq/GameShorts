@@ -1,10 +1,12 @@
 using UnityEngine;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
+using Code.Core.ShortGamesCore.Lawnmower.Scripts.UI;
+using UnityEngine.Serialization;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
 {
-    public class LawnmowerSceneContextView : MonoBehaviour
+    internal class LawnmowerSceneContextView : MonoBehaviour
     {
         [Header("Player")]
         [SerializeField] private PlayerView playerPrefab;
@@ -16,7 +18,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
         [Header("UI")]
         [SerializeField] private Canvas uiCanvas;
         [SerializeField] private Transform startScreenParent;
-        [SerializeField] private Transform gameScreenParent;
+        [SerializeField] private MainGameUIView mainUi;
         [SerializeField] private Transform finishScreenParent;
         
         [Header("Input")]
@@ -35,7 +37,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
         public int CurrentLevelIndex => currentLevelIndex;
         public Canvas UiCanvas => uiCanvas;
         public Transform StartScreenParent => startScreenParent;
-        public Transform GameScreenParent => gameScreenParent;
+        public MainGameUIView MainUi => mainUi;
         public Transform FinishScreenParent => finishScreenParent;
         public FixedJoystick Joystick => joystick;
         public UnityEngine.Camera MainCamera => mainCamera;
