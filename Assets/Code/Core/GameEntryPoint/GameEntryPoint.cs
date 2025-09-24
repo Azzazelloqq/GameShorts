@@ -115,7 +115,8 @@ namespace Code.Core.GameEntryPoint
             {
                 { typeof(TestGame1), ResourceIdsContainer.TestGames.TestGame1 },
                 { typeof(TestGame2), ResourceIdsContainer.TestGames.TestGame2 },
-                { typeof(TestGame3), ResourceIdsContainer.TestGames.TestGame3 }
+                { typeof(TestGame3), ResourceIdsContainer.TestGames.TestGame3 },
+                { typeof(TestGame4), ResourceIdsContainer.TestGames.TestGame4 },
             };
         }
 
@@ -126,6 +127,7 @@ namespace Code.Core.GameEntryPoint
                 typeof(TestGame1), 
                 typeof(TestGame2),
                 typeof(TestGame3),
+                typeof(TestGame4),
             };
         }
         
