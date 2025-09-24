@@ -32,7 +32,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
         // Grass cutting tracking
         private float _lastGrassCutTime = 0f;
         private readonly ITickHandler _tickHandler;
-        private const float GRASS_CUT_INTERVAL = 0.1f; // Режем траву каждые 0.1 секунды при движении
 
         public LawnmowerPlayerPm(Ctx ctx, 
             [Inject] IInputManager inputManager, 
@@ -95,7 +94,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
                 levelManager = _ctx.levelManager
             };
             
-            _playerMover = new LawnmowerPlayerMoverPm(moverCtx, _inputManager, _tickHandler);
+            _playerMover = LawnmowerPlayerMoverPmFactory.CreateLawnmowerPlayerMoverPm(moverCtx);
             AddDispose(_playerMover);
         }
 

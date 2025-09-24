@@ -43,12 +43,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             // Получаем направление джойстика
             Vector2 joystickInput = _inputManager.GetJoystickInput();
             
-            // Отладочная информация (закомментировано для производительности)
-            // if (joystickInput.magnitude > 0.01f)
-            // {
-            //     Debug.Log($"PlayerMover: Joystick input detected: {joystickInput}");
-            // }
-            
             // Если джойстик не активен, не двигаемся
             if (joystickInput.magnitude < 0.01f)
             {
