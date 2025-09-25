@@ -1,0 +1,21 @@
+{
+    "name": "EscapeFromDark",
+    "rootNamespace": "EscapeFromDark",
+    "references": [
+        "BaseDMDisposable",
+        "Code.Core.InputManager",
+        "LightDI",
+        "Core.ShortGame",
+        "TickHandler",
+        "Tools"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

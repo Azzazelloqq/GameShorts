@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1;
+using Code.Core.ShortGamesCore.EscapeFromDark;
 using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Lawnmower;
 using Code.Core.ShortGamesCore.Source.Factory;
@@ -122,7 +123,8 @@ namespace Code.Core.Tester
             {
                 typeof(AsteroidsGame),
                 typeof(Game2),
-                typeof(LawnmowerGame)
+                typeof(LawnmowerGame),
+                typeof(EscapeFromDarkGame),
             };
 
             _gameTypes.AddRange(types);
@@ -136,6 +138,7 @@ namespace Code.Core.Tester
                 { typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.Game1MAIN },
                 { typeof(Game2), ResourceIdsContainer.GameBoxTower.Game2Main },
                 { typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
+                { typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
             };
         }
 

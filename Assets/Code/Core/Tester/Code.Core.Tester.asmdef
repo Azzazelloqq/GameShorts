@@ -2,7 +2,7 @@
     "name": "Code.Core.Tester",
     "rootNamespace": "Code.Core.Tester",
     "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "Unity.TextMeshPro",
         "GUID:0d8beb7f090555447a6cf5ce9e54dbb4",
         "Core.ShortGame",
         "Logger",
@@ -12,9 +12,10 @@
         "AddressablesGroups",
         "Game1_test",
         "Game2",
-        "GUID:0e6e4a9ef4644d21a397a36906ffc8e9",
-        "GUID:e8684917f5d44c0692010208f37a5f09",
-        "GUID:b7b3ea8b2a7e415eb3e68437629cbc43"
+        "Tools",
+        "Lawnmower",
+        "Asteroids.Game",
+        "EscapeFromDark"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
