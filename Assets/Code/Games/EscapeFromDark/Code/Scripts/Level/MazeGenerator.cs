@@ -10,6 +10,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
         private int _width;
         private int _height;
         private Vector2Int _startPosition;
+        private Vector2Int _exitPosition;
         private System.Random _random;
 
         public int[,] GetLabirint(int width, int height)
@@ -28,9 +29,13 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
                 }
             }
 
-            // Стартовая позиция всегда [0, 5] (или центр если высота меньше)
-            int startY = Math.Min(5, _height / 2);
-            _startPosition = new Vector2Int(0, startY);
+            // Выбираем случайную стартовую позицию на одной из сторон
+            _startPosition = GenerateRandomEntrancePosition();
+            
+            // Выбираем случайную позицию выхода на другой стороне
+            _exitPosition = GenerateRandomExitPosition();
+            
+            Debug.Log($"MazeGenerator: Generated entrance at {_startPosition}, exit at {_exitPosition}");
             
             // Создаем путь от стартовой позиции к противоположной стороне
             GeneratePath();
@@ -61,7 +66,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             List<Vector2Int> mainPath = new List<Vector2Int>();
             List<Vector2Int> straightSegments = new List<Vector2Int>(); // Для отслеживания прямых участков
             Vector2Int currentPos = _startPosition;
-            Vector2Int currentDirection = Vector2Int.right; // Начинаем движение вправо
+            Vector2Int currentDirection = GetInitialDirection(); // Направление к выходу
             int stepsInCurrentDirection = 0;
             int maxStepsInDirection = _random.Next(1, 4); // 1-3 клетки в одном направлении
             Vector2Int segmentStart = currentPos; // Начало текущего прямого участка
@@ -70,8 +75,8 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             _maze[currentPos.y, currentPos.x] = 0;
             mainPath.Add(currentPos);
             
-            // Генерируем путь к правой стороне
-            while (currentPos.x < _width - 2) // останавливаемся перед правой стеной
+            // Генерируем путь к выходу
+            while (!IsNearExit(currentPos))
             {
                 List<Vector2Int> possibleDirections = GetMainPathDirections(currentPos);
                 
@@ -80,30 +85,31 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
                     Vector2Int nextDirection;
                     bool willTurn = false;
                     
+                    // Выбираем направление с предпочтением к выходу
+                    nextDirection = ChooseBestDirection(possibleDirections, currentPos);
+                    
                     // Проверяем, нужно ли поворачивать
                     if (stepsInCurrentDirection >= maxStepsInDirection)
                     {
-                        // Обязательный поворот - исключаем текущее направление
+                        // Обязательный поворот - исключаем текущее направление если возможно
                         List<Vector2Int> turnDirections = new List<Vector2Int>(possibleDirections);
                         turnDirections.Remove(currentDirection);
                         
                         if (turnDirections.Count > 0)
                         {
-                            // Предпочитаем направления, которые ведут к цели
-                            nextDirection = ChooseBestTurnDirection(turnDirections, currentPos);
+                            nextDirection = ChooseBestDirection(turnDirections, currentPos);
                             willTurn = true;
                         }
                         else
                         {
                             // Если поворот невозможен, продолжаем прямо
-                            nextDirection = currentDirection;
                             stepsInCurrentDirection++;
                         }
                     }
                     else
                     {
                         // Можем продолжить в том же направлении или повернуть
-                        if (possibleDirections.Contains(currentDirection) && _random.Next(100) < 60)
+                        if (possibleDirections.Contains(currentDirection) && _random.Next(100) < 70)
                         {
                             // Продолжаем в том же направлении
                             nextDirection = currentDirection;
@@ -112,7 +118,6 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
                         else
                         {
                             // Добровольный поворот
-                            nextDirection = possibleDirections[_random.Next(possibleDirections.Count)];
                             if (nextDirection != currentDirection)
                             {
                                 willTurn = true;
@@ -165,11 +170,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             }
             
             // Создаем финальный проход к выходу
-            if (currentPos.x == _width - 2)
-            {
-                Vector2Int exitPos = new Vector2Int(_width - 1, currentPos.y);
-                _maze[exitPos.y, exitPos.x] = 0;
-            }
+            CreateFinalPathToExit(currentPos);
             
             return straightSegments;
         }
@@ -177,20 +178,33 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
         private List<Vector2Int> GetMainPathDirections(Vector2Int currentPos)
         {
             List<Vector2Int> directions = new List<Vector2Int>();
-            Vector2Int[] possibleDirections = { Vector2Int.right, Vector2Int.up, Vector2Int.down };
+            Vector2Int[] possibleDirections = { Vector2Int.right, Vector2Int.up, Vector2Int.down, Vector2Int.left };
 
             foreach (Vector2Int direction in possibleDirections)
             {
                 Vector2Int newPos = currentPos + direction;
                 
-                // Проверяем границы (оставляем место для стен по периметру)
-                if (newPos.x >= 1 && newPos.x < _width - 1 && 
-                    newPos.y >= 1 && newPos.y < _height - 1)
+                // Проверяем базовые границы
+                if (IsValidPosition(newPos))
                 {
-                    // Проверяем, что это стена и не создаст пересечение с существующим путем
-                    if (_maze[newPos.y, newPos.x] == 1 && !WillCreateIntersection(newPos))
+                    // Разрешаем движение к периметру только если это ведет к выходу
+                    bool isOnPerimeter = newPos.x == 0 || newPos.x == _width - 1 || newPos.y == 0 || newPos.y == _height - 1;
+                    
+                    if (isOnPerimeter)
                     {
-                        directions.Add(direction);
+                        // Разрешаем только если это выход
+                        if (newPos == _exitPosition)
+                        {
+                            directions.Add(direction);
+                        }
+                    }
+                    else
+                    {
+                        // Внутри лабиринта - проверяем, что это стена и не создаст пересечение
+                        if (_maze[newPos.y, newPos.x] == 1 && !WillCreateIntersection(newPos))
+                        {
+                            directions.Add(direction);
+                        }
                     }
                 }
             }
@@ -216,21 +230,47 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             return pathCount > 1; // Больше одного соседнего прохода = пересечение
         }
 
-        private Vector2Int ChooseBestTurnDirection(List<Vector2Int> turnDirections, Vector2Int currentPos)
+        private Vector2Int ChooseBestDirection(List<Vector2Int> availableDirections, Vector2Int currentPos)
         {
-            // Приоритет направлений для достижения цели (правая сторона)
-            Vector2Int[] priorityOrder = { Vector2Int.right, Vector2Int.up, Vector2Int.down, Vector2Int.left };
+            if (availableDirections.Count == 0) return Vector2Int.zero;
             
-            foreach (Vector2Int priority in priorityOrder)
+            // Вычисляем направление к выходу
+            Vector2Int directionToExit = _exitPosition - currentPos;
+            
+            // Нормализуем к базовым направлениям
+            Vector2Int preferredDirection = Vector2Int.zero;
+            if (Mathf.Abs(directionToExit.x) > Mathf.Abs(directionToExit.y))
             {
-                if (turnDirections.Contains(priority))
+                preferredDirection = directionToExit.x > 0 ? Vector2Int.right : Vector2Int.left;
+            }
+            else
+            {
+                preferredDirection = directionToExit.y > 0 ? Vector2Int.up : Vector2Int.down;
+            }
+            
+            // Если предпочтительное направление доступно, используем его
+            if (availableDirections.Contains(preferredDirection))
+            {
+                return preferredDirection;
+            }
+            
+            // Иначе выбираем направление, которое приближает к цели
+            Vector2Int bestDirection = availableDirections[0];
+            float bestDistance = Vector2Int.Distance(currentPos + bestDirection, _exitPosition);
+            
+            foreach (Vector2Int direction in availableDirections)
+            {
+                Vector2Int nextPos = currentPos + direction;
+                float distance = Vector2Int.Distance(nextPos, _exitPosition);
+                
+                if (distance < bestDistance)
                 {
-                    return priority;
+                    bestDistance = distance;
+                    bestDirection = direction;
                 }
             }
             
-            // Если ничего не найдено по приоритету, возвращаем случайное
-            return turnDirections[_random.Next(turnDirections.Count)];
+            return bestDirection;
         }
 
         private void GenerateFalsePathsInStraightSegments(List<Vector2Int> straightSegments)
@@ -334,9 +374,6 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         private void EnsurePerimeterWalls()
         {
-            // Находим выход на правой стороне
-            Vector2Int exitPosition = FindExitPosition();
-            
             // Делаем весь периметр стенами
             for (int x = 0; x < _width; x++)
             {
@@ -354,27 +391,11 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             _maze[_startPosition.y, _startPosition.x] = 0;
             
             // Делаем единственный выход
-            if (exitPosition != Vector2Int.one * -1)
-            {
-                _maze[exitPosition.y, exitPosition.x] = 0;
-            }
+            _maze[_exitPosition.y, _exitPosition.x] = 0;
+            
+            Debug.Log($"MazeGenerator: Entrance at {_startPosition}, Exit at {_exitPosition}");
         }
 
-        private Vector2Int FindExitPosition()
-        {
-            // Ищем проход на правой стороне лабиринта
-            for (int y = 1; y < _height - 1; y++) // не включаем углы
-            {
-                if (_maze[y, _width - 1] == 0)
-                {
-                    return new Vector2Int(_width - 1, y);
-                }
-            }
-            
-            // Если не нашли выход, создаем его в центре правой стороны
-            int exitY = _height / 2;
-            return new Vector2Int(_width - 1, exitY);
-        }
 
         private int CountAdjacentPaths(Vector2Int pos)
         {
@@ -391,6 +412,164 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             }
 
             return pathCount;
+        }
+
+        private Vector2Int GenerateRandomEntrancePosition()
+        {
+            // Выбираем случайную сторону для входа (0-3: верх, право, низ, лево)
+            int side = _random.Next(4);
+            
+            switch (side)
+            {
+                case 0: // Верхняя сторона
+                    return new Vector2Int(_random.Next(1, _width - 1), 0);
+                case 1: // Правая сторона
+                    return new Vector2Int(_width - 1, _random.Next(1, _height - 1));
+                case 2: // Нижняя сторона
+                    return new Vector2Int(_random.Next(1, _width - 1), _height - 1);
+                case 3: // Левая сторона
+                default:
+                    return new Vector2Int(0, _random.Next(1, _height - 1));
+            }
+        }
+
+        private Vector2Int GenerateRandomExitPosition()
+        {
+            // Определяем сторону входа
+            int entranceSide = GetSideOfPosition(_startPosition);
+            
+            // Выбираем случайную сторону для выхода, исключая сторону входа
+            List<int> availableSides = new List<int>();
+            for (int i = 0; i < 4; i++)
+            {
+                if (i != entranceSide)
+                {
+                    availableSides.Add(i);
+                }
+            }
+            
+            int exitSide = availableSides[_random.Next(availableSides.Count)];
+            
+            switch (exitSide)
+            {
+                case 0: // Верхняя сторона
+                    return new Vector2Int(_random.Next(1, _width - 1), 0);
+                case 1: // Правая сторона
+                    return new Vector2Int(_width - 1, _random.Next(1, _height - 1));
+                case 2: // Нижняя сторона
+                    return new Vector2Int(_random.Next(1, _width - 1), _height - 1);
+                case 3: // Левая сторона
+                default:
+                    return new Vector2Int(0, _random.Next(1, _height - 1));
+            }
+        }
+
+        private int GetSideOfPosition(Vector2Int position)
+        {
+            if (position.y == 0) return 0; // Верх
+            if (position.x == _width - 1) return 1; // Право
+            if (position.y == _height - 1) return 2; // Низ
+            if (position.x == 0) return 3; // Лево
+            
+            return -1; // Не на периметре
+        }
+
+        private Vector2Int GetInitialDirection()
+        {
+            // Определяем общее направление от входа к выходу
+            Vector2Int direction = _exitPosition - _startPosition;
+            
+            // Нормализуем направление к одному из базовых векторов
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            {
+                return direction.x > 0 ? Vector2Int.right : Vector2Int.left;
+            }
+            else
+            {
+                return direction.y > 0 ? Vector2Int.up : Vector2Int.down;
+            }
+        }
+
+        private bool IsNearExit(Vector2Int currentPos)
+        {
+            // Проверяем, близко ли мы к выходу (в пределах 1 клетки) или можем дойти напрямую
+            int distance = Mathf.Abs(currentPos.x - _exitPosition.x) + Mathf.Abs(currentPos.y - _exitPosition.y);
+            return distance <= 1 || CanReachExitDirectly(currentPos);
+        }
+
+        private bool CanReachExitDirectly(Vector2Int currentPos)
+        {
+            // Проверяем, можем ли дойти до выхода по прямой линии
+            Vector2Int direction = _exitPosition - currentPos;
+            
+            // Если на одной линии по X или Y
+            if (direction.x == 0 || direction.y == 0)
+            {
+                Vector2Int step = new Vector2Int(
+                    direction.x == 0 ? 0 : (direction.x > 0 ? 1 : -1),
+                    direction.y == 0 ? 0 : (direction.y > 0 ? 1 : -1)
+                );
+                
+                Vector2Int checkPos = currentPos + step;
+                
+                // Проверяем каждый шаг до выхода
+                while (checkPos != _exitPosition)
+                {
+                    if (!IsValidPosition(checkPos) || _maze[checkPos.y, checkPos.x] == 0)
+                    {
+                        return false; // Путь заблокирован
+                    }
+                    checkPos += step;
+                }
+                
+                return true; // Можем дойти напрямую
+            }
+            
+            return false;
+        }
+
+        private void CreateFinalPathToExit(Vector2Int currentPos)
+        {
+            // Создаем простой прямой путь к выходу
+            Vector2Int pos = currentPos;
+            int maxSteps = _width + _height; // Защита от бесконечного цикла
+            int steps = 0;
+            
+            while (pos != _exitPosition && steps < maxSteps)
+            {
+                steps++;
+                
+                // Простая логика: сначала выравниваем по X, потом по Y
+                Vector2Int direction = Vector2Int.zero;
+                
+                if (pos.x != _exitPosition.x)
+                {
+                    direction.x = _exitPosition.x > pos.x ? 1 : -1;
+                }
+                else if (pos.y != _exitPosition.y)
+                {
+                    direction.y = _exitPosition.y > pos.y ? 1 : -1;
+                }
+                
+                if (direction != Vector2Int.zero)
+                {
+                    pos += direction;
+                    if (IsValidPosition(pos))
+                    {
+                        _maze[pos.y, pos.x] = 0;
+                        Debug.Log($"MazeGenerator: Creating final path step at {pos}");
+                    }
+                }
+                else
+                {
+                    break; // Достигли выхода
+                }
+            }
+            
+            // Убеждаемся, что выход точно открыт
+            _maze[_exitPosition.y, _exitPosition.x] = 0;
+            
+            Debug.Log($"MazeGenerator: Final path created from {currentPos} to {_exitPosition} in {steps} steps");
         }
 
         private void GenerateDeadEndPaths()
@@ -694,3 +873,4 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
     }
 }
+

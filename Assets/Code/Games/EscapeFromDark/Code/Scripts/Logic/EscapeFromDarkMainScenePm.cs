@@ -49,7 +49,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
             
             _currentState = EscapeFromDarkGameState.WaitingToStart;
             
-            StartGame();
+            ShowStartScreen();
         }
 
         private void ShowStartScreen()
@@ -107,7 +107,8 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
                 sceneContextView = _ctx.sceneContextView,
                 levelNumber = _currentLevel,
                 onLevelCompleted = OnLevelCompleted,
-                cancellationToken = _ctx.cancellationToken
+                cancellationToken = _ctx.cancellationToken,
+                playerTransform = _playerPm?.GetPlayerView()?.transform // Передаем Transform игрока если он есть
             };
             
             _levelPm = new EscapeFromDarkLevelPm(levelCtx);
@@ -134,6 +135,9 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
             
             _playerPm = EscapeFromDarkPlayerPmFactory.CreateEscapeFromDarkPlayerPm(playerCtx);
             AddDispose(_playerPm);
+            
+            // Обновляем ссылку на игрока в ExitSpot
+            _levelPm?.UpdatePlayerReference(_playerPm.GetPlayerView()?.transform);
             
             Debug.Log("EscapeFromDark: Player created");
         }

@@ -82,6 +82,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
             // Подписываемся на изменения модели игрока
             AddDispose(_playerModel.Position.Subscribe(OnPositionChanged));
             AddDispose(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
+            AddDispose(_playerModel.CurrentRotation.Subscribe(OnRotationChanged));
             
             // Подписываемся на обновления
             _tickHandler.FrameUpdate += HandleMovement;
@@ -107,6 +108,14 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
             }
         }
 
+        private void OnRotationChanged(float newRotation)
+        {
+            if (_playerView != null)
+            {
+                _playerView.UpdateRotation(newRotation);
+            }
+        }
+
         private void HandleMovement(float deltaTime)
         {
 
@@ -124,17 +133,20 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
                 {
                     _playerModel.SetPosition(targetPosition);
                     _playerModel.SetMoving(true);
+                    _playerModel.SetMovementDirection(inputDirection.normalized);
                     Debug.Log($"EscapeFromDarkPlayerPm: Moving to {targetPosition}, maze pos {targetMazePos}");
                 }
                 else
                 {
                     _playerModel.SetMoving(false);
+                    _playerModel.SetMovementDirection(Vector2.zero);
                     Debug.Log($"EscapeFromDarkPlayerPm: Cannot move to {targetPosition}, maze pos {targetMazePos} - invalid");
                 }
             }
             else
             {
                 _playerModel.SetMoving(false);
+                _playerModel.SetMovementDirection(Vector2.zero);
             }
         }
 

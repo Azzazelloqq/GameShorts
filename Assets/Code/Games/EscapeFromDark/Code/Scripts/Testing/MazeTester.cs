@@ -59,28 +59,21 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Testing
             sb.AppendLine("Legend: 1 = Wall, 0 = Path, S = Start, E = Exit");
             sb.AppendLine();
 
-            // Находим выход на правой стороне
-            int exitY = -1;
-            for (int y = 0; y < height; y++)
-            {
-                if (maze[y, width - 1] == 0)
-                {
-                    exitY = y;
-                    break;
-                }
-            }
+            // Находим вход и выход на периметре
+            Vector2Int startPos = FindEntrancePosition(maze, width, height);
+            Vector2Int exitPos = FindExitPosition(maze, width, height, startPos);
 
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     // Отмечаем стартовую позицию
-                    if (x == 0 && y == Mathf.Min(5, height / 2))
+                    if (x == startPos.x && y == startPos.y)
                     {
                         sb.Append("S");
                     }
                     // Отмечаем выход
-                    else if (x == width - 1 && y == exitY)
+                    else if (x == exitPos.x && y == exitPos.y)
                     {
                         sb.Append("E");
                     }
@@ -97,8 +90,8 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Testing
             }
             
             sb.AppendLine();
-            sb.AppendLine($"Start position: [0, {Mathf.Min(5, height / 2)}]");
-            sb.AppendLine($"Exit position: [{width - 1}, {exitY}]");
+            sb.AppendLine($"Start position: [{startPos.x}, {startPos.y}]");
+            sb.AppendLine($"Exit position: [{exitPos.x}, {exitPos.y}]");
             sb.AppendLine("Press SPACE for next maze");
             sb.AppendLine("================================");
 
@@ -141,6 +134,48 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Testing
         {
             _currentLevel = 1;
             Debug.Log("Level reset to 1");
+        }
+
+        private Vector2Int FindEntrancePosition(int[,] maze, int width, int height)
+        {
+            // Ищем вход на периметре
+            for (int y = 0; y < height; y++)
+            {
+                if (maze[y, 0] == 0) return new Vector2Int(0, y); // Левая сторона
+                if (maze[y, width - 1] == 0) return new Vector2Int(width - 1, y); // Правая сторона
+            }
+            
+            for (int x = 0; x < width; x++)
+            {
+                if (maze[0, x] == 0) return new Vector2Int(x, 0); // Верхняя сторона
+                if (maze[height - 1, x] == 0) return new Vector2Int(x, height - 1); // Нижняя сторона
+            }
+            
+            return new Vector2Int(0, height / 2); // Fallback
+        }
+
+        private Vector2Int FindExitPosition(int[,] maze, int width, int height, Vector2Int startPos)
+        {
+            // Ищем выход на периметре (исключаем вход)
+            for (int y = 0; y < height; y++)
+            {
+                Vector2Int leftPos = new Vector2Int(0, y);
+                if (maze[y, 0] == 0 && leftPos != startPos) return leftPos;
+                
+                Vector2Int rightPos = new Vector2Int(width - 1, y);
+                if (maze[y, width - 1] == 0 && rightPos != startPos) return rightPos;
+            }
+            
+            for (int x = 0; x < width; x++)
+            {
+                Vector2Int topPos = new Vector2Int(x, 0);
+                if (maze[0, x] == 0 && topPos != startPos) return topPos;
+                
+                Vector2Int bottomPos = new Vector2Int(x, height - 1);
+                if (maze[height - 1, x] == 0 && bottomPos != startPos) return bottomPos;
+            }
+            
+            return new Vector2Int(width - 1, height / 2); // Fallback
         }
     }
 }

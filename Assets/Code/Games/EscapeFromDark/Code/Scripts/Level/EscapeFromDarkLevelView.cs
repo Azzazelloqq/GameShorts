@@ -1,5 +1,6 @@
 using Code.Core.BaseDMDisposable.Scripts;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
@@ -13,18 +14,26 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
         [SerializeField] private TileBase _floorTile;
         [SerializeField] private Vector2Int origin = Vector2Int.zero;
         
+        [FormerlySerializedAs("_exitSpot")]
+        [Header("Exit Spot")]
+        [SerializeField] private GameObject _exitSpotPrefab;
+        
         [Header("Debug")]
         [SerializeField] private bool showDebugInfo = false;
         
         private int[,] _currentMaze;
         private int _mazeWidth;
         private int _mazeHeight;
+        private ExitSpotController _spawnedExitSpot;
+
+        public ExitSpotController SpawnedExitSpot => _spawnedExitSpot;
 
         internal struct Ctx
         {
             public int[,] mazeData;
             public int mazeWidth;
             public int mazeHeight;
+            public Transform playerTransform; // Ссылка на игрока для ExitSpot
         }
 
         public void SetCtx(Ctx ctx)
@@ -57,7 +66,13 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
                 return;
             }
             
+            if (_exitSpotPrefab == null)
+            {
+                Debug.LogWarning("EscapeFromDarkLevelView: ExitSpot prefab is not assigned!");
+            }
+            
             RenderMaze();
+            SpawnExitSpot(ctx.playerTransform);
             
             if (showDebugInfo)
             {
@@ -133,8 +148,31 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public Vector2Int GetStartPosition()
         {
-            // Стартовая позиция всегда [0, 5] или центр по высоте
-            return new Vector2Int(0, Mathf.Min(5, _mazeHeight / 2));
+            // Ищем вход на периметре лабиринта
+            for (int y = 0; y < _mazeHeight; y++)
+            {
+                // Проверяем левую сторону
+                if (_currentMaze[y, 0] == 0)
+                    return new Vector2Int(0, y);
+                    
+                // Проверяем правую сторону
+                if (_currentMaze[y, _mazeWidth - 1] == 0)
+                    return new Vector2Int(_mazeWidth - 1, y);
+            }
+            
+            for (int x = 0; x < _mazeWidth; x++)
+            {
+                // Проверяем верхнюю сторону
+                if (_currentMaze[0, x] == 0)
+                    return new Vector2Int(x, 0);
+                    
+                // Проверяем нижнюю сторону
+                if (_currentMaze[_mazeHeight - 1, x] == 0)
+                    return new Vector2Int(x, _mazeHeight - 1);
+            }
+            
+            // Fallback - центр левой стороны
+            return new Vector2Int(0, _mazeHeight / 2);
         }
 
         public Vector3 GetPlayerSpawnWorldPosition()
@@ -145,17 +183,103 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public Vector2Int GetExitPosition()
         {
-            // Ищем выход на правой стороне
+            // Ищем выход на периметре лабиринта (исключаем вход)
+            Vector2Int startPos = GetStartPosition();
+            
             for (int y = 0; y < _mazeHeight; y++)
             {
-                if (_currentMaze[y, _mazeWidth - 1] == 0)
-                {
-                    return new Vector2Int(_mazeWidth - 1, y);
-                }
+                // Проверяем левую сторону
+                Vector2Int leftPos = new Vector2Int(0, y);
+                if (_currentMaze[y, 0] == 0 && leftPos != startPos)
+                    return leftPos;
+                    
+                // Проверяем правую сторону
+                Vector2Int rightPos = new Vector2Int(_mazeWidth - 1, y);
+                if (_currentMaze[y, _mazeWidth - 1] == 0 && rightPos != startPos)
+                    return rightPos;
             }
             
-            // Если не найден, возвращаем центр правой стороны
-            return new Vector2Int(_mazeWidth - 1, _mazeHeight / 2);
+            for (int x = 0; x < _mazeWidth; x++)
+            {
+                // Проверяем верхнюю сторону
+                Vector2Int topPos = new Vector2Int(x, 0);
+                if (_currentMaze[0, x] == 0 && topPos != startPos)
+                    return topPos;
+                    
+                // Проверяем нижнюю сторону
+                Vector2Int bottomPos = new Vector2Int(x, _mazeHeight - 1);
+                if (_currentMaze[_mazeHeight - 1, x] == 0 && bottomPos != startPos)
+                    return bottomPos;
+            }
+            
+            // Fallback - центр правой стороны (если не на левой стороне)
+            return startPos.x == 0 ? new Vector2Int(_mazeWidth - 1, _mazeHeight / 2) : new Vector2Int(0, _mazeHeight / 2);
+        }
+
+        private void SpawnExitSpot(Transform playerTransform)
+        {
+            // Удаляем предыдущий ExitSpot если он есть
+            if (_spawnedExitSpot != null)
+            {
+                DestroyImmediate(_spawnedExitSpot.gameObject);
+                _spawnedExitSpot = null;
+            }
+
+            if (_exitSpotPrefab == null)
+            {
+                Debug.LogWarning("EscapeFromDarkLevelView: ExitSpot prefab is not assigned!");
+                return;
+            }
+
+            // Получаем позицию выхода
+            Vector2Int exitMazePos = GetExitPosition();
+            Vector3 exitWorldPos = GetWorldPosition(exitMazePos.x, exitMazePos.y);
+
+            // Вычисляем поворот в сторону лабиринта
+            Quaternion exitRotation = GetExitRotation(exitMazePos);
+
+            // Спавним ExitSpot
+            var spawnedExitSpot = Instantiate(_exitSpotPrefab, exitWorldPos, exitRotation);
+
+            // Инициализируем контроллер ExitSpot
+            _spawnedExitSpot = spawnedExitSpot.GetComponent<ExitSpotController>();
+            if (_spawnedExitSpot != null && playerTransform != null)
+            {
+                ExitSpotController.Ctx exitCtx = new ExitSpotController.Ctx
+                {
+                    playerTransform = playerTransform
+                };
+                _spawnedExitSpot.SetCtx(exitCtx);
+            }
+            else
+            {
+                Debug.LogWarning("EscapeFromDarkLevelView: ExitSpotController not found on prefab or player transform is null!");
+            }
+
+            Debug.Log($"EscapeFromDarkLevelView: ExitSpot spawned at {exitWorldPos} (maze pos {exitMazePos}) with rotation {exitRotation.eulerAngles}");
+        }
+
+        private Quaternion GetExitRotation(Vector2Int exitPosition)
+        {
+            // Определяем, на какой стороне находится выход, и поворачиваем в сторону лабиринта
+            if (exitPosition.x == 0) // Левая сторона
+            {
+                return Quaternion.Euler(0, 0, 0); // Смотрит вправо (в лабиринт)
+            }
+            else if (exitPosition.x == _mazeWidth - 1) // Правая сторона
+            {
+                return Quaternion.Euler(0, 0, 180); // Смотрит влево (в лабиринт)
+            }
+            else if (exitPosition.y == 0) // Верхняя сторона
+            {
+                return Quaternion.Euler(0, 0, -90); // Смотрит вниз (в лабиринт)
+            }
+            else if (exitPosition.y == _mazeHeight - 1) // Нижняя сторона
+            {
+                return Quaternion.Euler(0, 0, 90); // Смотрит вверх (в лабиринт)
+            }
+
+            return Quaternion.identity; // По умолчанию
         }
 
         // Метод для отладки - показать координаты в консоли
@@ -179,6 +303,26 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             Debug.Log($"Walls Tilemap: {(_wallsTilemap != null ? _wallsTilemap.name : "Not assigned")}");
             Debug.Log($"Brush Tiles: {(_brushTiles != null ? _brushTiles.name : "Not assigned")}");
             Debug.Log($"Floor Tile: {(_floorTile != null ? _floorTile.name : "Not assigned")}");
+            Debug.Log($"Exit Spot: {(_exitSpotPrefab != null ? _exitSpotPrefab.name : "Not assigned")}");
+            Debug.Log($"Spawned Exit Spot: {(_spawnedExitSpot != null ? _spawnedExitSpot.name : "Not spawned")}");
+        }
+
+        private void OnDestroy()
+        {
+            // Очищаем спавненный ExitSpot при уничтожении компонента
+            if (_spawnedExitSpot != null)
+            {
+                DestroyImmediate(_spawnedExitSpot.gameObject);
+                _spawnedExitSpot = null;
+            }
+        }
+
+        // Метод для ручного пересоздания ExitSpot
+        [ContextMenu("Respawn Exit Spot")]
+        private void RespawnExitSpot()
+        {
+            // Для ручного пересоздания без игрока
+            SpawnExitSpot(null);
         }
     }
 }

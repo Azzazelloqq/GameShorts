@@ -14,6 +14,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             public int levelNumber;
             public Action onLevelCompleted;
             public CancellationToken cancellationToken;
+            public Transform playerTransform; // Для передачи в ExitSpot
         }
 
         private readonly Ctx _ctx;
@@ -50,9 +51,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         private void CreateLevelView()
         {
-            // TODO: Загрузить префаб уровня или найти существующий View
-            // Пока что ищем View в сцене или создаем программно
-            _levelView = UnityEngine.Object.FindObjectOfType<EscapeFromDarkLevelView>();
+            _levelView = _ctx.sceneContextView.LevelView;
             
             if (_levelView == null)
             {
@@ -65,12 +64,12 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             {
                 mazeData = _currentMazeData,
                 mazeWidth = _mazeSize,
-                mazeHeight = _mazeSize
+                mazeHeight = _mazeSize,
+                playerTransform = _ctx.playerTransform
             };
             
             _levelView.SetCtx(viewCtx);
             
-            Debug.Log($"EscapeFromDarkLevelPm: Level view initialized for level {_ctx.levelNumber}");
         }
 
         private int CalculateMazeSize(int levelNumber)
@@ -133,12 +132,29 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             return $"Level {_ctx.levelNumber}: Size {_mazeSize}x{_mazeSize}, Start: {start}, Exit: {exit}";
         }
 
-        protected override void OnDispose()
+        // Метод для обновления ссылки на игрока в ExitSpot
+        public void UpdatePlayerReference(Transform playerTransform)
         {
-            // Очистка ресурсов, если необходимо
             if (_levelView != null)
             {
-                // View будет очищен автоматически Unity
+                // Находим ExitSpotController и обновляем ссылку на игрока
+                ExitSpotController exitController = _levelView.SpawnedExitSpot;
+                if (exitController != null)
+                {
+                    exitController.SetPlayer(playerTransform);
+                    Debug.Log("EscapeFromDarkLevelPm: Updated player reference in ExitSpot");
+                }
+            }
+        }
+
+        protected override void OnDispose()
+        {
+            // Очищаем ExitSpot перед уничтожением уровня
+            if (_levelView?.SpawnedExitSpot != null)
+            {
+                _levelView.SpawnedExitSpot.DisableLight();
+                UnityEngine.Object.DestroyImmediate(_levelView.SpawnedExitSpot.gameObject);
+                Debug.Log("EscapeFromDarkLevelPm: ExitSpot cleaned up on dispose");
             }
         }
     }

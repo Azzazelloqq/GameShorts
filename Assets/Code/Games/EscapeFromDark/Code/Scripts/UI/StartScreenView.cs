@@ -1,4 +1,5 @@
 using Code.Core.BaseDMDisposable.Scripts;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,32 +9,21 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI
     {
         [Header("UI Elements")]
         [SerializeField] private Button startButton;
-        [SerializeField] private Text titleText;
-        [SerializeField] private Text instructionText;
+        [SerializeField] private TMP_Text instructionText;
 
         public Button StartButton => startButton;
-        public Text TitleText => titleText;
-        public Text InstructionText => instructionText;
+        public TMP_Text InstructionText => instructionText;
 
         internal struct Ctx
         {
-            // Контекст для инициализации, если потребуется
         }
 
         public void SetCtx(Ctx ctx)
         {
-            // Инициализация View компонента
-            if (titleText != null)
-            {
-                titleText.text = "ESCAPE FROM DARK";
-            }
-            
             if (instructionText != null)
             {
                 instructionText.text = "Tap to Start";
             }
-            
-            Debug.Log("StartScreenView: Context set");
         }
     }
 }

@@ -21,6 +21,8 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI
         public StartScreenPm(Ctx ctx)
         {
             _ctx = ctx;
+            _view = _ctx.sceneContextView.StartScreenView;
+            _view.SetCtx(new StartScreenView.Ctx());
             CreateView();
         }
 
@@ -31,12 +33,12 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI
 
         private void OnStartButtonClicked()
         {
-            Debug.Log("StartScreenPm: Start button clicked");
             _ctx.startGameClicked?.Invoke();
         }
 
         protected override void OnDispose()
         {
+            _view.StartButton.onClick.RemoveAllListeners();
             if (_view != null)
             {
                 UnityEngine.Object.Destroy(_view.gameObject);

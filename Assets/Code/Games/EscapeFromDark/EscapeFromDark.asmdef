@@ -6,8 +6,10 @@
         "Code.Core.InputManager",
         "LightDI",
         "Core.ShortGame",
+        "Unity.TextMeshPro",
         "TickHandler",
-        "Tools"
+        "Tools",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
