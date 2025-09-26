@@ -1622,6 +1622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game2::Code.Core.ShortGamesCore.Game2.Game2
   _camera: {fileID: 7912019879970335723}
+  _sceneContext: {fileID: 36039005896570670}
 --- !u!1 &6979019433228734036
 GameObject:
   m_ObjectHideFlags: 0

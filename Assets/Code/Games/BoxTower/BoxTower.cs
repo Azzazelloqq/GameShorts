@@ -13,9 +13,16 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 	[SerializeField]
 	private Camera _camera;
 
+	[SerializeField]
+	private BoxTowerSceneContextView _sceneContext;
+
+	public bool IsPreloaded { get; private set; }
+
+	private bool _isDisposed;
 	private IDisposable _root;
 	private RenderTexture _renderTexture;
-	public bool IsPreloaded { get; private set; }
+	private BoxTowerCorePm _core;
+	private CancellationTokenSource _cancellationTokenSource;
 
 	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
@@ -27,12 +34,6 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 	public RenderTexture GetRenderTexture()
 	{
 		return _renderTexture;
-	}
-
-	public void Dispose()
-	{
-		_root?.Dispose();
-		_root = null;
 	}
 
 	public void StartGame()
@@ -48,18 +49,67 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 	{
 	}
 
+	public void ResumeGame()
+	{
+	}
+
 	public void RestartGame()
 	{
-		CreateRoot();
+		RecreateRoot();
 	}
 
 	public void StopGame()
 	{
-		_root?.Dispose();
+		Dispose();
+	}
+
+	public void Dispose()
+	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		DisposeCore();
+
+		_isDisposed = true;
+	}
+
+	private void RecreateRoot()
+	{
+		DisposeCore();
+
+		CreateRoot();
+	}
+
+	private void DisposeCore()
+	{
+		if (_cancellationTokenSource != null)
+		{
+			if (!_cancellationTokenSource.IsCancellationRequested)
+			{
+				_cancellationTokenSource.Cancel();
+			}
+
+			_cancellationTokenSource.Dispose();
+
+			_cancellationTokenSource = null;
+		}
+
+		_core?.Dispose();
+		_core = null;
 	}
 
 	private void CreateRoot()
 	{
+		_cancellationTokenSource = new CancellationTokenSource();
+		var rootCtx = new BoxTowerCorePm.Ctx
+		{
+			sceneContextView = _sceneContext,
+			cancellationToken = _cancellationTokenSource.Token,
+			restartGame = RestartGame
+		};
+		_core = BoxTowerCorePmFactory.CreateBoxTowerCorePm(rootCtx);
 	}
 }
 }
