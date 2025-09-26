@@ -1,0 +1,18 @@
+{
+    "name": "Code.Core.GamesLoader",
+    "rootNamespace": "Code.Core.GamesLoader",
+    "references": [
+        "Core.ShortGame",
+        "Logger",
+        "LightDI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Code.Core.GameSwiper",
+    "rootNamespace": "Code.Core.GameSwiper",
+    "references": [
+        "Core.ShortGame",
+        "Logger",
+        "LightDI",
+        "TickHandler",
+        "BaseDMDisposable",
+        "R3.Unity",
+        "ResourceLoader",
+        "AddressablesGroups",
+        "Tools"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

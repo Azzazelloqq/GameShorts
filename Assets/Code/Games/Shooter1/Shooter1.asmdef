@@ -1,0 +1,20 @@
+{
+    "name": "Shooter1",
+    "rootNamespace": "Shooter1",
+    "references": [
+        "Core.ShortGame",
+        "Logger",
+        "LightDI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+

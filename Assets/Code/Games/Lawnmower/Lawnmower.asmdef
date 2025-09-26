@@ -1,0 +1,22 @@
+﻿{
+    "name": "Lawnmower",
+    "rootNamespace": "",
+    "references": [
+        "Core.ShortGame",
+        "BaseDMDisposable",
+        "LightDI",
+        "Tools",
+        "Code.Core.InputManager",
+        "Unity.TextMeshPro",
+        "TickHandler"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

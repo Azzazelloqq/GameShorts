@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Game_Asteroids
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Game_Asteroids
+  m_GUID: 3a3ddc81ecd5f354584e5996e035006e
+  m_SerializeEntries:
+  - m_GUID: 0a4b47358fe200844be0d78f083e0865
+    m_Address: FinishScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3aa9d8b2a27618a4dbc080d49acbc5c4
+    m_Address: UFO
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53c31ff457246174794694d8e8adb5fe
+    m_Address: Player
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f65c7acaa27450469407f6afa19c045
+    m_Address: Asteroid
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7fff6dbf4fd31224c89d6cdf3354da35
+    m_Address: StartScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 871980f9eb9ef1b40815ed3f6eec5eba
+    m_Address: MainScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae34959529e07224786ab75f523373ce
+    m_Address: Laser
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bd74642336a09e54481544fab0e2cff3
+    m_Address: Game1_MAIN
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0c85b9f90880fe4d83c3813be3d5429
+    m_Address: LaserChargeUI
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e4f8283ce84152a4391ed264555a8244
+    m_Address: Projectile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Game
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ec6459043f355ec42964fd52d59931d4, type: 2}
+    - {fileID: 11400000, guid: 8dc7352f67368154e96951b76510e843, type: 2}

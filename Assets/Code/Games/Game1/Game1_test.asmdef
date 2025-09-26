@@ -1,0 +1,25 @@
+{
+    "name": "Asteroids.Game",
+    "rootNamespace": "Asteroids",
+    "references": [
+        "Core.ShortGame",
+        "BaseDMDisposable",
+        "LightDI",
+        "TickHandler",
+        "ResourceLoader",
+        "Tools",
+        "Unity.TextMeshPro",
+        "Code.Core.InputManager",
+        "Logger",
+        "AddressablesGroups"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

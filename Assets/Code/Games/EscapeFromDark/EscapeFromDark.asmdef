@@ -1,0 +1,23 @@
+{
+    "name": "EscapeFromDark",
+    "rootNamespace": "EscapeFromDark",
+    "references": [
+        "BaseDMDisposable",
+        "Code.Core.InputManager",
+        "LightDI",
+        "Core.ShortGame",
+        "Unity.TextMeshPro",
+        "TickHandler",
+        "Tools",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
