@@ -270,8 +270,8 @@ Canvas:
   m_GameObject: {fileID: 5983071330590580044}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 9222493222884818580}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -335,7 +335,7 @@ GameObject:
   - component: {fileID: 1208694894178478649}
   - component: {fileID: 5628086770371485131}
   m_Layer: 0
-  m_Name: Game1_MAIN
+  m_Name: AsteroidGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -369,7 +369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05812a3f9b5147b490d8919abf9b0afb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game1_test::Code.Core.ShortGamesCore.Game1.Game1
-  sceneContextView: {fileID: 3475041514368071639}
+  _sceneContextView: {fileID: 3475041514368071639}
+  _camera: {fileID: 9222493222884818580}
 --- !u!1 &7283872487638234352
 GameObject:
   m_ObjectHideFlags: 0

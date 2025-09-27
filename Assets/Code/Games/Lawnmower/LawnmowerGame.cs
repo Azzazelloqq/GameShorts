@@ -30,7 +30,7 @@ public class LawnmowerGame : BaseMonoBehaviour, IShortGame2D
 
 	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
-		_renderTexture = RenderTextureUtils.GetRenderTexture(_camera);
+		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
 		IsPreloaded = true;
 		
 		return default;

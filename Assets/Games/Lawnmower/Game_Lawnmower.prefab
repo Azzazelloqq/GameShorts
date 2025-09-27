@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 26.9494, y: -10.225}
+  m_AnchoredPosition: {x: 26.9494, y: -10.225002}
   m_SizeDelta: {x: 300, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3455271396541354899
@@ -2583,8 +2583,8 @@ Canvas:
   m_GameObject: {fileID: 4442554308860860319}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 8302916857865045288}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -3699,7 +3699,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578b5b5e288b43d46b1ce0ba4708bb9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Lawnmower::Code.Core.ShortGamesCore.Lawnmower.LawnmowerGame
-  sceneContextView: {fileID: 2265873148016966820}
+  _sceneContextView: {fileID: 2265873148016966820}
+  _camera: {fileID: 8302916857865045288}
 --- !u!1 &7581492855433431250
 GameObject:
   m_ObjectHideFlags: 0

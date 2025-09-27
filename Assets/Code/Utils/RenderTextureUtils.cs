@@ -4,7 +4,7 @@ namespace Code.Utils
 {
 public static class RenderTextureUtils
 {
-	public static RenderTexture GetRenderTexture(Camera camera)
+	public static RenderTexture GetRenderTextureForShortGame(Camera camera)
 	{
 		if (camera != null)
 		{

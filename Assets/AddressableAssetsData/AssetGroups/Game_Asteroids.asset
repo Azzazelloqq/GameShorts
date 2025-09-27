@@ -58,7 +58,7 @@ MonoBehaviour:
     - Game
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bd74642336a09e54481544fab0e2cff3
-    m_Address: Game1_MAIN
+    m_Address: AsteroidGame
     m_ReadOnly: 0
     m_SerializedLabels:
     - Game

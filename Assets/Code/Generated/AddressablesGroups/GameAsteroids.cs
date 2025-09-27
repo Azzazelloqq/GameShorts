@@ -11,7 +11,7 @@ namespace Code.Generated.Addressables
         public string StartScreen = "StartScreen";
         public string MainScreen = "MainScreen";
         public string Laser = "Laser";
-        public string Game1MAIN = "Game1_MAIN";
+        public string AsteroidGame = "AsteroidGame";
         public string LaserChargeUI = "LaserChargeUI";
         public string Projectile = "Projectile";
     }

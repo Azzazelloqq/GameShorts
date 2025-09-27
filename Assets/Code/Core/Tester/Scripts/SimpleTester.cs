@@ -148,7 +148,7 @@ internal class SimpleTester : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.Game1MAIN },
+			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain }

@@ -7,13 +7,11 @@ using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Asteroids.Code.Games.Game1
 {
-public class AsteroidsGame : BaseMonoBehaviour, IShortGame
+public class AsteroidsGame : BaseMonoBehaviour, IShortGame2D
 {
-	[FormerlySerializedAs("sceneContextView")]
 	[SerializeField]
 	private MainSceneContextView _sceneContextView;
 
@@ -33,7 +31,7 @@ public class AsteroidsGame : BaseMonoBehaviour, IShortGame
 	{
 		IsPreloaded = true;
 
-		_renderTexture = RenderTextureUtils.GetRenderTexture(_camera);
+		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
 		
 		return default;
 	}

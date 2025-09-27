@@ -27,7 +27,7 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
 		IsPreloaded = true;
-		_renderTexture = RenderTextureUtils.GetRenderTexture(_camera);
+		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
 		return default;
 	}
 

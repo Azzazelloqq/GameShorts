@@ -16,7 +16,10 @@
     "Tools",
     "TestGames",
     "Game2_test",
-    "Asteroids.Game"
+    "Asteroids.Game",
+    "BoxTower",
+    "EscapeFromDark",
+    "Lawnmower"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
