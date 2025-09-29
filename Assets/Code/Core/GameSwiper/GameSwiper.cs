@@ -106,18 +106,21 @@ internal class GameSwiper : MonoBehaviour
 		{
 			SetupImageSize(_topImage.rectTransform);
 			_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
+			_topImage.raycastTarget = false; // Don't block input
 		}
 
 		if (_centerImage)
 		{
 			SetupImageSize(_centerImage.rectTransform);
 			_centerImage.rectTransform.anchoredPosition = Vector2.zero;
+			_centerImage.raycastTarget = false; // Don't block input - let game UI handle it
 		}
 
 		if (_bottomImage)
 		{
 			SetupImageSize(_bottomImage.rectTransform);
 			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
+			_bottomImage.raycastTarget = false; // Don't block input
 		}
 	}
 	
@@ -157,6 +160,7 @@ internal class GameSwiper : MonoBehaviour
 		{
 			_topImage.texture = previous;
 			_topImage.enabled = previous != null;
+			_topImage.raycastTarget = false; // Don't block input for preview games
 			// Update aspect ratio fitter when texture changes
 			if (_topImageFitter != null)
 			{
@@ -168,6 +172,7 @@ internal class GameSwiper : MonoBehaviour
 		{
 			_centerImage.texture = current;
 			_centerImage.enabled = current != null;
+			_centerImage.raycastTarget = false; // Don't block input - let game UI handle it
 			// Update aspect ratio fitter when texture changes
 			if (_centerImageFitter != null)
 			{
@@ -179,6 +184,7 @@ internal class GameSwiper : MonoBehaviour
 		{
 			_bottomImage.texture = next;
 			_bottomImage.enabled = next != null;
+			_bottomImage.raycastTarget = false; // Don't block input for preview games
 			// Update aspect ratio fitter when texture changes
 			if (_bottomImageFitter != null)
 			{

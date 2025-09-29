@@ -83,7 +83,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = false;
             StopCallCount++;
         }
-        
+
+        public void EnableInput()
+        {
+            
+        }
+
+        public void DisableInput()
+        {
+        }
+
         public void Reset()
         {
             IsStarted = false;
@@ -155,7 +164,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsStarted = false;
             IsPaused = false;
         }
-        
+
+        public void EnableInput()
+        {
+            
+        }
+
+        public void DisableInput()
+        {
+        }
+
         public void OnPooled()
         {
             IsPooled = true;
@@ -230,7 +248,15 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsStarted = false;
             IsPaused = false;
         }
-        
+
+        public void EnableInput()
+        {
+        }
+
+        public void DisableInput()
+        {
+        }
+
         public void PauseGame()
         {
             IsPaused = true;
@@ -300,7 +326,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsStarted = false;
             IsPaused = false;
         }
-        
+
+        public void EnableInput()
+        {
+            
+        }
+
+        public void DisableInput()
+        {
+        }
+
         public void PauseGame()
         {
             IsPaused = true;
@@ -370,7 +405,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsStarted = false;
             IsPaused = false;
         }
-        
+
+        public void EnableInput()
+        {
+            
+        }
+
+        public void DisableInput()
+        {
+        }
+
         public void PauseGame()
         {
             IsPaused = true;
@@ -443,7 +487,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsStarted = false;
             IsPaused = false;
         }
-        
+
+        public void EnableInput()
+        {
+            
+        }
+
+        public void DisableInput()
+        {
+        }
+
         public void PauseGame()
         {
             IsPaused = true;

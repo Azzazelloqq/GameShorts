@@ -97,6 +97,11 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		{
 			_logger.Log("Starting current game");
 			CurrentGame.StartGame();
+			
+			// Enable input only for current game, disable for others
+			EnableCurrentGameInput();
+			DisableNextGameInput();
+			DisablePreviousGameInput();
 		}
 	}
 
@@ -223,6 +228,76 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		StopPreviousGame();
 	}
 
+	public void EnableCurrentGameInput()
+	{
+		if (CurrentGame != null)
+		{
+			_logger.Log("Enabling current game input");
+			CurrentGame.EnableInput();
+		}
+	}
+
+	public void DisableCurrentGameInput()
+	{
+		if (CurrentGame != null)
+		{
+			_logger.Log("Disabling current game input");
+			CurrentGame.DisableInput();
+		}
+	}
+
+	public void EnableNextGameInput()
+	{
+		if (NextGame != null)
+		{
+			_logger.Log("Enabling next game input");
+			NextGame.EnableInput();
+		}
+	}
+
+	public void DisableNextGameInput()
+	{
+		if (NextGame != null)
+		{
+			_logger.Log("Disabling next game input");
+			NextGame.DisableInput();
+		}
+	}
+
+	public void EnablePreviousGameInput()
+	{
+		if (PreviousGame != null)
+		{
+			_logger.Log("Enabling previous game input");
+			PreviousGame.EnableInput();
+		}
+	}
+
+	public void DisablePreviousGameInput()
+	{
+		if (PreviousGame != null)
+		{
+			_logger.Log("Disabling previous game input");
+			PreviousGame.DisableInput();
+		}
+	}
+
+	public void EnableAllGamesInput()
+	{
+		_logger.Log("Enabling all games input");
+		EnableCurrentGameInput();
+		EnableNextGameInput();
+		EnablePreviousGameInput();
+	}
+
+	public void DisableAllGamesInput()
+	{
+		_logger.Log("Disabling all games input");
+		DisableCurrentGameInput();
+		DisableNextGameInput();
+		DisablePreviousGameInput();
+	}
+
 	public async ValueTask UpdatePreloadedGamesAsync(CancellationToken cancellationToken = default)
 	{
 		if (_queueService == null || _gamesLoader == null)
@@ -267,6 +342,9 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 				}
 			}
 
+			// Disable input for all games during transition
+			DisableAllGamesInput();
+			
 			// Pause current game
 			PauseCurrentGame();
 
@@ -276,7 +354,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 			// Stop old game
 			StopPreviousGame();
 
-			// Start new current game
+			// Start new current game (this will automatically enable input for current game)
 			StartCurrentGame();
 
 			// Update preloaded games for new position
@@ -328,6 +406,9 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 				}
 			}
 
+			// Disable input for all games during transition
+			DisableAllGamesInput();
+			
 			// Pause current game
 			PauseCurrentGame();
 
@@ -337,7 +418,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 			// Stop old game
 			StopNextGame();
 
-			// Start new current game
+			// Start new current game (this will automatically enable input for current game)
 			StartCurrentGame();
 
 			// Update preloaded games for new position

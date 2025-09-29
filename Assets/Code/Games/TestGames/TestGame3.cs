@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Code.Games.TestGames
 {
@@ -14,6 +15,9 @@ public class TestGame3: MonoBehaviour, IShortGame3D
 	[SerializeField]
 	private Transform _targetToRotate;
 
+	[SerializeField]
+	private GraphicRaycaster _graphicRaycaster;
+	
 	private Coroutine _rotateRoutine;
 	private RenderTexture _rt;
 
@@ -131,6 +135,16 @@ public class TestGame3: MonoBehaviour, IShortGame3D
 			StopCoroutine(_rotateRoutine);
 			_rotateRoutine = null;
 		}
+	}
+
+	public void EnableInput()
+	{
+		_graphicRaycaster.enabled = true;
+	}
+
+	public void DisableInput()
+	{
+		_graphicRaycaster.enabled = false;
 	}
 }
 }

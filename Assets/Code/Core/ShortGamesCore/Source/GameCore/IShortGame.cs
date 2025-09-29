@@ -49,5 +49,8 @@ namespace Code.Core.ShortGamesCore.Source.GameCore
         /// Stops the game
         /// </summary>
         public void StopGame();
+
+        public void EnableInput();
+        public void DisableInput();
     }
 }

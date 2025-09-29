@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Asteroids.Code.Games.Game1;
 using Code.Core.GamesLoader;
 using Code.Core.GameSwiper;
-using Code.Core.ShortGamesCore.EscapeFromDark;
-using Code.Core.ShortGamesCore.Game2;
-using Code.Core.ShortGamesCore.Lawnmower;
 using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.Pool;
@@ -121,10 +117,10 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
-			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
-			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
-			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame }
+			{ typeof(TestGame1), ResourceIdsContainer.TestGames.TestGame1 },
+			{ typeof(TestBoxTower), ResourceIdsContainer.TestGames.TestGame2 },
+			{ typeof(TestGame3), ResourceIdsContainer.TestGames.TestGame3 },
+			{ typeof(TestGame4), ResourceIdsContainer.TestGames.TestGame4 }
 		};
 	}
 
@@ -132,10 +128,10 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
-			typeof(BoxTower),
-			typeof(EscapeFromDarkGame),
-			typeof(LawnmowerGame),
-			typeof(AsteroidsGame)
+			typeof(TestGame1),
+			typeof(TestBoxTower),
+			typeof(TestGame3),
+			typeof(TestGame4)
 		};
 	}
 

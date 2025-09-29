@@ -369,7 +369,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05812a3f9b5147b490d8919abf9b0afb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game1_test::Code.Core.ShortGamesCore.Game1.Game1
-  sceneContextView: {fileID: 3475041514368071639}
+  _sceneContextView: {fileID: 3475041514368071639}
+  _camera: {fileID: 9222493222884818580}
+  _graphicRaycaster: {fileID: 2596206027501217322}
 --- !u!1 &7283872487638234352
 GameObject:
   m_ObjectHideFlags: 0

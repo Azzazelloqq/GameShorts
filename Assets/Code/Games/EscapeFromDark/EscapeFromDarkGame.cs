@@ -8,6 +8,7 @@ using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark
 {
@@ -19,6 +20,9 @@ public class EscapeFromDarkGame : BaseMonoBehaviour, IShortGame2D
 
 	[SerializeField]
 	private Camera _camera; 
+	
+	[SerializeField]
+	private GraphicRaycaster _graphicRaycaster;
 	
 	private IDisposable _core;
 	private CancellationTokenSource _cancellationTokenSource;
@@ -68,6 +72,16 @@ public class EscapeFromDarkGame : BaseMonoBehaviour, IShortGame2D
 	public void StopGame()
 	{
 		Dispose();
+	}
+
+	public void EnableInput()
+	{
+		_graphicRaycaster.enabled = true;
+	}
+
+	public void DisableInput()
+	{
+		_graphicRaycaster.enabled = false;
 	}
 
 	public void Dispose()

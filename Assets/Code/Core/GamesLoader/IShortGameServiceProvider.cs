@@ -149,6 +149,46 @@ public interface IShortGameServiceProvider : IDisposable
 	void StopAllGames();
 
 	/// <summary>
+	/// Enables input for the current game
+	/// </summary>
+	void EnableCurrentGameInput();
+
+	/// <summary>
+	/// Disables input for the current game
+	/// </summary>
+	void DisableCurrentGameInput();
+
+	/// <summary>
+	/// Enables input for the next game
+	/// </summary>
+	void EnableNextGameInput();
+
+	/// <summary>
+	/// Disables input for the next game
+	/// </summary>
+	void DisableNextGameInput();
+
+	/// <summary>
+	/// Enables input for the previous game
+	/// </summary>
+	void EnablePreviousGameInput();
+
+	/// <summary>
+	/// Disables input for the previous game
+	/// </summary>
+	void DisablePreviousGameInput();
+
+	/// <summary>
+	/// Enables input for all games
+	/// </summary>
+	void EnableAllGamesInput();
+
+	/// <summary>
+	/// Disables input for all games
+	/// </summary>
+	void DisableAllGamesInput();
+
+	/// <summary>
 	/// Updates preloaded games based on current queue position
 	/// </summary>
 	/// <param name="cancellationToken">Cancellation token</param>

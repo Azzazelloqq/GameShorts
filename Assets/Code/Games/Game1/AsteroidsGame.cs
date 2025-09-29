@@ -7,6 +7,7 @@ using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Asteroids.Code.Games.Game1
 {
@@ -17,22 +18,24 @@ public class AsteroidsGame : BaseMonoBehaviour, IShortGame2D
 
 	[SerializeField]
 	private Camera _camera;
-	
+
+	[SerializeField]
+	private GraphicRaycaster _graphicRaycaster;
+
+	public int Id => 1;
+	public bool IsPreloaded { get; private set; }
+
 	private IDisposable _core;
 	private CancellationTokenSource _cancellationTokenSource;
-
 	private bool _isDisposed;
 	private RenderTexture _renderTexture;
-	public int Id => 1;
-
-	public bool IsPreloaded { get; private set; }
 
 	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
 		IsPreloaded = true;
 
 		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-		
+
 		return default;
 	}
 
@@ -67,6 +70,16 @@ public class AsteroidsGame : BaseMonoBehaviour, IShortGame2D
 	public void StopGame()
 	{
 		Dispose();
+	}
+
+	public void EnableInput()
+	{
+		_graphicRaycaster.enabled = true;
+	}
+
+	public void DisableInput()
+	{
+		_graphicRaycaster.enabled = false;
 	}
 
 	public void Dispose()

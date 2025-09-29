@@ -5,6 +5,7 @@ using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -16,6 +17,9 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 	[SerializeField]
 	private BoxTowerSceneContextView _sceneContext;
 
+	[SerializeField]
+	private GraphicRaycaster _graphicRaycaster;
+	
 	public bool IsPreloaded { get; private set; }
 
 	private bool _isDisposed;
@@ -61,6 +65,16 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 	public void StopGame()
 	{
 		Dispose();
+	}
+
+	public void EnableInput()
+	{
+		_graphicRaycaster.enabled = true;
+	}
+
+	public void DisableInput()
+	{
+		_graphicRaycaster.enabled = false;
 	}
 
 	public void Dispose()

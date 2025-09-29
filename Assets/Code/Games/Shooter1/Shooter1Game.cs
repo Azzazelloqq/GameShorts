@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace Shooter1
 {
@@ -34,6 +35,9 @@ public class Shooter1Game : MonoBehaviour, IShortGame
 
 	[SerializeField]
 	private GameObject bulletPrefab;
+
+	[SerializeField]
+	private GraphicRaycaster _graphicRaycaster;
 
 	public int Id { get; private set; } = System.Guid.NewGuid().GetHashCode();
 	public bool IsPreloaded => true;
@@ -125,6 +129,16 @@ public class Shooter1Game : MonoBehaviour, IShortGame
 		StopAllCoroutines();
 		ClearGameObjects();
 		Time.timeScale = 1f; // Восстанавливаем нормальную скорость времени
+	}
+
+	public void EnableInput()
+	{
+		_graphicRaycaster.enabled = true;
+	}
+
+	public void DisableInput()
+	{
+		_graphicRaycaster.enabled = false;
 	}
 
 	private void CreateGameObjects()
