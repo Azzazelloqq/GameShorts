@@ -1,7 +1,14 @@
 fileFormatVersion: 2
 guid: 2d226e59912d0014fbf2646ed5c4b916
+AssetOrigin:
+  serializedVersion: 1
+  productId: 221766
+  packageName: Character Pack - Lowpoly FREE
+  packageVersion: 1.1
+  assetPath: Assets/CharacterPack Lowpoly (FREE)/Models/character2.fbx
+  uploadId: 507838
 ModelImporter:
-  serializedVersion: 21202
+  serializedVersion: 24200
   internalIDToNameTable:
   - first:
       74: 3591740854655688942
@@ -22,8 +29,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 1
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -42,10 +47,11 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 0
+    meshCompression: 2
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -63,6 +69,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -73,6 +82,7 @@ ModelImporter:
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -586,8 +596,7 @@ ModelImporter:
     - name: LeftHandThumb4
       parentName: LeftHandThumb3
       position: {x: -0.0063517904, y: 0.049946297, z: 0.00000024318695}
-      rotation: {x: 0.000000014901161, y: -0.0000000013969845, z: 0.00000004190952,
-        w: 1}
+      rotation: {x: 0.000000014901161, y: -0.0000000013969845, z: 0.00000004190952, w: 1}
       scale: {x: 1, y: 0.99999994, z: 1.0000002}
     - name: LeftHandThumb4_end
       parentName: LeftHandThumb4
@@ -637,8 +646,7 @@ ModelImporter:
     - name: LeftHandMiddle4
       parentName: LeftHandMiddle3
       position: {x: 0.0000065059025, y: 0.051708568, z: -0.00000022680469}
-      rotation: {x: 0.000000002224958, y: -0.00000003634778, z: -0.000000041472166,
-        w: 1}
+      rotation: {x: 0.000000002224958, y: -0.00000003634778, z: -0.000000041472166, w: 1}
       scale: {x: 1, y: 1, z: 0.9999999}
     - name: LeftHandMiddle4_end
       parentName: LeftHandMiddle4
@@ -663,8 +671,7 @@ ModelImporter:
     - name: LeftHandRing4
       parentName: LeftHandRing3
       position: {x: -0.0000003252468, y: 0.047916073, z: 0.00000009854437}
-      rotation: {x: 0.000000014245118, y: 0.000000007974437, z: 0.00000000848207,
-        w: 1}
+      rotation: {x: 0.000000014245118, y: 0.000000007974437, z: 0.00000000848207, w: 1}
       scale: {x: 1.0000001, y: 0.99999994, z: 1}
     - name: LeftHandRing4_end
       parentName: LeftHandRing4
@@ -734,8 +741,7 @@ ModelImporter:
     - name: RightHandThumb4
       parentName: RightHandThumb3
       position: {x: 0.005729966, y: 0.049495205, z: -0.0000003170967}
-      rotation: {x: 0.000000014901157, y: -0.00000003306195, z: 0.000000041443855,
-        w: 1}
+      rotation: {x: 0.000000014901157, y: -0.00000003306195, z: 0.000000041443855, w: 1}
       scale: {x: 0.99999994, y: 1.0000002, z: 1.0000002}
     - name: RightHandThumb4_end
       parentName: RightHandThumb4
@@ -760,8 +766,7 @@ ModelImporter:
     - name: RightHandIndex4
       parentName: RightHandIndex3
       position: {x: 0.00013296932, y: 0.049068607, z: 0.00000011953293}
-      rotation: {x: 0.000000005696619, y: 0.00000010786391, z: 0.000000090500706,
-        w: 1}
+      rotation: {x: 0.000000005696619, y: 0.00000010786391, z: 0.000000090500706, w: 1}
       scale: {x: 1.0000001, y: 1.0000001, z: 1.0000001}
     - name: RightHandIndex4_end
       parentName: RightHandIndex4
@@ -786,8 +791,7 @@ ModelImporter:
     - name: RightHandMiddle4
       parentName: RightHandMiddle3
       position: {x: -0.000045779645, y: 0.05308875, z: -0.00000021934974}
-      rotation: {x: -0.000000004659113, y: 0.0000000020738338, z: 0.000000013398626,
-        w: 1}
+      rotation: {x: -0.000000004659113, y: 0.0000000020738338, z: 0.000000013398626, w: 1}
       scale: {x: 1, y: 1, z: 1.0000002}
     - name: RightHandMiddle4_end
       parentName: RightHandMiddle4
@@ -812,8 +816,7 @@ ModelImporter:
     - name: RightHandRing4
       parentName: RightHandRing3
       position: {x: 0.000051798073, y: 0.047704604, z: -0.00000008266419}
-      rotation: {x: -0.0000000072730018, y: 0.000000011898502, z: 0.000000020475284,
-        w: 1}
+      rotation: {x: -0.0000000072730018, y: 0.000000011898502, z: 0.000000020475284, w: 1}
       scale: {x: 1, y: 1.0000001, z: 0.9999999}
     - name: RightHandRing4_end
       parentName: RightHandRing4
@@ -838,8 +841,7 @@ ModelImporter:
     - name: RightHandPinky4
       parentName: RightHandPinky3
       position: {x: -0.00001311697, y: 0.03205374, z: -0.000000026151538}
-      rotation: {x: -0.0000000110940155, y: 0.0000000060462444, z: -0.000000003533557,
-        w: 1}
+      rotation: {x: -0.0000000110940155, y: 0.0000000060462444, z: -0.000000003533557, w: 1}
       scale: {x: 1, y: 1.0000001, z: 1.0000001}
     - name: RightHandPinky4_end
       parentName: RightHandPinky4
@@ -934,14 +936,9 @@ ModelImporter:
   humanoidOversampling: 1
   avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 221766
-  packageName: Character Pack - Lowpoly FREE
-  packageVersion: 1.1
-  assetPath: Assets/CharacterPack Lowpoly (FREE)/Models/character2.fbx
-  uploadId: 507838
