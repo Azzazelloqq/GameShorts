@@ -110,19 +110,6 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
             return mazeX == exitPos.x && mazeY == exitPos.y;
         }
 
-        public void OnPlayerReachedExit()
-        {
-            Debug.Log($"EscapeFromDarkLevelPm: Player reached exit on level {_ctx.levelNumber}!");
-            _ctx.onLevelCompleted?.Invoke();
-        }
-
-        // Метод для перегенерации уровня (для отладки или рестарта)
-        public void RegenerateLevel()
-        {
-            Debug.Log($"EscapeFromDarkLevelPm: Regenerating level {_ctx.levelNumber}");
-            GenerateLevel();
-        }
-
         // Метод для получения информации о текущем уровне
         public string GetLevelInfo()
         {

@@ -80,39 +80,30 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
         private void StartInputHandling()
         {
             // Подписываемся на изменения модели игрока
-            AddDispose(_playerModel.Position.Subscribe(OnPositionChanged));
             AddDispose(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
-            AddDispose(_playerModel.CurrentRotation.Subscribe(OnRotationChanged));
             
             // Подписываемся на обновления
-            _tickHandler.FrameUpdate += HandleMovement;
+            _tickHandler.PhysicUpdate += HandleMovement;
             _tickHandler.FrameUpdate += CheckExitReached;
+            _tickHandler.FrameUpdate += MoveView;
             
             Debug.Log("EscapeFromDarkPlayerPm: Input handling started");
         }
 
-        private void OnPositionChanged(Vector3 newPosition)
+        private void MoveView(float deltaTime)
         {
             if (_playerView != null)
             {
-                _playerView.UpdatePosition(newPosition);
+                _playerView.UpdatePosition(_playerModel.Position.CurrentValue);
+                _playerView.UpdateRotation(_playerModel.CurrentRotation.CurrentValue);
             }
         }
-
         private void OnMovingStateChanged(bool isMoving)
         {
             if (_playerView != null && _inputManager != null)
             {
                 Vector2 inputDirection = _inputManager.GetJoystickInput();
                 _playerView.UpdateMovementVisuals(inputDirection, isMoving);
-            }
-        }
-
-        private void OnRotationChanged(float newRotation)
-        {
-            if (_playerView != null)
-            {
-                _playerView.UpdateRotation(newRotation);
             }
         }
 
@@ -134,14 +125,12 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
                     _playerModel.SetPosition(targetPosition);
                     _playerModel.SetMoving(true);
                     _playerModel.SetMovementDirection(inputDirection.normalized);
-                    Debug.Log($"EscapeFromDarkPlayerPm: Moving to {targetPosition}, maze pos {targetMazePos}");
                 }
-                else
-                {
-                    _playerModel.SetMoving(false);
-                    _playerModel.SetMovementDirection(Vector2.zero);
-                    Debug.Log($"EscapeFromDarkPlayerPm: Cannot move to {targetPosition}, maze pos {targetMazePos} - invalid");
-                }
+                // else
+                // {
+                //     _playerModel.SetMoving(false);
+                //     _playerModel.SetMovementDirection(Vector2.zero);
+                // }
             }
             else
             {
@@ -197,7 +186,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
 
         protected override void OnDispose()
         {
-            _tickHandler.FrameUpdate -= HandleMovement;
+            _tickHandler.PhysicUpdate -= HandleMovement;
             _tickHandler.FrameUpdate -= CheckExitReached;
             
             if (_playerView != null)

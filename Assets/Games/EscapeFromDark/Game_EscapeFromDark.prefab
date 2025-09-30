@@ -2241,7 +2241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec691759de0b96248b864aea05b40995, type: 3}
   m_Name: 
   m_EditorClassIdentifier: EscapeFromDark::Code.Core.ShortGamesCore.EscapeFromDark.EscapeFromDarkGame
-  sceneContextView: {fileID: 7531261986792522166}
+  _sceneContextView: {fileID: 7531261986792522166}
+  _camera: {fileID: 0}
 --- !u!1 &7581492855433431250
 GameObject:
   m_ObjectHideFlags: 0
@@ -2921,7 +2922,7 @@ MonoBehaviour:
     m_FlipX: 0
     m_FlipY: 0
     m_InitialTrim: 0
-  m_CastingOption: 1
+  m_CastingOption: 2
   m_PreviousTrimEdge: 0
   m_PreviousEdgeProcessing: 1
   m_PreviousShadowCastingSource: 2

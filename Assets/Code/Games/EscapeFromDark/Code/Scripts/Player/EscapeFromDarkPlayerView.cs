@@ -64,7 +64,6 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
             if (characterTransform != null)
             {
                 characterTransform.rotation = Quaternion.Euler(0, 0, rotationAngle);
-                Debug.Log($"EscapeFromDarkPlayerView: Rotated to {rotationAngle} degrees");
             }
         }
 
