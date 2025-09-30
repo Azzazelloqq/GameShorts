@@ -14,7 +14,127 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Game_AngryHumans
   m_GUID: 9b9870b3072ca1d42a49489a83f5e05d
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 07eee4fd3500edc428286d97818ccea8
+    m_Address: Content/Human10
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 14bca2efa2fc2c141a00f470a73bff29
+    m_Address: Content/HumanHelmet1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 19156056bb3bcf0429097ee85292c68f
+    m_Address: Content/Human1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 546955982851bc2499f1942c8c10170b
+    m_Address: AnimationControllers/Idle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 56e872fe7f44dd04d80d9b00abeafafc
+    m_Address: Animations/Idle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5dbfbca1f563bc740a808876825945e0
+    m_Address: Content/Human6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c862a2ec7bc28340a3a9ef465788c40
+    m_Address: Towers/TowerBase
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ce4a52227c4efa46b9cbc2f0354d9bd
+    m_Address: Content/Human3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 85f417fded6178c4fb5d4cbf959535c7
+    m_Address: Content/HumanHelmet3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 878b566a4555a7f4696766b3430aef7d
+    m_Address: Target
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f4160e708bab034197f3014ebe8892a
+    m_Address: Content/Human5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0cf94748e9d21c4ba0694d603027f10
+    m_Address: Content/Human8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c847ec80be5e6d943bc763db615c4703
+    m_Address: Content/HumanHelmet4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca184648d1cfb0d4fad944d440f87c21
+    m_Address: Content/HumanHelmet2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd07c2354b88bd547861fb2e2a0a4f47
+    m_Address: Materials/TrajectoryMaterialDefault
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cef6c635c01e4d545920f25f93bac6a5
+    m_Address: Content/Human9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf44835814a9e8941b353c19093852f7
+    m_Address: Towers/FirstLevelTower
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d2ffbeaa5169ec94289ea3ce7e59eb64
+    m_Address: Block
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d669d118b86187242b4cdf21cd459362
+    m_Address: Content/Human4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd5befebc46f90d43b351c1ff4f36846
+    m_Address: Content/Human7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dfc25ab85a45e7648bb6d38582563695
+    m_Address: Content/Human11
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e12f91956b60e1b478cc1138b3725d83
+    m_Address: FlyHumansMainGame
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7927815e192e9c44a52c9a9aa6961ec
+    m_Address: Content/Human2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea0f60c0df34dbf46b5f9665c932f8ec
+    m_Address: Content/Human12
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
   m_SchemaSet:
