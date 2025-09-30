@@ -1,0 +1,158 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Assets_CommonCharactersLowpoly
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Assets_CommonCharactersLowpoly
+  m_GUID: 948c8e058c2d29d498694726c8c2e6ac
+  m_SerializeEntries:
+  - m_GUID: 1a521f8c0b18b724aacad4ac9466967c
+    m_Address: RagdollCharacters/Character8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1f05b36eff9f0c941a187ddef4a43a0a
+    m_Address: RagdollCharacters/Character14
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2d226e59912d0014fbf2646ed5c4b916
+    m_Address: FBX/ManWithHelmet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37f6354679f3e1748b76a9221f51f4ac
+    m_Address: Materials/CharactersMaterial2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 398b170567520af4c84b36db24c7b4c1
+    m_Address: RagdollCharacters/Character12
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 48626994a6237ee48b55227ca93172cc
+    m_Address: RagdollCharacters/Character5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4bd33e1e21997ce40943100eae6b272c
+    m_Address: Textures/Texture1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f2e058a94bca0742939d136d2b88baf
+    m_Address: RagdollCharacters/Character16
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d8e51ad5b3198b41833f682cdfe2c48
+    m_Address: RagdollCharacters/Character6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 643d73b2e86e20b429364be7d7d79616
+    m_Address: Materials/CharactersMaterial4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 650198e412a690c49b965b7e7817f3c2
+    m_Address: Textures/Texture2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6cad1b61c791a7b45b14911b6f78ddde
+    m_Address: RagdollCharacters/Character9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 709fb7c37701f9f42b184a1d8ff562c5
+    m_Address: RagdollCharacters/Character11
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73b960d954b4d0e41833cf51608d11e6
+    m_Address: RagdollCharacters/Character4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7811a2a6bf503e5409756a8b1c632000
+    m_Address: Materials/CharactersMaterial3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7889e84b0c13b8e439b3b8dee1897061
+    m_Address: RagdollCharacters/Character3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7966d979d9982a743a30e3b75a402b94
+    m_Address: FBX/CommonMan
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79a76738c9277534092f8c0914d298b1
+    m_Address: Textures/Texture3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a3e76d3ba476dc43adbe00faa26df0d
+    m_Address: RagdollCharacters/Character1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7bb35b94324b749479ee38d03607dc3f
+    m_Address: RagdollCharacters/Character10
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8bcd49163fbf8ce40bcb6a0049a767eb
+    m_Address: Materials/CharactersMaterial5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a15133d8898d400449f7c21aef33e511
+    m_Address: RagdollCharacters/Character2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: adc8a892651df934a900ef57d5838c18
+    m_Address: Materials/CharactersMaterial1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cafa5d58a4142a04aa15734cb33635e9
+    m_Address: RagdollCharacters/Character7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0760a66a63a36740b36de46ef865962
+    m_Address: RagdollCharacters/Character15
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ddbffb44e49e6e047ad6a0e418884164
+    m_Address: CharactersMaterial6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7707aec2cc25b449a610f5087a64251
+    m_Address: RagdollCharacters/Character13
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 24543e02c7ed9154d8cf8bd8fe24ccb3, type: 2}
+    - {fileID: 11400000, guid: 6c56845d00ebaa24cbf866145cf2c248, type: 2}
