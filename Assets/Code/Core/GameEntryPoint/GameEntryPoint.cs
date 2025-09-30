@@ -13,6 +13,7 @@ using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
 using Code.Games;
+using Code.Games.AngryHumans;
 using Code.Games.TestGames;
 using Code.Generated.Addressables;
 using InGameLogger;
@@ -122,7 +123,7 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
+			{ typeof(AngryHumansShortGame), ResourceIdsContainer.GameAngryHumans.AngryHumansMainGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
@@ -134,11 +135,11 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
-			typeof(AsteroidsGame),
-			typeof(BoxTower),
-			typeof(LawnmowerGame),
-			typeof(EscapeFromDarkGame),
-			typeof(Game2048)
+			typeof(AngryHumansShortGame),
+			typeof(TestBoxTower),
+			typeof(TestGame3),
+			typeof(TestGame4),
+			typeof(Game2048),
 		};
 	}
 
