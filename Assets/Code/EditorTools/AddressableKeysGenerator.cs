@@ -144,7 +144,7 @@ namespace Code.EditorTools
             foreach (var address in node.DirectAddresses)
             {
                 var fieldName = GetFieldNameFromAddress(address);
-                sb.AppendLine($"{indent}public {(isRootLevel ? "" : "static ")}string {fieldName} = \"{address}\";");
+                sb.AppendLine($"{indent}public string {fieldName} = \"{address}\";");
             }
 
             // Add empty line between fields and nested classes if both exist
@@ -154,18 +154,29 @@ namespace Code.EditorTools
             }
 
             // Then, generate nested classes for each child
+            var generatedClasses = new List<string>();
             foreach (var child in node.Children)
             {
                 var className = ToCamelCase(child.Key, true);
+                generatedClasses.Add(className);
                 
                 // Generate the nested class
-                sb.AppendLine($"{indent}public static class {className}");
+                sb.AppendLine($"{indent}public class {className}");
                 sb.AppendLine($"{indent}{{");
                 
                 GenerateNodeContent(sb, child.Value, indentLevel + 1);
                 
                 sb.AppendLine($"{indent}}}");
                 sb.AppendLine();
+            }
+            
+            // Generate instance fields for nested classes at root level
+            if (isRootLevel && generatedClasses.Count > 0)
+            {
+                foreach (var className in generatedClasses)
+                {
+                    sb.AppendLine($"{indent}public readonly {className} {className} = new {className}();");
+                }
             }
         }
 
