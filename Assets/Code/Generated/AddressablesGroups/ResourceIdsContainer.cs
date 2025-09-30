@@ -8,6 +8,7 @@ namespace Code.Generated.Addressables
         public static readonly GameEscapeFromDark GameEscapeFromDark = new GameEscapeFromDark();
         public static readonly GameAsteroids GameAsteroids = new GameAsteroids();
         public static readonly DefaultLocalGroup DefaultLocalGroup = new DefaultLocalGroup();
+        public static readonly Game2048 Game2048 = new Game2048();
         public static readonly TestGames TestGames = new TestGames();
         public static readonly GameLawnmover GameLawnmover = new GameLawnmover();
         public static readonly GameBoxTower GameBoxTower = new GameBoxTower();

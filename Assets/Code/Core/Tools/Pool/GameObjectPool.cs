@@ -57,6 +57,9 @@ namespace Code.Core.Tools.Pool
 				return null;
 				
 			var gameObject = _pool.Get();
+			gameObject.transform.localPosition = Vector3.zero;
+			gameObject.transform.rotation = Quaternion.identity;
+			gameObject.transform.localRotation = Quaternion.identity;
 			gameObject.transform.position = position;
 			gameObject.gameObject.SetActive(true);
 			return gameObject;

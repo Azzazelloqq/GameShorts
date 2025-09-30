@@ -10,6 +10,7 @@ using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
+using Code.Games._2048;
 using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
@@ -19,6 +20,7 @@ using TickHandler;
 using TickHandler.UnityTickHandler;
 using UnityEngine;
 using UnityEngine.UI;
+using Game2048 = Code.Games._2048.Game2048;
 
 namespace Code.Core.Tester
 {
@@ -137,7 +139,8 @@ internal class SimpleTester : MonoBehaviour
 			typeof(AsteroidsGame),
 			typeof(BoxTower),
 			typeof(LawnmowerGame),
-			typeof(EscapeFromDarkGame)
+			typeof(EscapeFromDarkGame),
+			typeof(Game2048)
 		};
 
 		_gameTypes.AddRange(types);
@@ -151,7 +154,8 @@ internal class SimpleTester : MonoBehaviour
 			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
-			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain }
+			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
+			{ typeof(Game2048), ResourceIdsContainer.Game2048.Id2048Main}
 		};
 	}
 
