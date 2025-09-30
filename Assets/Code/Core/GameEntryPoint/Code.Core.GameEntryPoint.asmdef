@@ -16,7 +16,8 @@
     "Asteroids.Game",
     "BoxTower",
     "EscapeFromDark",
-    "Lawnmower"
+    "Lawnmower",
+    "AngryHumans"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
