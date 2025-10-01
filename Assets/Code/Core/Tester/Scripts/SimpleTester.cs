@@ -10,7 +10,6 @@ using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
-using Code.Games._2048;
 using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
@@ -20,7 +19,6 @@ using TickHandler;
 using TickHandler.UnityTickHandler;
 using UnityEngine;
 using UnityEngine.UI;
-using Game2048 = Code.Games._2048.Game2048;
 
 namespace Code.Core.Tester
 {

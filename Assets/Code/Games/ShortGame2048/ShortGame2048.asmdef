@@ -1,0 +1,25 @@
+{
+    "name": "ShortGame2048",
+    "references": [
+        "Core.ShortGame",
+        "BaseDMDisposable",
+        "LightDI",
+        "TickHandler",
+        "ResourceLoader",
+        "Tools",
+        "Unity.TextMeshPro",
+        "Code.Core.InputManager",
+        "Logger",
+        "AddressablesGroups",
+        "Utils"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
