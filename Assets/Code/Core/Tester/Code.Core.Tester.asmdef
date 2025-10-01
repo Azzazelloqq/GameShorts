@@ -13,6 +13,7 @@
         "Tools",
         "Lawnmower",
         "Asteroids.Game",
+        "2048.Game",
         "EscapeFromDark"
     ],
     "includePlatforms": [],

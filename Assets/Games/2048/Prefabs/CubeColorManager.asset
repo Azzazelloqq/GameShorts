@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8d898d1dcecc7e458152e9fb894ea38, type: 3}
+  m_Name: CubeColorManager
+  m_EditorClassIdentifier: Assembly-CSharp::Games._2048.Scripts.CubeColorManager
+  colorSchemes:
+  - number: 2
+    baseColor: {r: 0.8301887, g: 0.32173517, b: 0.09789959, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.5754717, g: 0.2414589, b: 0.09500711, a: 1}
+  - number: 4
+    baseColor: {r: 0.017354928, g: 0.735849, b: 0.6671239, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.11258457, g: 0.4339623, b: 0.42461818, a: 1}
+  - number: 8
+    baseColor: {r: 0.7924528, g: 0.12335351, b: 0.6537793, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.42408213, g: 0.10196077, b: 0.47058824, a: 1}
+  - number: 16
+    baseColor: {r: 0.81097555, g: 0.8867924, b: 0.12967247, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.43560046, g: 0.5660378, b: 0.1308295, a: 1}
+  - number: 32
+    baseColor: {r: 0.121885024, g: 0.2949625, b: 0.7830189, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.102483094, g: 0.14222632, b: 0.46226418, a: 1}
+  - number: 64
+    baseColor: {r: 1, g: 0.43921566, b: 0.5871017, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.58431375, g: 0.27450982, b: 0.43616256, a: 1}
+  - number: 128
+    baseColor: {r: 0.12019401, g: 0.6376697, b: 0.6886792, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.102483094, g: 0.42929512, b: 0.46226418, a: 1}
+  - number: 256
+    baseColor: {r: 0.1745283, g: 1, b: 0.616385, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.26666668, g: 0.5176471, b: 0.39383587, a: 1}
+  - number: 512
+    baseColor: {r: 0.46686798, g: 0.12482201, b: 0.8018868, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.28151342, g: 0.08940014, b: 0.46226418, a: 1}
+  - number: 1024
+    baseColor: {r: 0.16237983, g: 0.46411112, b: 0.8396226, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.12682448, g: 0.3032273, b: 0.4716981, a: 1}
+  - number: 2048
+    baseColor: {r: 0, g: 1, b: 0.050011873, a: 1}
+    digitColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.14702742, g: 0.5283019, b: 0.20977397, a: 1}
+  defaultScheme:
+    number: 0
+    baseColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    digitColor: {r: 0, g: 0, b: 0, a: 1}
+    outlineColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}

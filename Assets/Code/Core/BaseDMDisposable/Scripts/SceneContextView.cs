@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.View
 {
-    internal class SceneContextView : BaseMonoBehaviour
+    public class SceneContextView : BaseMonoBehaviour
     {
 		
         [SerializeField] private Camera _camera;
