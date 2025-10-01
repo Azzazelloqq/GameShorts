@@ -1225,6 +1225,7 @@ MonoBehaviour:
   _pausePanel: {fileID: 0}
   _finishScreenView: {fileID: 275197624091731965}
   _mainUIView: {fileID: 6699522437092641548}
+  _startScreenView: {fileID: 1591968846071602926}
 --- !u!1 &5042146771604084088
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,7 +1244,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5009202267520798204
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1392,7 +1393,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7917357685950979195}
   - component: {fileID: 456969777333951782}
-  - component: {fileID: 1031198354165168646}
   - component: {fileID: 3876793671964800447}
   m_Layer: 0
   m_Name: Camera
@@ -1468,14 +1468,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &1031198354165168646
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5208440312089139323}
-  m_Enabled: 1
 --- !u!114 &3876793671964800447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2418,7 +2410,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.052729126, y: 0.46780887}
   m_AnchorMax: {x: 0.9386236, y: 0.7517085}
-  m_AnchoredPosition: {x: 0, y: -672}
+  m_AnchoredPosition: {x: 0, y: -424}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5749178110801557351
@@ -2449,17 +2441,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'YOUR SCORE: 0'
+  m_text: Tap anywhere to start!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4287496093
-  m_fontColor: {r: 0.6172329, g: 1, b: 0.5518868, a: 1}
+    rgba: 4291100927
+  m_fontColor: {r: 1, g: 0, b: 0.7734499, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2476,13 +2468,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 44
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 44
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2978,7 +2970,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2541638349991279482}
-  - component: {fileID: 1392862297653057879}
+  - component: {fileID: 1591968846071602926}
   m_Layer: 0
   m_Name: StartScreen
   m_TagString: Untagged
@@ -3006,7 +2998,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1392862297653057879
+--- !u!114 &1591968846071602926
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3015,11 +3007,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8359298653191813517}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9371d10745c9484b84e3a11a2e9c3fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 7abfdf39ceaee2143a0e9f4c28b682dd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: EscapeFromDark::Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI.StartScreenView
-  startButton: {fileID: 7364931529600994714}
-  instructionText: {fileID: 1476080609051286673}
+  m_EditorClassIdentifier: ShortGame2048::Code.Games.Game2048StartScreenView
+  _startButton: {fileID: 7364931529600994714}
 --- !u!1 &8454467735629618941
 GameObject:
   m_ObjectHideFlags: 0

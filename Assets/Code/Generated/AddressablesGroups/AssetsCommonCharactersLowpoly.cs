@@ -6,47 +6,51 @@ namespace Code.Generated.Addressables
     {
         public string CharactersMaterial6 = "CharactersMaterial6";
 
-        public static class RagdollCharacters
+        public readonly RagdollCharactersSubGroup RagdollCharacters = new RagdollCharactersSubGroup();
+        public readonly FBXSubGroup FBX = new FBXSubGroup();
+        public readonly MaterialsSubGroup Materials = new MaterialsSubGroup();
+        public readonly TexturesSubGroup Textures = new TexturesSubGroup();
+
+        public class RagdollCharactersSubGroup
         {
-            public static string Character16 = "RagdollCharacters/Character16";
-            public static string Character14 = "RagdollCharacters/Character14";
-            public static string Character4 = "RagdollCharacters/Character4";
-            public static string Character3 = "RagdollCharacters/Character3";
-            public static string Character1 = "RagdollCharacters/Character1";
-            public static string Character2 = "RagdollCharacters/Character2";
-            public static string Character13 = "RagdollCharacters/Character13";
-            public static string Character15 = "RagdollCharacters/Character15";
-            public static string Character7 = "RagdollCharacters/Character7";
-            public static string Character5 = "RagdollCharacters/Character5";
-            public static string Character8 = "RagdollCharacters/Character8";
-            public static string Character9 = "RagdollCharacters/Character9";
-            public static string Character10 = "RagdollCharacters/Character10";
-            public static string Character11 = "RagdollCharacters/Character11";
-            public static string Character12 = "RagdollCharacters/Character12";
-            public static string Character6 = "RagdollCharacters/Character6";
+            public string Character8 = "RagdollCharacters/Character8";
+            public string Character14 = "RagdollCharacters/Character14";
+            public string Character12 = "RagdollCharacters/Character12";
+            public string Character5 = "RagdollCharacters/Character5";
+            public string Character16 = "RagdollCharacters/Character16";
+            public string Character6 = "RagdollCharacters/Character6";
+            public string Character9 = "RagdollCharacters/Character9";
+            public string Character11 = "RagdollCharacters/Character11";
+            public string Character4 = "RagdollCharacters/Character4";
+            public string Character3 = "RagdollCharacters/Character3";
+            public string Character1 = "RagdollCharacters/Character1";
+            public string Character10 = "RagdollCharacters/Character10";
+            public string Character2 = "RagdollCharacters/Character2";
+            public string Character7 = "RagdollCharacters/Character7";
+            public string Character15 = "RagdollCharacters/Character15";
+            public string Character13 = "RagdollCharacters/Character13";
         }
 
-        public static class FBX
+        public class FBXSubGroup
         {
-            public static string ManWithHelmet = "FBX/ManWithHelmet";
-            public static string CommonMan = "FBX/CommonMan";
+            public string ManWithHelmet = "FBX/ManWithHelmet";
+            public string CommonMan = "FBX/CommonMan";
         }
 
-        public static class Materials
+        public class MaterialsSubGroup
         {
-            public static string CharactersMaterial2 = "Materials/CharactersMaterial2";
-            public static string CharactersMaterial4 = "Materials/CharactersMaterial4";
-            public static string CharactersMaterial3 = "Materials/CharactersMaterial3";
-            public static string CharactersMaterial5 = "Materials/CharactersMaterial5";
-            public static string CharactersMaterial1 = "Materials/CharactersMaterial1";
+            public string CharactersMaterial2 = "Materials/CharactersMaterial2";
+            public string CharactersMaterial4 = "Materials/CharactersMaterial4";
+            public string CharactersMaterial3 = "Materials/CharactersMaterial3";
+            public string CharactersMaterial5 = "Materials/CharactersMaterial5";
+            public string CharactersMaterial1 = "Materials/CharactersMaterial1";
         }
 
-        public static class Textures
+        public class TexturesSubGroup
         {
-            public static string Texture1 = "Textures/Texture1";
-            public static string Texture2 = "Textures/Texture2";
-            public static string Texture3 = "Textures/Texture3";
+            public string Texture1 = "Textures/Texture1";
+            public string Texture2 = "Textures/Texture2";
+            public string Texture3 = "Textures/Texture3";
         }
-
     }
 }

@@ -14,7 +14,8 @@
         "Lawnmower",
         "Asteroids.Game",
         "2048.Game",
-        "EscapeFromDark"
+        "EscapeFromDark",
+        "ShortGame2048"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

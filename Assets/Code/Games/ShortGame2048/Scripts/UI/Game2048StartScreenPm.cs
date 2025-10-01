@@ -19,18 +19,25 @@ namespace Code.Games
         public Game2048StartScreenPm(Ctx ctx)
         {
             _ctx = ctx;
-            
+            _view = _ctx.sceneContextView.StartScreenView;
+            _view.gameObject.SetActive(true);
             CreateView();
+        }
+        
+        private void OnStartButtonClicked()
+        {
+            _ctx.startGameClicked?.Invoke();
         }
 
         private void CreateView()
         {
-            // TODO: Load start screen prefab from addressables and setup UI
+            _view.StartButton.onClick.AddListener(OnStartButtonClicked);
         }
 
         protected override void OnDispose()
-        {
-            _view?.SetCtx(new Game2048StartScreenView.Ctx());
+        { 
+            _view.gameObject.SetActive(false);
+            _view.StartButton.onClick.RemoveAllListeners();
             base.OnDispose();
         }
     }

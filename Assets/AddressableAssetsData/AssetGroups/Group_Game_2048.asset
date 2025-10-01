@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Game_2048
+  m_Name: Group_Game_2048
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: Game_2048
+  m_GroupName: Group_Game_2048
   m_GUID: babed78263648c640bc27486e4ab70df
   m_SerializeEntries:
   - m_GUID: 534ad1273cc6b754ab9a053c444ad44a

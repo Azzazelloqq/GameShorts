@@ -31,7 +31,7 @@ namespace Code.Games
             _currentState = Game2048GameState.WaitingToStart;
             
             InitializeFinishScreen();
-            StartGame();
+            ShowStartScreen();
         }
         
         private void InitializeFinishScreen()

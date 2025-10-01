@@ -56,6 +56,8 @@ namespace Code.Games
         private Game2048FinishScreenView _finishScreenView;
         [SerializeField]
         private GameObject _mainUIView;
+        
+        [SerializeField] private Game2048StartScreenView _startScreenView;
 
         public Transform GameSpawnPoint => _gameSpawnPoint;
         public Game2048InputAreaView InputAreaView => _inputAreaView;
@@ -72,5 +74,7 @@ namespace Code.Games
         public GameObject MainUIView => _mainUIView;
 
         public Transform FinishGamePoint => _finishGamePoint;
+
+        public Game2048StartScreenView StartScreenView => _startScreenView;
     }
 }

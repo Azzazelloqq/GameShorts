@@ -448,7 +448,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8208126589755050306}
   - component: {fileID: 8302916857865045288}
-  - component: {fileID: 111219648524155652}
   - component: {fileID: 7368342437703867085}
   m_Layer: 0
   m_Name: Camera
@@ -523,14 +522,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &111219648524155652
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2301127342082006278}
-  m_Enabled: 1
 --- !u!114 &7368342437703867085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2243,6 +2234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: EscapeFromDark::Code.Core.ShortGamesCore.EscapeFromDark.EscapeFromDarkGame
   _sceneContextView: {fileID: 7531261986792522166}
   _camera: {fileID: 0}
+  _graphicRaycaster: {fileID: 0}
 --- !u!1 &7581492855433431250
 GameObject:
   m_ObjectHideFlags: 0

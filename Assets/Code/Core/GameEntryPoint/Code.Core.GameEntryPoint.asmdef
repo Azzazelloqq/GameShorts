@@ -16,7 +16,8 @@
     "Asteroids.Game",
     "BoxTower",
     "EscapeFromDark",
-    "Lawnmower"
+    "Lawnmower",
+    "ShortGame2048"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
