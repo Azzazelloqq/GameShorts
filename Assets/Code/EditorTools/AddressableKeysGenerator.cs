@@ -147,35 +147,54 @@ namespace Code.EditorTools
                 sb.AppendLine($"{indent}public string {fieldName} = \"{address}\";");
             }
 
+            // Collect child class names
+            var childClasses = new Dictionary<string, AddressNode>();
+            foreach (var child in node.Children)
+            {
+                var fieldName = ToCamelCase(child.Key, true);
+                childClasses[fieldName] = child.Value;
+            }
+
+            // Generate instance fields for nested classes (before class declarations)
+            if (isRootLevel && childClasses.Count > 0)
+            {
+                if (node.DirectAddresses.Count > 0)
+                {
+                    sb.AppendLine();
+                }
+                
+                foreach (var fieldName in childClasses.Keys)
+                {
+                    var className = fieldName + "SubGroup";
+                    sb.AppendLine($"{indent}public readonly {className} {fieldName} = new {className}();");
+                }
+            }
+
             // Add empty line between fields and nested classes if both exist
-            if (node.DirectAddresses.Count > 0 && node.Children.Count > 0)
+            if ((node.DirectAddresses.Count > 0 || (isRootLevel && childClasses.Count > 0)) && childClasses.Count > 0)
             {
                 sb.AppendLine();
             }
 
             // Then, generate nested classes for each child
-            var generatedClasses = new List<string>();
-            foreach (var child in node.Children)
+            foreach (var kvp in childClasses)
             {
-                var className = ToCamelCase(child.Key, true);
-                generatedClasses.Add(className);
+                var fieldName = kvp.Key;
+                var className = fieldName + "SubGroup";
+                var childNode = kvp.Value;
                 
                 // Generate the nested class
                 sb.AppendLine($"{indent}public class {className}");
                 sb.AppendLine($"{indent}{{");
                 
-                GenerateNodeContent(sb, child.Value, indentLevel + 1);
+                GenerateNodeContent(sb, childNode, indentLevel + 1);
                 
                 sb.AppendLine($"{indent}}}");
-                sb.AppendLine();
-            }
-            
-            // Generate instance fields for nested classes at root level
-            if (isRootLevel && generatedClasses.Count > 0)
-            {
-                foreach (var className in generatedClasses)
+                
+                // Don't add empty line after the last class
+                if (kvp.Key != childClasses.Keys.Last())
                 {
-                    sb.AppendLine($"{indent}public readonly {className} {className} = new {className}();");
+                    sb.AppendLine();
                 }
             }
         }
