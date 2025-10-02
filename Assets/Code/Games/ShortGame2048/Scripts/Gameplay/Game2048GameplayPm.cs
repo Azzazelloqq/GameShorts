@@ -20,7 +20,7 @@ namespace Code.Games
             public float spawnDelay;
             public CancellationToken cancellationToken;
             public ReadOnlyReactiveProperty<bool> isPaused;
-            public Action gameOver;
+            public Action<int> gameOver;
         }
 
         private readonly Ctx _ctx;
@@ -32,6 +32,10 @@ namespace Code.Games
         private Game2048CubeMergeManagerPm _mergeManager;
         private float _spawnTimer;
         private CubePm _currentCube;
+        
+        private ReactiveProperty<int> _currentScore = new();
+        
+        public ReadOnlyReactiveProperty<int> CurrentScore => _currentScore;
         
         private readonly Dictionary<Rigidbody, Vector3> _savedVelocities = new();
         private readonly Dictionary<Rigidbody, Vector3> _savedAngularVelocities = new();
@@ -91,12 +95,24 @@ namespace Code.Games
                 cubePrefab = _ctx.cubePrefab,
                 cancellationToken = _ctx.cancellationToken,
                 onCubeCreated = (id,cube) => { _currentCube = cube;} ,
-                onMegredCubeCreated = (id,cube) => { _cubes.Add(id, cube);} ,
+                onMegredCubeCreated = (id, cube) =>
+                {
+                    _cubes.Add(id, cube);
+                    UpdateScore(cube);
+                } ,
             };
             
             _cubeSpawner = new Game2048CubeSpawnerPm(spawnerCtx);
             AddDispose(_cubeSpawner);
         }
+
+        private void UpdateScore(CubePm cube)
+        {
+            var maxNumber = _cubeSpawner.UsedNumbers.Max;
+            _currentScore.Value = maxNumber;
+            Debug.Log($"Game2048GameplayPm: Score updated to {maxNumber}");
+        }
+
 
         private void InitializeMergeManager()
         {
@@ -207,7 +223,10 @@ namespace Code.Games
             {
                 DisposeCube(_cubeController.CurrentCube.Id);
             }
-            _ctx.gameOver.Invoke();
+            
+            var finalScore = _currentScore.Value;
+            Debug.Log($"Game2048GameplayPm: Game Over with score {finalScore}");
+            _ctx.gameOver.Invoke(finalScore);
         }
 
         private void SpawnNewCube()
@@ -309,6 +328,7 @@ namespace Code.Games
             }
             _cubes.Clear();
             _currentCube?.Dispose();
+            _currentScore?.Dispose();
             base.OnDispose();
         }
     }

@@ -10,6 +10,8 @@ namespace Code.Games
         internal struct Ctx
         {
             public System.Action onRestartClicked;
+            public int currentScore;
+            public int bestScore;
         }
 
         [SerializeField] 
@@ -17,6 +19,12 @@ namespace Code.Games
         
         [SerializeField]
         private GameObject _rootPanel;
+        
+        [SerializeField]
+        private TextMeshProUGUI _currentScoreText;
+        
+        [SerializeField]
+        private TextMeshProUGUI _bestScoreText;
 
         private Ctx _ctx;
 
@@ -29,6 +37,22 @@ namespace Code.Games
             {
                 _restartButton.onClick.RemoveAllListeners();
                 _restartButton.onClick.AddListener(OnRestartClick);
+            }
+            
+            // Обновляем текст счета
+            UpdateScoreDisplay();
+        }
+        
+        private void UpdateScoreDisplay()
+        {
+            if (_currentScoreText != null)
+            {
+                _currentScoreText.text = _ctx.currentScore.ToString();
+            }
+            
+            if (_bestScoreText != null)
+            {
+                _bestScoreText.text = _ctx.bestScore.ToString();
             }
         }
 

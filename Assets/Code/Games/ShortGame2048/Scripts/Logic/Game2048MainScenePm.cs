@@ -23,6 +23,7 @@ namespace Code.Games
         private Game2048PausePm _pausePm;
         private Game2048FinishScreenPm _finishScreenPm;
         private Game2048GameplayPm _gameplayPm;
+        private Game2048MainUIPm _mainUIPm;
 
         public Game2048MainScenePm(Ctx ctx)
         {
@@ -146,9 +147,24 @@ namespace Code.Games
             
             _gameplayPm = Game2048GameplayPmFactory.CreateGame2048GameplayPm(gameplayCtx);
             AddDispose(_gameplayPm);
+            
+            InitializeMainUI();
+        }
+        
+        private void InitializeMainUI()
+        {
+            var mainUICtx = new Game2048MainUIPm.Ctx
+            {
+                mainUIView = _ctx.sceneContextView.MainUIView,
+                currentScore = _gameplayPm.CurrentScore,
+                cancellationToken = _ctx.cancellationToken
+            };
+            
+            _mainUIPm = new Game2048MainUIPm(mainUICtx);
+            AddDispose(_mainUIPm);
         }
 
-        public void ShowFinishScreen()
+        public void ShowFinishScreen(int finalScore)
         {
             if (_currentState != Game2048GameState.Playing)
                 return;
@@ -162,12 +178,18 @@ namespace Code.Games
                 _ctx.isPaused.Value = false;
             }
             
+            int bestScore = _mainUIPm?.BestScore ?? 0;
+            
+            // Останавливаем UI
+            _mainUIPm?.Dispose();
+            _mainUIPm = null;
+            
             // Останавливаем геймплей
             _gameplayPm?.Dispose();
             _gameplayPm = null;
 
             // Показываем экран проигрыша
-            _finishScreenPm?.ShowFinishScreen();
+            _finishScreenPm?.ShowFinishScreen(finalScore, bestScore);
         }
     }
 

@@ -1348,6 +1348,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 055dc45a4e56a4a4da644a4311075e75, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5675687095251840372}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 055dc45a4e56a4a4da644a4311075e75, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4784401556510349917}
   m_SourcePrefab: {fileID: 100100000, guid: 055dc45a4e56a4a4da644a4311075e75, type: 3}
 --- !u!23 &3199889879027694569 stripped
 MeshRenderer:
@@ -1383,6 +1386,31 @@ MonoBehaviour:
   - {fileID: 7550041146646455816}
   - {fileID: 1230545651969051450}
   _cubeColorManager: {fileID: 11400000, guid: fe46e26f5c772ac418d332bb2c3e3ca1, type: 2}
+  _accelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.000015258789
+      value: 0.69729614
+      inSlope: 0.07332401
+      outSlope: 0.07332401
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.595688
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.86162406
+      outSlope: 0.86162406
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.08010414
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _launchDuration: 0.5
   _outlineWidth: 0.2
 --- !u!54 &8663200974704891421
 Rigidbody:
@@ -1392,7 +1420,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3992641816728934972}
   serializedVersion: 5
-  m_Mass: 2.5
+  m_Mass: 4
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0.5, y: 0, z: 0.5}
@@ -1418,7 +1446,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3992641816728934972}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 5948cde5ad357234b99da2521b90cc66, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1432,6 +1460,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.59999996, y: 0.59999996, z: 0.59999996}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!111 &4784401556510349917
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3992641816728934972}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 5351dd6d34f2c6d47b78bfa4d4d38f64, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 5351dd6d34f2c6d47b78bfa4d4d38f64, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!4 &4333419659510399110 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 055dc45a4e56a4a4da644a4311075e75, type: 3}

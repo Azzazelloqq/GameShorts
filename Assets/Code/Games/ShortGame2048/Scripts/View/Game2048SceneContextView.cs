@@ -50,14 +50,18 @@ namespace Code.Games
         [SerializeField]
         private GameObject _pausePanel;
         
+        [Header("Main UI")]
+        
+        [SerializeField]
+        private Game2048MainUIView _mainUIView;
+        
         [Header("Finish UI")]
         
         [SerializeField]
         private Game2048FinishScreenView _finishScreenView;
-        [SerializeField]
-        private GameObject _mainUIView;
         
-        [SerializeField] private Game2048StartScreenView _startScreenView;
+        [SerializeField] 
+        private Game2048StartScreenView _startScreenView;
 
         public Transform GameSpawnPoint => _gameSpawnPoint;
         public Game2048InputAreaView InputAreaView => _inputAreaView;
@@ -71,10 +75,8 @@ namespace Code.Games
         public Button PauseButton => _pauseButton;
         public GameObject PausePanel => _pausePanel;
         public Game2048FinishScreenView FinishScreenView => _finishScreenView;
-        public GameObject MainUIView => _mainUIView;
-
+        public Game2048MainUIView MainUIView => _mainUIView;
         public Transform FinishGamePoint => _finishGamePoint;
-
         public Game2048StartScreenView StartScreenView => _startScreenView;
     }
 }

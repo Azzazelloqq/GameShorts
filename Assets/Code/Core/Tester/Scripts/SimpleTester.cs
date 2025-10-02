@@ -76,7 +76,8 @@ internal class SimpleTester : MonoBehaviour
 
 	private async void Start()
 	{
-		_cancellationTokenSource = new CancellationTokenSource();
+		Application.targetFrameRate = 60;
+ 		_cancellationTokenSource = new CancellationTokenSource();
 		var exitGameCancellationToken = Application.exitCancellationToken;
 
 		if (_gamesParent == null)

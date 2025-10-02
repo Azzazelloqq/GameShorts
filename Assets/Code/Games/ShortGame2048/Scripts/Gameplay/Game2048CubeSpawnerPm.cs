@@ -26,7 +26,9 @@ namespace Code.Games
         private SortedSet<int> _usedNumbers = new();
         private System.Action<Guid, Guid> _onCubeCollision;
         private WeightedPickerUnity.Table _weightTable;
-        
+
+        public SortedSet<int> UsedNumbers => _usedNumbers;
+
         public Game2048CubeSpawnerPm(Ctx ctx)
         {
             _ctx = ctx;

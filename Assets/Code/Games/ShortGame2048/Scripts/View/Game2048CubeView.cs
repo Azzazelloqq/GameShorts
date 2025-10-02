@@ -2,6 +2,7 @@ using Code.Core.BaseDMDisposable.Scripts;
 using UnityEngine;
 using TMPro;
 using System;
+using System.Collections;
 
 namespace Code.Games
 {
@@ -34,6 +35,15 @@ namespace Code.Games
         
         [SerializeField] private CubeColorManager  _cubeColorManager;
         
+        [Header("Launch Settings")]
+        [SerializeField] 
+        [Tooltip("Кривая ускорения (X - время 0-1, Y - множитель силы)")]
+        private AnimationCurve _accelerationCurve = AnimationCurve.Linear(0f, 1f, 1f, 1f);
+        
+        [SerializeField]
+        [Tooltip("Длительность применения силы (в секундах)")]
+        private float _launchDuration = 0.5f;
+        
         private Color _cubeColor = new Color(1f, 0.6f, 0f, 1f);
         
         private Color _textColor = Color.white;
@@ -49,6 +59,7 @@ namespace Code.Games
         private float _createdPositionX;
         private float _targetX;
         private const float _lerpSpeed = 15f;
+        private Coroutine _launchCoroutine;
 
         public LineRenderer Line => _line;
 
@@ -132,7 +143,30 @@ namespace Code.Games
             _isControlled = false;
             _line.gameObject.SetActive(false);
             _rigidbody.isKinematic = false;
-            _rigidbody.AddForce(Vector3.forward * force, ForceMode.Impulse);
+            
+            // Запускаем корутину для применения силы по кривой
+            _launchCoroutine = StartCoroutine(LaunchCoroutine(force));
+        }
+        
+        private IEnumerator LaunchCoroutine(float baseForce)
+        {
+            float elapsedTime = 0f;
+            
+            while (elapsedTime < _launchDuration)
+            {
+                float progress = Mathf.Clamp01(elapsedTime / _launchDuration);
+                
+                // Получаем множитель силы из кривой
+                float curveMultiplier = _accelerationCurve.Evaluate(progress);
+                
+                // Применяем силу вперед с учетом кривой
+                // Делим на _launchDuration чтобы распределить импульс по времени
+                float currentForce = (baseForce / _launchDuration) * curveMultiplier;
+                _rigidbody.AddForce(Vector3.forward * currentForce, ForceMode.Force);
+                
+                elapsedTime += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
         }
 
         /// <summary>
@@ -140,6 +174,8 @@ namespace Code.Games
         /// </summary>
         public void ResetVelocity()
         {
+            StopLaunchAcceleration();
+            
             if (_rigidbody != null)
             {
                 _rigidbody.isKinematic = false;
@@ -236,6 +272,9 @@ namespace Code.Games
             var otherCube = collision.gameObject.GetComponent<Game2048CubeView>();
             if (otherCube == null)
                 return;
+            
+            // Останавливаем ускорение при столкновении с любым кубом
+            StopLaunchAcceleration();
 
             // Проверяем, что числа одинаковые
             if (GetNumber() != otherCube.GetNumber())
@@ -249,8 +288,23 @@ namespace Code.Games
             _ctx.onCollisionWithCube?.Invoke(otherCube.GetCubeId());
         }
         
+        /// <summary>
+        /// Останавливает корутину ускорения при запуске
+        /// </summary>
+        private void StopLaunchAcceleration()
+        {
+            if (_launchCoroutine != null)
+            {
+                StopCoroutine(_launchCoroutine);
+                _launchCoroutine = null;
+            }
+        }
+        
         private void OnDestroy()
         {
+            // Останавливаем корутину ускорения
+            StopLaunchAcceleration();
+            
             // Освобождаем созданный материал
             if (_cubeMaterial != null)
             {

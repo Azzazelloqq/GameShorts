@@ -17,6 +17,7 @@ namespace Code.Games
         private readonly Ctx _ctx;
         private Game2048FinishScreenView _view;
         private int _currentScore;
+        private int _bestScore;
 
         public Game2048FinishScreenPm(Ctx ctx)
         {
@@ -48,14 +49,25 @@ namespace Code.Games
             Debug.Log("Game2048FinishScreenPm: Initialized");
         }
 
-        public void ShowFinishScreen()
+        public void ShowFinishScreen(int currentScore, int bestScore)
         {
+            _currentScore = currentScore;
+            _bestScore = bestScore;
             
             if (_view != null)
             {
+                var viewCtx = new Game2048FinishScreenView.Ctx
+                {
+                    onRestartClicked = OnRestartClicked,
+                    currentScore = _currentScore,
+                    bestScore = _bestScore
+                };
+                
+                _view.SetCtx(viewCtx);
                 _view.Show();
             }
             
+            Debug.Log($"Game2048FinishScreenPm: Showing finish screen with score {_currentScore}, best {_bestScore}");
         }
 
         public void HideFinishScreen()
