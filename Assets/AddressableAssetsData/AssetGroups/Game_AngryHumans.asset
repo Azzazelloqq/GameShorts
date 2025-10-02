@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 9b9870b3072ca1d42a49489a83f5e05d
   m_SerializeEntries:
   - m_GUID: e12f91956b60e1b478cc1138b3725d83
-    m_Address: AngryHumansMainGame
+    m_Address: FlyHumansMainGame
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
