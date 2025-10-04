@@ -15,7 +15,8 @@
         "Asteroids.Game",
         "2048.Game",
         "EscapeFromDark",
-        "ShortGame2048"
+        "ShortGame2048",
+        "FlyHumans"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

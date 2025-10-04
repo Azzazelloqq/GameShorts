@@ -12,6 +12,7 @@ using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
 using Code.Games;
 using Code.Generated.Addressables;
+using GameShorts.FlyHumans;
 using InGameLogger;
 using LightDI.Runtime;
 using ResourceLoader;
@@ -31,9 +32,6 @@ internal class SimpleTester : MonoBehaviour
 	[Header("Settings")]
 	[SerializeField]
 	private Transform _gamesParent;
-
-	[SerializeField]
-	private int _preloadDepth = 2;
 
 	[Header("UI Settings")]
 	[SerializeField]
@@ -140,7 +138,8 @@ internal class SimpleTester : MonoBehaviour
 			typeof(BoxTower),
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
-			typeof(Game2048)
+			typeof(Game2048),
+			typeof(FlyHumansGame),
 		};
 
 		_gameTypes.AddRange(types);
@@ -155,7 +154,8 @@ internal class SimpleTester : MonoBehaviour
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
-			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main}
+			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main},
+			{ typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain}
 		};
 	}
 

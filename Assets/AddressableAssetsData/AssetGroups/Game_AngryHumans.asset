@@ -14,12 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Game_AngryHumans
   m_GUID: 9b9870b3072ca1d42a49489a83f5e05d
-  m_SerializeEntries:
-  - m_GUID: e12f91956b60e1b478cc1138b3725d83
-    m_Address: FlyHumansMainGame
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
   m_SchemaSet:

@@ -1,8 +1,16 @@
 {
     "name": "FlyHumans",
-    "rootNamespace": "",
+    "rootNamespace": "GameShorts.FlyHumans",
     "references": [
-        "R3.Unity"
+        "R3.Unity",
+        "DOTween",
+        "BaseDisposable",
+        "Core.ShortGame",
+        "Code.Utils",
+        "LightDI",
+        "BaseDMDisposable",
+        "Utils",
+        "Tools"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
