@@ -16,7 +16,6 @@ namespace GameShorts.FlyHumans.Gameplay
         [SerializeField] private ParticleSystem _flyParticles;
         
         [Header("Movement Settings")]
-        [SerializeField] private float _forwardSpeed = 5f;
         [SerializeField] private float _jumpForce = 5f;
         [SerializeField] private float _gravity = 9.8f;
         
@@ -24,14 +23,12 @@ namespace GameShorts.FlyHumans.Gameplay
         private bool _wasFlying;
         private bool _isActive;
         private float _currentGravity;
-        private float _currentSpeed;
         private Vector3 _movementDirection;
         private Quaternion _initialRotation;
 
         // Properties
         public RagdollRoot RagdollRoot => _ragdollRoot;
         public Animator Animator => _animator;
-        public float ForwardSpeed => _forwardSpeed;
         public float JumpForce => _jumpForce;
         public float Gravity => _gravity;
         
@@ -52,12 +49,6 @@ namespace GameShorts.FlyHumans.Gameplay
             get => _currentGravity;
             set => _currentGravity = value;
         }
-        
-        public float CurrentSpeed
-        {
-            get => _currentSpeed;
-            set => _currentSpeed = value;
-        }
 
         public void Initialize()
         {
@@ -74,7 +65,6 @@ namespace GameShorts.FlyHumans.Gameplay
         public void ResetState()
         {
             _currentGravity = 0;
-            _currentSpeed = 0;
             _verticalVelocity = 0f;
             _isActive = false;
             _wasFlying = false;

@@ -216,7 +216,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1003914507137147278}
-  - component: {fileID: 5092060311385443847}
+  - component: {fileID: 5379507579327228891}
   m_Layer: 0
   m_Name: Path_2
   m_TagString: Untagged
@@ -243,7 +243,7 @@ Transform:
   - {fileID: 7813583814277500717}
   m_Father: {fileID: 5862617324934856234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5092060311385443847
+--- !u!114 &5379507579327228891
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -252,16 +252,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 635575605898754026}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab9f78a62b57fc641bba3e2dd2e8a17e, type: 3}
+  m_Script: {fileID: 11500000, guid: 7097b70e76c6a0145b8c6d9be24918e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FlyHumans::FlyHumans.TrafficPath
-  waypoints:
+  m_EditorClassIdentifier: FlyHumans::GameShorts.FlyHumans.View.TrafficPath
+  _waypoints:
   - {fileID: 7952033607242945855}
   - {fileID: 1327641915016949251}
   - {fileID: 5090545915454101261}
   - {fileID: 7813583814277500717}
-  showPath: 1
-  pathColor: {r: 1, g: 0.015686398, b: 0.015686274, a: 1}
+  _showPath: 1
+  _pathColor: {r: 1, g: 0.0882454, b: 0.015686274, a: 1}
 --- !u!1 &684160529704565881
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,7 +271,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5862617324934856234}
-  - component: {fileID: 9155535462015888678}
+  - component: {fileID: 4095095312677462099}
   m_Layer: 0
   m_Name: Cars
   m_TagString: Untagged
@@ -297,9 +297,10 @@ Transform:
   - {fileID: 6192553011138566297}
   - {fileID: 6997587219083435612}
   - {fileID: 8588998764375916452}
+  - {fileID: 783678230106051028}
   m_Father: {fileID: 5518343764512662722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9155535462015888678
+--- !u!114 &4095095312677462099
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -308,10 +309,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 684160529704565881}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b456bffe755139d4aa1d3fd070877483, type: 3}
+  m_Script: {fileID: 11500000, guid: cc09507dd78944a40906b360dff5a502, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FlyHumans::FlyHumans.TrafficController
-  vehiclePrefabs:
+  m_EditorClassIdentifier: FlyHumans::GameShorts.FlyHumans.View.BlockTrafficView
+  _vehiclePrefabs:
   - {fileID: 100000, guid: 9b25e71fd5b7ac6469539d930c6dc2e6, type: 3}
   - {fileID: 100000, guid: 9500f0cdde0097a4aac35ced7c1935d7, type: 3}
   - {fileID: 100000, guid: 79ef5961b86276943ab5da38ae9f2e4b, type: 3}
@@ -333,16 +334,24 @@ MonoBehaviour:
   - {fileID: 100000, guid: cffe1734bc43bcb47b6433ebca05c04c, type: 3}
   - {fileID: 100000, guid: e218686c5655fad46a02ebfb004972ee, type: 3}
   - {fileID: 100000, guid: 993432d7809c9bf489a5a96006618fef, type: 3}
-  paths:
-  - {fileID: 7303271080198447384}
-  - {fileID: 5092060311385443847}
-  - {fileID: 7229013076215278894}
-  - {fileID: 979577568932385268}
-  vehicleCount: 10
-  minSpeed: 35
-  maxSpeed: 40
-  restartDelay: 2
-  autoStartOnAwake: 1
+  _vehiclePaths:
+  - {fileID: 5285573617075472252}
+  - {fileID: 5379507579327228891}
+  - {fileID: 2601328907394099971}
+  - {fileID: 2968052452945906165}
+  - {fileID: 7950111880512413784}
+  _vehicleCount: 10
+  _vehicleMinSpeed: 30
+  _vehicleMaxSpeed: 40
+  _vehicleRestartDelay: 3
+  _airplanePrefabs: []
+  _airplanePaths: []
+  _airplaneCount: 1
+  _airplaneMinSpeed: 50
+  _airplaneMaxSpeed: 80
+  _airplaneSpawnInterval: 5
+  _vehiclesContainer: {fileID: 783678230106051028}
+  _airplanesContainer: {fileID: 0}
 --- !u!1 &725238688999030779
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,6 +445,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8588998764375916452}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1092017254996665959
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 783678230106051028}
+  m_Layer: 0
+  m_Name: Cars
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &783678230106051028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1092017254996665959}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5862617324934856234}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1141324339113497045
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,7 +485,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8870309208144058959}
-  - component: {fileID: 7303271080198447384}
+  - component: {fileID: 5285573617075472252}
   m_Layer: 0
   m_Name: Path_1
   m_TagString: Untagged
@@ -474,7 +514,7 @@ Transform:
   - {fileID: 5263237183764406008}
   m_Father: {fileID: 5862617324934856234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7303271080198447384
+--- !u!114 &5285573617075472252
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -483,18 +523,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1141324339113497045}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab9f78a62b57fc641bba3e2dd2e8a17e, type: 3}
+  m_Script: {fileID: 11500000, guid: 7097b70e76c6a0145b8c6d9be24918e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FlyHumans::FlyHumans.TrafficPath
-  waypoints:
+  m_EditorClassIdentifier: FlyHumans::GameShorts.FlyHumans.View.TrafficPath
+  _waypoints:
   - {fileID: 5263237183764406008}
   - {fileID: 3886667045523917731}
   - {fileID: 328103413854004459}
   - {fileID: 175298842803812717}
   - {fileID: 4337440956081243636}
   - {fileID: 3283022577249964882}
-  showPath: 1
-  pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _showPath: 1
+  _pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &1208231718172415377
 GameObject:
   m_ObjectHideFlags: 0
@@ -535,7 +575,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8588998764375916452}
-  - component: {fileID: 3594641497919563191}
+  - component: {fileID: 7950111880512413784}
   m_Layer: 0
   m_Name: Path_5
   m_TagString: Untagged
@@ -563,7 +603,7 @@ Transform:
   - {fileID: 5424425443387813657}
   m_Father: {fileID: 5862617324934856234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3594641497919563191
+--- !u!114 &7950111880512413784
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -572,18 +612,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1211723511531355856}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab9f78a62b57fc641bba3e2dd2e8a17e, type: 3}
+  m_Script: {fileID: 11500000, guid: 7097b70e76c6a0145b8c6d9be24918e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FlyHumans::FlyHumans.TrafficPath
-  waypoints:
+  m_EditorClassIdentifier: FlyHumans::GameShorts.FlyHumans.View.TrafficPath
+  _waypoints:
   - {fileID: 7207035033559890695}
   - {fileID: 4933397086154768584}
   - {fileID: 3744807911242303939}
   - {fileID: 2444868824923741009}
   - {fileID: 5424425443387813657}
-  - {fileID: 0}
-  showPath: 1
-  pathColor: {r: 1, g: 0.015686274, b: 0.8737743, a: 1}
+  _showPath: 1
+  _pathColor: {r: 0.06722958, g: 1, b: 0.015686274, a: 1}
 --- !u!1 &1255193063129042754
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,7 +1015,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6192553011138566297}
-  - component: {fileID: 7229013076215278894}
+  - component: {fileID: 2601328907394099971}
   m_Layer: 0
   m_Name: Path_3
   m_TagString: Untagged
@@ -1003,7 +1042,7 @@ Transform:
   - {fileID: 8630187585742344035}
   m_Father: {fileID: 5862617324934856234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7229013076215278894
+--- !u!114 &2601328907394099971
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1012,16 +1051,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 2274701284110973274}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab9f78a62b57fc641bba3e2dd2e8a17e, type: 3}
+  m_Script: {fileID: 11500000, guid: 7097b70e76c6a0145b8c6d9be24918e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FlyHumans::FlyHumans.TrafficPath
-  waypoints:
+  m_EditorClassIdentifier: FlyHumans::GameShorts.FlyHumans.View.TrafficPath
+  _waypoints:
   - {fileID: 6263099341377480196}
   - {fileID: 1609796791803857135}
   - {fileID: 208195846475269767}
   - {fileID: 8630187585742344035}
-  showPath: 1
-  pathColor: {r: 0.015686274, g: 0.21921769, b: 1, a: 1}
+  _showPath: 1
+  _pathColor: {r: 1, g: 0, b: 0.8284645, a: 1}
 --- !u!1 &2387339705956015263
 GameObject:
   m_ObjectHideFlags: 0
@@ -1911,7 +1950,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6997587219083435612}
-  - component: {fileID: 979577568932385268}
+  - component: {fileID: 2968052452945906165}
   m_Layer: 0
   m_Name: Path_4
   m_TagString: Untagged
@@ -1940,7 +1979,7 @@ Transform:
   - {fileID: 6726394438270334029}
   m_Father: {fileID: 5862617324934856234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &979577568932385268
+--- !u!114 &2968052452945906165
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1949,18 +1988,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 4535602411554150628}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab9f78a62b57fc641bba3e2dd2e8a17e, type: 3}
+  m_Script: {fileID: 11500000, guid: 7097b70e76c6a0145b8c6d9be24918e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FlyHumans::FlyHumans.TrafficPath
-  waypoints:
+  m_EditorClassIdentifier: FlyHumans::GameShorts.FlyHumans.View.TrafficPath
+  _waypoints:
   - {fileID: 5947494023240183193}
   - {fileID: 5567797882250127160}
   - {fileID: 3496977991574059771}
   - {fileID: 1286770241325093077}
   - {fileID: 1990398902209262365}
   - {fileID: 6726394438270334029}
-  showPath: 1
-  pathColor: {r: 0.015686274, g: 1, b: 0.33297747, a: 1}
+  _showPath: 1
+  _pathColor: {r: 0.080524236, g: 0.015686274, b: 1, a: 1}
 --- !u!1 &4680595556140613154
 GameObject:
   m_ObjectHideFlags: 0
@@ -2010,9 +2049,10 @@ MonoBehaviour:
   _blockPrefabs:
   - {fileID: 8875685284065424311, guid: 6dbb0d85e4915f94a9fd6da04e9bc956, type: 3}
   - {fileID: 720032502791567076, guid: 9eee65cf643e14648b5ee2178a4f1dda, type: 3}
+  - {fileID: 720032502791567076, guid: 47ecb6aa84a6b1d4a9daf8ec16856045, type: 3}
   _blocksContainer: {fileID: 515606089826181359}
-  _worldSpeed: 25
-  _removalDistance: 30
+  _worldSpeed: 8
+  _removalDistance: 40
 --- !u!1 &5009553182932265798
 GameObject:
   m_ObjectHideFlags: 0
@@ -2755,6 +2795,7 @@ MonoBehaviour:
   _startPoint: {fileID: 215292395171452574}
   _endPoint: {fileID: 6598781903199594537}
   _spawnNextBlockDistance: 40
+  _trafficView: {fileID: 4095095312677462099}
   _showGizmos: 1
 --- !u!1 &7835760444470019934
 GameObject:
@@ -5013,7 +5054,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6280845361890362896, guid: d9e0b0516b7b50a45ae62003b7aa8b80, type: 3}
       propertyPath: _forwardSpeed
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6280845361890362896, guid: d9e0b0516b7b50a45ae62003b7aa8b80, type: 3}
       propertyPath: _cameraTransform

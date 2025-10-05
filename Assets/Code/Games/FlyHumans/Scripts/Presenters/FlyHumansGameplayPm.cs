@@ -28,7 +28,6 @@ namespace GameShorts.FlyHumans.Gameplay
         private IDisposable _updateSubscription;
         private IDisposable _jumpTrigger;
         private IDisposable _inputSubscription;
-        private bool _isGameStarted = false;
 
         public FlyHumansGameplayPm(Ctx ctx)
         {
@@ -80,47 +79,58 @@ namespace GameShorts.FlyHumans.Gameplay
         {
             if (_character == null) return;
             
-            if (!_character.IsActive) return;
-            
-            // Применяем гравитацию
-            _character.VerticalVelocity -= _character.CurrentGravity * Time.deltaTime;
-            
-            // Обновляем позицию персонажа (только вверх/вниз)
-            _character.UpdatePosition(Time.deltaTime);
-            
-            // Обновляем мир (движение блоков) через презентер
             _ctx.worldBlocksPm?.UpdateWorld(Time.deltaTime);
             
-            // Обновляем анимацию персонажа
-            _character.UpdateAnimation();
-            
-            // Обновляем камеру через презентер
-            _ctx.cameraPm?.UpdateCameraPosition();
+            // Обновляем персонажа только если он активен
+            if (_character.IsActive)
+            {
+                // Применяем гравитацию
+                _character.VerticalVelocity -= _character.CurrentGravity * Time.deltaTime;
+                
+                // Обновляем позицию персонажа (только вверх/вниз)
+                _character.UpdatePosition(Time.deltaTime);
+                
+                // Обновляем анимацию персонажа
+                _character.UpdateAnimation();
+                
+                // Обновляем камеру через презентер только если персонаж активен
+                _ctx.cameraPm?.UpdateCameraPosition();
+            }
         }
 
         public void StartGame()
         {
-            if (_isGameStarted || _character == null) return;
+            if (_character == null)
+            {
+                Debug.LogError("Character is null!");
+                return;
+            }
             
-            _isGameStarted = true;
+            
+            // Запускаем анимацию старта персонажа
             _character.StartJumpAnimation();
         }
 
         private void InitGravity()
         {
             _character.CurrentGravity = _character.Gravity;
-            _character.CurrentSpeed = _character.ForwardSpeed;
             _character.IsActive = true;
             
-            // Запускаем движение мира со скоростью персонажа через презентер
-            if (_ctx.worldBlocksPm != null)
-            {
-                _ctx.worldBlocksPm.SetSpeed(_character.ForwardSpeed);
-                _ctx.worldBlocksPm.IsMoving = true;
-            }
+            // Мир уже двигается с момента старта игры
+            // Здесь только активируем персонажа и камеру
             
             // Анимируем камеру через презентер
             _ctx.cameraPm?.AnimateCamera();
+            
+            // Запускаем движение мира с постепенным ускорением
+            if (_ctx.worldBlocksPm != null)
+            {
+                _ctx.worldBlocksPm.IsMoving = true;
+            }
+            else
+            {
+                Debug.LogError("WorldBlocksPm is null!");
+            }
         }
 
         private void Jump()
@@ -138,10 +148,12 @@ namespace GameShorts.FlyHumans.Gameplay
                _character.StopCharacter();
             }
             
-            // Останавливаем движение мира через презентер
+            // Останавливаем только движение блоков (спавн новых и удаление старых)
+            // Трафик продолжает работать на существующих блоках
             if (_ctx.worldBlocksPm != null)
             {
                 _ctx.worldBlocksPm.IsMoving = false;
+                Debug.Log("World movement stopped, but traffic continues on existing blocks");
             }
         }
 

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.Tools.Pool;
+using GameShorts.FlyHumans.Logic;
 using GameShorts.FlyHumans.View;
 using LightDI.Runtime;
 using UnityEngine;
@@ -21,13 +23,18 @@ namespace GameShorts.FlyHumans.Presenters
         private Vector3 _movementDirection = Vector3.back; // Мир движется назад
         private bool _isMoving = false;
         private float _currentSpeed;
+        private float _targetSpeed;
+        private float _speedAcceleration = 10f; // Скорость ускорения в единицах в секунду (быстрое ускорение)
         private readonly IPoolManager _poolManager;
+        private readonly Dictionary<WorldBlock, WorldBlockModel> _blockModels = new Dictionary<WorldBlock, WorldBlockModel>();
 
         public bool IsMoving 
         { 
             get => _isMoving; 
             set => _isMoving = value; 
         }
+        
+        public float CurrentSpeed => _currentSpeed;
 
         public WorldBlocksPm(Ctx ctx, [Inject] IPoolManager poolManager)
         {
@@ -41,16 +48,16 @@ namespace GameShorts.FlyHumans.Presenters
             if (_ctx.worldBlocksView != null)
             {
                 _ctx.worldBlocksView.Initialize();
-                _currentSpeed = _ctx.worldBlocksView.WorldSpeed;
+                _currentSpeed = 0f; // Начинаем с нулевой скорости
+                _targetSpeed = _ctx.worldBlocksView.WorldSpeed;
+                
+                // Создаем модель для стартового блока, если он есть
+                if (_ctx.worldBlocksView.StartBlock != null)
+                {
+                    var startBlockModel = new WorldBlockModel(_ctx.worldBlocksView.StartBlock, _poolManager);
+                    _blockModels[_ctx.worldBlocksView.StartBlock] = startBlockModel;
+                }
             }
-        }
-
-        /// <summary>
-        /// Устанавливает скорость движения мира
-        /// </summary>
-        public void SetSpeed(float speed)
-        {
-            _currentSpeed = speed;
         }
 
         /// <summary>
@@ -58,21 +65,51 @@ namespace GameShorts.FlyHumans.Presenters
         /// </summary>
         public void UpdateWorld(float deltaTime)
         {
-            if (!_isMoving || _ctx.worldBlocksView == null) return;
+            if (_ctx.worldBlocksView == null) return;
             
-            // Двигаем все блоки
-            MoveBlocks(deltaTime);
+            // Постепенно увеличиваем скорость до целевой
+            if (_currentSpeed < _targetSpeed)
+            {
+                _currentSpeed = Mathf.Min(_currentSpeed + _speedAcceleration * deltaTime, _targetSpeed);
+                Debug.Log($"Accelerating: Current={_currentSpeed:F2}, Target={_targetSpeed:F2}");
+            }
+            else if (_currentSpeed > _targetSpeed)
+            {
+                _currentSpeed = Mathf.Max(_currentSpeed - _speedAcceleration * deltaTime, _targetSpeed);
+            }
             
-            // Проверяем, нужно ли спавнить новый блок
-            CheckAndSpawnNextBlock();
+            // Двигаем все блоки только если движение включено
+            if (_isMoving)
+            {
+                MoveBlocks(deltaTime);
+                
+                // Проверяем, нужно ли спавнить новый блок
+                CheckAndSpawnNextBlock();
+                
+                // Удаляем блоки, которые ушли за персонажа
+                RemoveOldBlocks();
+            }
+            else
+            {
+                Debug.LogWarning($"World not moving! IsMoving={_isMoving}");
+            }
             
-            // Удаляем блоки, которые ушли за персонажа
-            RemoveOldBlocks();
+            // Обновляем трафик на всех блоках ВСЕГДА (независимо от движения мира)
+            UpdateAllBlocksTraffic(deltaTime);
+        }
+
+        private void UpdateAllBlocksTraffic(float deltaTime)
+        {
+            foreach (var blockModel in _blockModels.Values)
+            {
+                blockModel.UpdateTraffic(deltaTime);
+            }
         }
 
         private void MoveBlocks(float deltaTime)
         {
             Vector3 movement = _movementDirection * _currentSpeed * deltaTime;
+            Debug.Log($"MoveBlocks: Speed={_currentSpeed:F2}, Movement={movement}, BlockCount={_ctx.worldBlocksView.ActiveBlocks.Count}");
             
             foreach (var block in _ctx.worldBlocksView.ActiveBlocks)
             {
@@ -132,6 +169,10 @@ namespace GameShorts.FlyHumans.Presenters
                 Debug.Log($"[Spawn] Spawned '{newBlock.gameObject.name}' after '{previousBlock.gameObject.name}' at position {newBlock.transform.position}");
             }
             
+            // Создаем модель блока с трафиком
+            var blockModel = WorldBlockModelFactory.CreateWorldBlockModel(newBlock);
+            _blockModels[newBlock] = blockModel;
+            
             // Добавляем в список активных
             _ctx.worldBlocksView.AddActiveBlock(newBlock);
             
@@ -161,6 +202,13 @@ namespace GameShorts.FlyHumans.Presenters
                         {
                             Debug.Log($"[RemoveOldBlocks] Removing block at distance: {distanceBehind}");
                             
+                            // Очищаем модель блока и его трафик
+                            if (_blockModels.TryGetValue(block, out var blockModel))
+                            {
+                                blockModel.Dispose();
+                                _blockModels.Remove(block);
+                            }
+                            
                             // ВАЖНО: Сначала удаляем из списка активных, потом возвращаем в пул
                             _ctx.worldBlocksView.RemoveActiveBlock(block);
                             _poolManager.Return(block.gameObject, block.gameObject);
@@ -187,6 +235,14 @@ namespace GameShorts.FlyHumans.Presenters
                 WorldBlock block = activeBlocks[i];
                 if (block != null && block != _ctx.worldBlocksView.StartBlock)
                 {
+                    // Очищаем модель блока и его трафик при удалении блока
+                    if (_blockModels.TryGetValue(block, out var blockModel))
+                    {
+                        Debug.Log($"Disposing traffic for removed block: {block.gameObject.name}");
+                        blockModel.Dispose();
+                        _blockModels.Remove(block);
+                    }
+                    
                     _ctx.worldBlocksView.RemoveActiveBlock(block);
                     Object.Destroy(block.gameObject);
                 }
@@ -204,6 +260,13 @@ namespace GameShorts.FlyHumans.Presenters
 
         protected override void OnDispose()
         {
+            // Очищаем все модели блоков
+            foreach (var blockModel in _blockModels.Values)
+            {
+                blockModel.Dispose();
+            }
+            _blockModels.Clear();
+            
             ResetWorld();
             base.OnDispose();
         }

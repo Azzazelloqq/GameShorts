@@ -14,6 +14,9 @@ namespace GameShorts.FlyHumans.View
         [Header("Trigger Settings")]
         [SerializeField] private float _spawnNextBlockDistance = 20f; // На каком расстоянии от конца блока спавнить следующий
         
+        [Header("Traffic")]
+        [SerializeField] private BlockTrafficView _trafficView; // Трафик на этом блоке (необязательно)
+        
         private bool _hasSpawnedNext = false;
         [SerializeField] private bool _showGizmos;
 
@@ -21,6 +24,7 @@ namespace GameShorts.FlyHumans.View
         public Transform StartPoint => _startPoint;
         public Transform EndPoint => _endPoint;
         public float SpawnNextBlockDistance => _spawnNextBlockDistance;
+        public BlockTrafficView TrafficView => _trafficView;
         public bool HasSpawnedNext 
         { 
             get => _hasSpawnedNext; 

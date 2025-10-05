@@ -39,7 +39,7 @@ namespace GameShorts.FlyHumans.Logic
                 AddDispose(_cameraPm);
             }
             
-            // Создаем World Blocks Presenter
+            // Создаем World Blocks Presenter (включая трафик на блоках)
             if (_ctx.sceneContextView.WorldBlocksView != null && _ctx.sceneContextView.Character != null)
             {
                 _worldBlocksPm = WorldBlocksPmFactory.CreateWorldBlocksPm(new WorldBlocksPm.Ctx
