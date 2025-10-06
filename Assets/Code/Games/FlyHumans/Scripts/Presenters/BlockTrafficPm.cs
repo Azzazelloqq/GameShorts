@@ -21,8 +21,13 @@ namespace GameShorts.FlyHumans.Presenters
 
         private readonly Ctx _ctx;
         private readonly IPoolManager _poolManager;
-        private readonly List<VehicleModel> _activeVehicles = new List<VehicleModel>();
-        private readonly List<VehicleModel> _activeAirplanes = new List<VehicleModel>();
+        
+        // Словарь для хранения активных машин: ключ - префаб, значение - список объектов этого префаба
+        private readonly Dictionary<GameObject, List<VehicleModel>> _activeVehicles = new Dictionary<GameObject, List<VehicleModel>>();
+        
+        // Словарь для хранения активных самолетов: ключ - префаб, значение - список объектов этого префаба
+        private readonly Dictionary<GameObject, List<VehicleModel>> _activeAirplanes = new Dictionary<GameObject, List<VehicleModel>>();
+        
         private float _airplaneSpawnTimer;
         private int _spawnedAirplanesCount;
         private bool _isRunning;
@@ -69,14 +74,20 @@ namespace GameShorts.FlyHumans.Presenters
         {
             _isRunning = false;
             
-            foreach (var vehicle in _activeVehicles)
+            foreach (var vehicleList in _activeVehicles.Values)
             {
-                vehicle.Stop();
+                foreach (var vehicle in vehicleList)
+                {
+                    vehicle.Stop();
+                }
             }
             
-            foreach (var airplane in _activeAirplanes)
+            foreach (var airplaneList in _activeAirplanes.Values)
             {
-                airplane.Stop();
+                foreach (var airplane in airplaneList)
+                {
+                    airplane.Stop();
+                }
             }
         }
 
@@ -96,23 +107,26 @@ namespace GameShorts.FlyHumans.Presenters
 
         private void UpdateVehicles(float deltaTime)
         {
-            for (int i = _activeVehicles.Count - 1; i >= 0; i--)
+            foreach (var vehicleList in _activeVehicles.Values)
             {
-                var vehicle = _activeVehicles[i];
-                
-                // Обновляем движение
-                vehicle.Update(deltaTime);
+                for (int i = vehicleList.Count - 1; i >= 0; i--)
+                {
+                    var vehicle = vehicleList[i];
+                    
+                    // Обновляем движение
+                    vehicle.Update(deltaTime);
 
-                // Если машина только что остановилась, устанавливаем задержку
-                if (vehicle.JustStopped)
-                {
-                    vehicle.SetRestartDelay(_ctx.trafficView.VehicleRestartDelay);
-                }
-                
-                // Проверяем, нужно ли перезапустить машину на новом пути
-                if (vehicle.NeedsRestart)
-                {
-                    RestartVehicleOnRandomPath(vehicle);
+                    // Если машина только что остановилась, устанавливаем задержку
+                    if (vehicle.JustStopped)
+                    {
+                        vehicle.SetRestartDelay(_ctx.trafficView.VehicleRestartDelay);
+                    }
+                    
+                    // Проверяем, нужно ли перезапустить машину на новом пути
+                    if (vehicle.NeedsRestart)
+                    {
+                        RestartVehicleOnRandomPath(vehicle);
+                    }
                 }
             }
         }
@@ -133,24 +147,30 @@ namespace GameShorts.FlyHumans.Presenters
             }
 
             // Обновляем существующие самолеты
-            for (int i = _activeAirplanes.Count - 1; i >= 0; i--)
+            foreach (var kvp in _activeAirplanes)
             {
-                var airplane = _activeAirplanes[i];
+                var prefab = kvp.Key;
+                var airplaneList = kvp.Value;
                 
-                // Обновляем движение
-                airplane.Update(deltaTime);
-
-                // Когда самолет завершает путь, удаляем его и спавним новый через интервал
-                if (airplane.JustStopped)
+                for (int i = airplaneList.Count - 1; i >= 0; i--)
                 {
-                    _activeAirplanes.RemoveAt(i);
+                    var airplane = airplaneList[i];
                     
-                    if (airplane.GameObject != null)
+                    // Обновляем движение
+                    airplane.Update(deltaTime);
+
+                    // Когда самолет завершает путь, удаляем его и спавним новый через интервал
+                    if (airplane.JustStopped)
                     {
-                        _poolManager.Return(airplane.GameObject, airplane.GameObject);
+                        airplaneList.RemoveAt(i);
+                        
+                        if (airplane.GameObject != null)
+                        {
+                            _poolManager.Return(airplane.GameObject, airplane.GameObject);
+                        }
+                        
+                        _spawnedAirplanesCount--;
                     }
-                    
-                    _spawnedAirplanesCount--;
                 }
             }
         }
@@ -182,7 +202,12 @@ namespace GameShorts.FlyHumans.Presenters
             float speed = Random.Range(_ctx.trafficView.VehicleMinSpeed, _ctx.trafficView.VehicleMaxSpeed);
             vehicleModel.Initialize(randomPath, speed);
 
-            _activeVehicles.Add(vehicleModel);
+            // Добавляем в словарь по ключу префаба
+            if (!_activeVehicles.ContainsKey(randomPrefab))
+            {
+                _activeVehicles[randomPrefab] = new List<VehicleModel>();
+            }
+            _activeVehicles[randomPrefab].Add(vehicleModel);
         }
 
         private void SpawnRandomAirplane()
@@ -212,7 +237,12 @@ namespace GameShorts.FlyHumans.Presenters
             float speed = Random.Range(_ctx.trafficView.AirplaneMinSpeed, _ctx.trafficView.AirplaneMaxSpeed);
             airplaneModel.Initialize(randomPath, speed);
 
-            _activeAirplanes.Add(airplaneModel);
+            // Добавляем в словарь по ключу префаба
+            if (!_activeAirplanes.ContainsKey(randomPrefab))
+            {
+                _activeAirplanes[randomPrefab] = new List<VehicleModel>();
+            }
+            _activeAirplanes[randomPrefab].Add(airplaneModel);
             _spawnedAirplanesCount++;
         }
 
@@ -236,21 +266,27 @@ namespace GameShorts.FlyHumans.Presenters
         private void ClearAllVehicles()
         {
             // Очищаем машины
-            foreach (var vehicle in _activeVehicles)
+            foreach (var vehicleList in _activeVehicles.Values)
             {
-                if (vehicle.GameObject != null)
+                foreach (var vehicle in vehicleList)
                 {
-                    _poolManager.Return(vehicle.GameObject, vehicle.GameObject);
+                    if (vehicle.GameObject != null)
+                    {
+                        _poolManager.Return(vehicle.GameObject, vehicle.GameObject);
+                    }
                 }
             }
             _activeVehicles.Clear();
 
             // Очищаем самолеты
-            foreach (var airplane in _activeAirplanes)
+            foreach (var airplaneList in _activeAirplanes.Values)
             {
-                if (airplane.GameObject != null)
+                foreach (var airplane in airplaneList)
                 {
-                    _poolManager.Return(airplane.GameObject, airplane.GameObject);
+                    if (airplane.GameObject != null)
+                    {
+                        _poolManager.Return(airplane.GameObject, airplane.GameObject);
+                    }
                 }
             }
             _activeAirplanes.Clear();
