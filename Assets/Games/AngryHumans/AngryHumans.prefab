@@ -686,7 +686,6 @@ MonoBehaviour:
   _humanFactory: {fileID: 7136296140998240550}
   _launchPlatform: {fileID: 3714849172571880035}
   _launchController: {fileID: 4439534651572777762}
-  _trajectoryDisplay: {fileID: 2153048092568445836}
   _inputHandler: {fileID: 8799301309195710164}
   _targetManager: {fileID: 7962202022187649927}
 --- !u!114 &7136296140998240550
@@ -826,15 +825,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a18b4ff944829eb4faa9549e62a2f001, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AngryHumans::Code.Games.AngryHumans.LaunchController
-  _launchForceMultiplier: 10
-  _maxLaunchForce: 60
-  _maxLaunchAngle: 30
-  _maxHorizontalDeviation: 35
+  _swipeForceMultiplier: 0.01
+  _maxLaunchForce: 25
+  _minSwipeSpeed: 1
+  _verticalToForwardRatio: 0.383
+  _baseForwardForce: 1
+  _velocitySamples: 5
+  _velocityTimeWindow: 0.1
+  _gameCamera: {fileID: 7602851814224093430}
+  _launchPlatform: {fileID: 3714849172571880035}
   _dragForce: 500
   _dragDamping: 10
-  _gameCamera: {fileID: 7602851814224093430}
-  _trajectoryDisplay: {fileID: 2153048092568445836}
-  _launchPlatform: {fileID: 3714849172571880035}
 --- !u!114 &2153048092568445836
 MonoBehaviour:
   m_ObjectHideFlags: 0

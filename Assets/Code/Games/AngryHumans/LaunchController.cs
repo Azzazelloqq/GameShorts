@@ -9,23 +9,24 @@ internal class LaunchController : MonoBehaviour
 	[Header("Swipe Throw Settings")]
 	[SerializeField]
 	[Tooltip("Множитель силы броска от скорости свайпа")]
-	private float _swipeForceMultiplier = 2f;
+	private float _swipeForceMultiplier = 0.05f;
 
 	[SerializeField]
 	[Tooltip("Максимальная сила броска")]
 	private float _maxLaunchForce = 30f;
 
 	[SerializeField]
-	[Tooltip("Минимальная скорость свайпа для броска (в мировых единицах/секунду)")]
-	private float _minSwipeSpeed = 1f;
+	[Tooltip("Минимальная скорость экранного свайпа для броска (пиксели/секунду)")]
+	private float _minSwipeSpeed = 100f;
 
 	[SerializeField]
-	[Tooltip("Максимальный угол запуска в градусах (0 = горизонтально, 90 = вертикально)")]
-	private float _maxLaunchAngle = 60f;
+	[Range(0f, 1f)]
+	[Tooltip("Баланс между высотой и глубиной: 0 = чисто вперед, 1 = чисто вверх")]
+	private float _verticalToForwardRatio = 0.5f;
 
 	[SerializeField]
-	[Tooltip("Максимальное отклонение влево/вправо в градусах")]
-	private float _maxHorizontalDeviation = 35f;
+	[Tooltip("Базовая сила броска вперед (независимо от свайпа)")]
+	private float _baseForwardForce = 15f;
 
 	[Header("Swipe Tracking")]
 	[SerializeField]
@@ -53,6 +54,10 @@ internal class LaunchController : MonoBehaviour
 	private List<Vector3> _swipePositions = new List<Vector3>();
 	private List<float> _swipeTimes = new List<float>();
 	private Vector3 _lastSwipeVelocity;
+	
+	// Для отслеживания экранного свайпа
+	private List<Vector2> _screenSwipePositions = new List<Vector2>();
+	private List<float> _screenSwipeTimes = new List<float>();
 	
 	[Header("Drag Physics")]
 	[SerializeField]
@@ -109,11 +114,18 @@ internal class LaunchController : MonoBehaviour
 		_isDragging = true;
 		_targetDragPosition = worldPosition;
 		
-		// Инициализируем отслеживание свайпа
+		// Инициализируем отслеживание свайпа (мировые координаты для перетаскивания)
 		_swipePositions.Clear();
 		_swipeTimes.Clear();
 		_swipePositions.Add(worldPosition);
 		_swipeTimes.Add(Time.time);
+		
+		// Инициализируем отслеживание экранного свайпа (для расчета направления броска)
+		_screenSwipePositions.Clear();
+		_screenSwipeTimes.Clear();
+		_screenSwipePositions.Add(eventData.position);
+		_screenSwipeTimes.Add(Time.time);
+		
 		_lastSwipeVelocity = Vector3.zero;
 	}
 
@@ -130,7 +142,7 @@ internal class LaunchController : MonoBehaviour
 		// Обновляем целевую позицию для физического перетаскивания
 		_targetDragPosition = worldPosition;
 		
-		// Добавляем новую позицию в историю свайпа
+		// Добавляем новую позицию в историю свайпа (мировые координаты)
 		_swipePositions.Add(worldPosition);
 		_swipeTimes.Add(currentTime);
 		
@@ -141,8 +153,23 @@ internal class LaunchController : MonoBehaviour
 			_swipeTimes.RemoveAt(0);
 		}
 		
-		// Вычисляем текущую скорость свайпа
-		_lastSwipeVelocity = CalculateSwipeVelocity();
+		// Добавляем экранную позицию для расчета направления броска
+		_screenSwipePositions.Add(eventData.position);
+		_screenSwipeTimes.Add(currentTime);
+		
+		while (_screenSwipePositions.Count > _velocitySamples)
+		{
+			_screenSwipePositions.RemoveAt(0);
+			_screenSwipeTimes.RemoveAt(0);
+		}
+		
+		// Визуализация направления для отладки
+		if (_swipePositions.Count > 1)
+		{
+			var startPos = _swipePositions[0];
+			var endPos = _swipePositions[_swipePositions.Count - 1];
+			Debug.DrawLine(startPos, endPos, Color.yellow, 0.1f);
+		}
 	}
 
 	private void FixedUpdate()
@@ -177,20 +204,34 @@ internal class LaunchController : MonoBehaviour
 
 		_isDragging = false;
 
-		// Вычисляем финальную скорость свайпа
-		var swipeVelocity = CalculateSwipeVelocity();
-		
-		// Проверяем минимальную скорость свайпа
-		if (swipeVelocity.magnitude < _minSwipeSpeed)
+		// Проверяем минимальную дельту свайпа в экранных координатах
+		if (_screenSwipePositions.Count < 2)
 		{
-			Debug.Log($"Swipe too slow ({swipeVelocity.magnitude:F2}), not launching. Minimum: {_minSwipeSpeed}");
-			
-			// Просто отпускаем человечка - он остается с текущей физикой
+			Debug.Log("No swipe detected");
 			_grabbedPoint = null;
 			_grabbedRigidbody = null;
 			_currentHuman = null;
 			return;
 		}
+		
+		var startScreenPos = _screenSwipePositions[0];
+		var endScreenPos = _screenSwipePositions[_screenSwipePositions.Count - 1];
+		var screenDelta = endScreenPos - startScreenPos;
+		var deltaTime = _screenSwipeTimes[_screenSwipeTimes.Count - 1] - _screenSwipeTimes[0];
+		var screenSpeed = screenDelta.magnitude / Mathf.Max(deltaTime, 0.001f);
+		
+		// Проверяем минимальную скорость свайпа (в пикселях в секунду)
+		if (screenSpeed < _minSwipeSpeed)
+		{
+			Debug.Log($"Swipe too slow ({screenSpeed:F0}px/s), not launching. Minimum: {_minSwipeSpeed}px/s");
+			_grabbedPoint = null;
+			_grabbedRigidbody = null;
+			_currentHuman = null;
+			return;
+		}
+
+		// Вычисляем финальную скорость свайпа из экранных координат
+		var swipeVelocity = CalculateSwipeVelocityFromScreen();
 
 		// Обнуляем скорость перед броском, чтобы не было остаточной скорости от перетаскивания
 		if (_grabbedRigidbody != null)
@@ -200,7 +241,18 @@ internal class LaunchController : MonoBehaviour
 		}
 
 		var launchVelocity = CalculateLaunchVelocity(swipeVelocity);
-		Debug.Log($"Swipe velocity: {swipeVelocity.magnitude:F1} -> Launch velocity: {launchVelocity.magnitude:F1}, direction: {launchVelocity.normalized}");
+		
+		// Отладочная информация
+		Debug.Log($"=== LAUNCH ===");
+		Debug.Log($"Screen: {screenDelta} ({screenSpeed:F0}px/s)");
+		Debug.Log($"Launch: speed={launchVelocity.magnitude:F1}, dir={launchVelocity.normalized}");
+		Debug.Log($"  X(right)={launchVelocity.x:F1}, Y(up)={launchVelocity.y:F1}, Z(forward)={launchVelocity.z:F1}");
+		
+		// Визуализация направления броска
+		var launchStartPos = _grabbedPoint.position;
+		Debug.DrawRay(launchStartPos, launchVelocity * 0.5f, Color.red, 5f);          // Полный вектор броска (красный)
+		Debug.DrawRay(launchStartPos, Vector3.up * launchVelocity.y * 0.5f, Color.green, 5f);  // Вертикальная компонента (зеленый)
+		Debug.DrawRay(launchStartPos, new Vector3(launchVelocity.x, 0, launchVelocity.z) * 0.5f, Color.blue, 5f);  // Горизонтальная компонента (синий)
 		
 		_currentHuman.Launch(_grabbedPoint, launchVelocity);
 
@@ -255,65 +307,79 @@ internal class LaunchController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Преобразует скорость свайпа в скорость броска с учетом ограничений
+	/// Вычисляет скорость свайпа из экранных координат и преобразует в мировое направление
+	/// </summary>
+	private Vector3 CalculateSwipeVelocityFromScreen()
+	{
+		if (_screenSwipePositions.Count < 2)
+		{
+			return Vector3.zero;
+		}
+		
+		// Берем первую и последнюю позицию свайпа
+		var startScreenPos = _screenSwipePositions[0];
+		var endScreenPos = _screenSwipePositions[_screenSwipePositions.Count - 1];
+		var screenDelta = endScreenPos - startScreenPos;
+		
+		var startTime = _screenSwipeTimes[0];
+		var endTime = _screenSwipeTimes[_screenSwipeTimes.Count - 1];
+		var deltaTime = endTime - startTime;
+		
+		if (deltaTime < 0.001f || screenDelta.magnitude < 1f)
+		{
+			return Vector3.zero;
+		}
+		
+		// Скорость свайпа в пикселях в секунду
+		var screenVelocity = screenDelta / deltaTime;
+		
+		// Получаем векторы камеры
+		var cameraRight = _gameCamera.transform.right;
+		var cameraUp = _gameCamera.transform.up;
+		var cameraForward = _gameCamera.transform.forward;
+		
+		// Горизонтальное направление камеры (без наклона)
+		var horizontalForward = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
+		
+		// Преобразуем экранную скорость в мировое направление
+		// X экрана → влево/вправо (camera.right)
+		var rightComponent = cameraRight * screenVelocity.x;
+		
+		// Y экрана → комбинация вверх и вперед в зависимости от _verticalToForwardRatio
+		// Положительный Y (свайп вверх) всегда учитываем
+		var verticalInput = screenVelocity.y;
+		
+		// Вертикальная компонента (вверх в мире)
+		var upComponent = Vector3.up * verticalInput * _verticalToForwardRatio;
+		
+		// Компонента вперед (горизонтальное направление камеры)
+		var forwardComponent = horizontalForward * verticalInput * (1f - _verticalToForwardRatio);
+		
+		// Суммируем все компоненты
+		var worldVelocity = rightComponent + upComponent + forwardComponent;
+		
+		// Добавляем базовую силу вперед
+		worldVelocity += horizontalForward * _baseForwardForce;
+		
+		Debug.Log($"Screen swipe: {screenDelta} = X:{screenVelocity.x:F0} Y:{screenVelocity.y:F0} px/s");
+		Debug.Log($"World velocity: {worldVelocity}, mag: {worldVelocity.magnitude:F1}");
+		Debug.Log($"Ratio: vertical={_verticalToForwardRatio:F2}, forward={1f - _verticalToForwardRatio:F2}");
+		
+		return worldVelocity;
+	}
+
+	/// <summary>
+	/// Преобразует скорость свайпа в скорость броска
 	/// </summary>
 	private Vector3 CalculateLaunchVelocity(Vector3 swipeVelocity)
 	{
-		// Применяем множитель силы
+		// Просто применяем множитель - никаких ограничений!
 		var velocity = swipeVelocity * _swipeForceMultiplier;
 		
-		// Ограничиваем максимальную силу броска
+		// Ограничиваем только максимальную силу
 		if (velocity.magnitude > _maxLaunchForce)
 		{
 			velocity = velocity.normalized * _maxLaunchForce;
-		}
-		
-		// Горизонтальная проекция скорости (на плоскость XZ)
-		var horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
-		var horizontalSpeed = horizontalVelocity.magnitude;
-		
-		if (horizontalSpeed > 0.01f)
-		{
-			// 1. Ограничиваем вертикальный угол
-			var verticalAngle = Mathf.Atan2(velocity.y, horizontalSpeed) * Mathf.Rad2Deg;
-			
-			if (verticalAngle > _maxLaunchAngle)
-			{
-				var angleRad = _maxLaunchAngle * Mathf.Deg2Rad;
-				var totalSpeed = velocity.magnitude;
-				var newHorizontalSpeed = totalSpeed * Mathf.Cos(angleRad);
-				var newVerticalSpeed = totalSpeed * Mathf.Sin(angleRad);
-				
-				// Масштабируем горизонтальные компоненты
-				var scale = newHorizontalSpeed / horizontalSpeed;
-				velocity.x *= scale;
-				velocity.z *= scale;
-				velocity.y = newVerticalSpeed;
-				
-				horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
-				horizontalSpeed = newHorizontalSpeed;
-			}
-			
-			// 2. Ограничиваем горизонтальное отклонение
-			// Базовое направление "вперед" - это направление от камеры в горизонтальной плоскости
-			var cameraForward = _gameCamera.transform.forward;
-			var forwardHorizontal = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
-			
-			if (forwardHorizontal.magnitude > 0.1f)
-			{
-				var currentHorizontalDir = horizontalVelocity.normalized;
-				var angleFromForward = Vector3.SignedAngle(forwardHorizontal, currentHorizontalDir, Vector3.up);
-				
-				// Ограничиваем угол
-				if (Mathf.Abs(angleFromForward) > _maxHorizontalDeviation)
-				{
-					var clampedAngle = Mathf.Clamp(angleFromForward, -_maxHorizontalDeviation, _maxHorizontalDeviation);
-					var limitedDir = Quaternion.AngleAxis(clampedAngle, Vector3.up) * forwardHorizontal;
-					
-					velocity.x = limitedDir.x * horizontalSpeed;
-					velocity.z = limitedDir.z * horizontalSpeed;
-				}
-			}
 		}
 		
 		return velocity;
@@ -321,18 +387,17 @@ internal class LaunchController : MonoBehaviour
 
 	private Vector3 GetWorldPosition(Vector2 screenPosition)
 	{
-		// Создаем плоскость, параллельную виду камеры, проходящую через позицию платформы
+		// Для корректного определения направления свайпа используем фиксированное расстояние от камеры
+		// Это гарантирует, что движение пальца по экрану напрямую соответствует направлению в 3D пространстве
 		var platformPosition = _launchPlatform != null ? _launchPlatform.GetSpawnPosition() : Vector3.zero;
-		var plane = new Plane(-_gameCamera.transform.forward, platformPosition);
-		var ray = _gameCamera.ScreenPointToRay(screenPosition);
 		
-		if (plane.Raycast(ray, out var distance))
-		{
-			return ray.GetPoint(distance);
-		}
+		// Вычисляем расстояние от камеры до платформы
+		var distanceFromCamera = Vector3.Distance(_gameCamera.transform.position, platformPosition);
 		
-		// Fallback if raycast fails
-		var worldPosition = _gameCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 10f));
+		// Преобразуем экранную позицию в мировую на том же расстоянии от камеры
+		var screenPoint = new Vector3(screenPosition.x, screenPosition.y, distanceFromCamera);
+		var worldPosition = _gameCamera.ScreenToWorldPoint(screenPoint);
+		
 		return worldPosition;
 	}
 
@@ -345,6 +410,8 @@ internal class LaunchController : MonoBehaviour
 		
 		_swipePositions.Clear();
 		_swipeTimes.Clear();
+		_screenSwipePositions.Clear();
+		_screenSwipeTimes.Clear();
 		_lastSwipeVelocity = Vector3.zero;
 	}
 }
