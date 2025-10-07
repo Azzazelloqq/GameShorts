@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1473827035137433765
+--- !u!1 &881693389112038152
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,46 +8,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6420170888913097662}
-  - component: {fileID: 1620740994472320438}
-  - component: {fileID: 5162399084365486258}
+  - component: {fileID: 1623552450937236695}
+  - component: {fileID: 5133243162920331145}
+  - component: {fileID: 8173415352925320603}
   m_Layer: 0
-  m_Name: EaglePlane_LeftWheel
+  m_Name: EaglePlane_RightWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6420170888913097662
+--- !u!4 &1623552450937236695
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473827035137433765}
+  m_GameObject: {fileID: 881693389112038152}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.00000005960465, z: -0, w: 1}
-  m_LocalPosition: {x: -0.15794362, y: 0.0022565757, z: -0.1878592}
+  m_LocalPosition: {x: -0.15794362, y: 0.0022565757, z: 0.1878592}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4913082653434189679}
+  m_Father: {fileID: 4881140483684469652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1620740994472320438
+--- !u!33 &5133243162920331145
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473827035137433765}
-  m_Mesh: {fileID: -8056481356816246745, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
---- !u!23 &5162399084365486258
+  m_GameObject: {fileID: 881693389112038152}
+  m_Mesh: {fileID: -6983146851942928028, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
+--- !u!23 &8173415352925320603
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473827035137433765}
+  m_GameObject: {fileID: 881693389112038152}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -89,7 +89,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5721003125740162517
+--- !u!1 &2891364150209412119
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,10 +97,99 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4913082653434189679}
-  - component: {fileID: 8322965685870991562}
-  - component: {fileID: 6081524673656122368}
-  - component: {fileID: 5803812191120942654}
+  - component: {fileID: 6511190393567989397}
+  - component: {fileID: 6918889074107218855}
+  - component: {fileID: 5166108675000021234}
+  m_Layer: 0
+  m_Name: EaglePlane_FrontPropeller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6511190393567989397
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2891364150209412119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.00000005960465, z: -0, w: 1}
+  m_LocalPosition: {x: -0.38820273, y: 0.21893072, z: 0.00012459213}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4881140483684469652}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6918889074107218855
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2891364150209412119}
+  m_Mesh: {fileID: -4386797457950771943, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
+--- !u!23 &5166108675000021234
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2891364150209412119}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: -13878747981224875, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &4050164448330028347
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4881140483684469652}
+  - component: {fileID: 322007226926672677}
+  - component: {fileID: 4710021135080353488}
+  - component: {fileID: 4231519134758715338}
   m_Layer: 0
   m_Name: EaglePlane
   m_TagString: Untagged
@@ -108,40 +197,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4913082653434189679
+--- !u!4 &4881140483684469652
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5721003125740162517}
+  m_GameObject: {fileID: 4050164448330028347}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.70710677, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 15, y: 15, z: 15}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 5251638254733894833}
-  - {fileID: 615010087132965700}
-  - {fileID: 6420170888913097662}
-  - {fileID: 8056250375173759593}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &8322965685870991562
+  - {fileID: 4884527550262597041}
+  - {fileID: 6511190393567989397}
+  - {fileID: 7060544451096267816}
+  - {fileID: 1623552450937236695}
+  m_Father: {fileID: 8402579609885307107}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!33 &322007226926672677
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5721003125740162517}
+  m_GameObject: {fileID: 4050164448330028347}
   m_Mesh: {fileID: 7290677456632681762, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
---- !u!23 &6081524673656122368
+--- !u!23 &4710021135080353488
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5721003125740162517}
+  m_GameObject: {fileID: 4050164448330028347}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -183,13 +272,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5803812191120942654
-CapsuleCollider:
+--- !u!65 &4231519134758715338
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5721003125740162517}
+  m_GameObject: {fileID: 4050164448330028347}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -201,12 +290,10 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.13
-  m_Height: 0.96
-  m_Direction: 0
-  m_Center: {x: 0, y: 0.21, z: 0}
---- !u!1 &7548437514625025048
+  serializedVersion: 3
+  m_Size: {x: 1.1821395, y: 0.38999167, z: 1.5373197}
+  m_Center: {x: 0.13242555, y: 0.19411336, z: 0}
+--- !u!1 &4221413250188971210
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,46 +301,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8056250375173759593}
-  - component: {fileID: 4839794768926407607}
-  - component: {fileID: 3822897197099816759}
+  - component: {fileID: 7060544451096267816}
+  - component: {fileID: 662316401276001010}
+  - component: {fileID: 233034166816893076}
   m_Layer: 0
-  m_Name: EaglePlane_RightWheel
+  m_Name: EaglePlane_LeftWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8056250375173759593
+--- !u!4 &7060544451096267816
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7548437514625025048}
+  m_GameObject: {fileID: 4221413250188971210}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.00000005960465, z: -0, w: 1}
-  m_LocalPosition: {x: -0.15794362, y: 0.0022565757, z: 0.1878592}
+  m_LocalPosition: {x: -0.15794362, y: 0.0022565757, z: -0.1878592}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4913082653434189679}
+  m_Father: {fileID: 4881140483684469652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4839794768926407607
+--- !u!33 &662316401276001010
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7548437514625025048}
-  m_Mesh: {fileID: -6983146851942928028, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
---- !u!23 &3822897197099816759
+  m_GameObject: {fileID: 4221413250188971210}
+  m_Mesh: {fileID: -8056481356816246745, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
+--- !u!23 &233034166816893076
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7548437514625025048}
+  m_GameObject: {fileID: 4221413250188971210}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -295,7 +382,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &7577544645469703758
+--- !u!1 &7828200653024412974
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -303,98 +390,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 615010087132965700}
-  - component: {fileID: 1222011947282299177}
-  - component: {fileID: 7801818297547229228}
-  m_Layer: 0
-  m_Name: EaglePlane_FrontPropeller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &615010087132965700
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7577544645469703758}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.00000005960465, z: -0, w: 1}
-  m_LocalPosition: {x: -0.38820273, y: 0.21893072, z: 0.00012459213}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4913082653434189679}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1222011947282299177
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7577544645469703758}
-  m_Mesh: {fileID: -4386797457950771943, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
---- !u!23 &7801818297547229228
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7577544645469703758}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: -13878747981224875, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &8581226815463879221
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5251638254733894833}
-  - component: {fileID: 910163488958235678}
-  - component: {fileID: 29212379481618036}
+  - component: {fileID: 4884527550262597041}
+  - component: {fileID: 1085326754170980116}
+  - component: {fileID: 3911865766706235669}
   m_Layer: 0
   m_Name: EaglePlane_BackWheel
   m_TagString: Untagged
@@ -402,36 +400,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5251638254733894833
+--- !u!4 &4884527550262597041
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8581226815463879221}
+  m_GameObject: {fileID: 7828200653024412974}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.00000005960465, z: -0, w: 1}
   m_LocalPosition: {x: 0.6969967, y: 0.118997246, z: 0.00018020981}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4913082653434189679}
+  m_Father: {fileID: 4881140483684469652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &910163488958235678
+--- !u!33 &1085326754170980116
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8581226815463879221}
+  m_GameObject: {fileID: 7828200653024412974}
   m_Mesh: {fileID: -2086876649160450230, guid: 1657bf789360cc84d9a407900d2c929e, type: 3}
---- !u!23 &29212379481618036
+--- !u!23 &3911865766706235669
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8581226815463879221}
+  m_GameObject: {fileID: 7828200653024412974}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -473,3 +471,35 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8395862288923510002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8402579609885307107}
+  m_Layer: 0
+  m_Name: EaglePlane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8402579609885307107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395862288923510002}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4881140483684469652}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -64,6 +64,20 @@ namespace Code.Core.Tools.Pool
 			GameObjectPool pool = CreateOrGetPool(prefab);
 			return pool?.Get(position, rotateDig);
 		}
+		public GameObject Get(GameObject prefab, Vector3 position, Quaternion rotate)
+		{
+			if (isDisposed)
+				return null;
+			GameObjectPool pool = CreateOrGetPool(prefab);
+			return pool?.Get(position, rotate);
+		}
+		public GameObject Get(GameObject prefab, Vector3 position, Transform parent , Quaternion rotate)
+		{
+			if (isDisposed)
+				return null;
+			GameObjectPool pool = CreateOrGetPool(prefab);
+			return pool?.Get(position, parent, rotate);
+		}
 
 		public void Return(GameObject prefab, GameObject obj)
 		{

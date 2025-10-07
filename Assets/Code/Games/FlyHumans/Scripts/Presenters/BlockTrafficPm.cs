@@ -187,9 +187,14 @@ namespace GameShorts.FlyHumans.Presenters
                 Random.Range(0, _ctx.trafficView.VehiclePaths.Count)
             ];
 
+
+            var startRotate = randomPath.Waypoints[1].transform.position
+                              - randomPath.Waypoints[0].transform.position;
+            var rotateQuat = Quaternion.LookRotation(startRotate, Vector3.up);
+
             // Получаем машину из пула
-            GameObject vehicleObj = _poolManager.Get(randomPrefab, _ctx.trafficView.VehiclesContainer);
-            
+            GameObject vehicleObj = _poolManager.Get(randomPrefab, randomPath.Waypoints[0].transform.position,
+                _ctx.trafficView.VehiclesContainer, rotateQuat);
             // Получаем или добавляем VehicleView
             VehicleView vehicleView = vehicleObj.GetComponent<VehicleView>();
             if (vehicleView == null)
@@ -222,8 +227,15 @@ namespace GameShorts.FlyHumans.Presenters
                 Random.Range(0, _ctx.trafficView.AirplanePaths.Count)
             ];
 
+            var startRotate = randomPath.Waypoints[1].transform.position
+                              - randomPath.Waypoints[0].transform.position;
+            
+            startRotate.Normalize();
+            var rotateQuat = Quaternion.LookRotation(startRotate, Vector3.up);
+
             // Получаем самолет из пула
-            GameObject airplaneObj = _poolManager.Get(randomPrefab, _ctx.trafficView.AirplanesContainer);
+            GameObject airplaneObj = _poolManager.Get(randomPrefab, randomPath.Waypoints[0].transform.position,
+                _ctx.trafficView.AirplanesContainer, rotateQuat);
             
             // Получаем или добавляем VehicleView
             VehicleView airplaneView = airplaneObj.GetComponent<VehicleView>();

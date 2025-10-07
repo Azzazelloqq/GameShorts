@@ -18,6 +18,7 @@ namespace GameShorts.FlyHumans.Gameplay
         [Header("Movement Settings")]
         [SerializeField] private float _jumpForce = 5f;
         [SerializeField] private float _gravity = 9.8f;
+        [SerializeField] private float _maxHeight = 10f;
         
         private float _verticalVelocity;
         private bool _wasFlying;
@@ -90,8 +91,11 @@ namespace GameShorts.FlyHumans.Gameplay
             // Движение только вверх/вниз
             movement += Vector3.up * _verticalVelocity * deltaTime;
 
+            var newPos = _characterTransform.position;
             // Обновляем позицию персонажа
-            _characterTransform.position += movement;
+            newPos += movement;
+            newPos.y = Mathf.Min(_maxHeight,  newPos.y);
+            _characterTransform.position = newPos;
             _characterTransform.rotation = _initialRotation;
         }
         

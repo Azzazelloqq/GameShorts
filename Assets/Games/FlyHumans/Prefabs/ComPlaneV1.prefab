@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1856216891051664401}
   - component: {fileID: 3345401535444675508}
   - component: {fileID: 687282389745475454}
-  - component: {fileID: 6832311805619950485}
+  - component: {fileID: 107715973469234192}
   m_Layer: 0
   m_Name: ComPlaneV1
   m_TagString: Untagged
@@ -96,8 +96,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &6832311805619950485
-CapsuleCollider:
+--- !u!65 &107715973469234192
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -114,11 +114,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.22
-  m_Height: 3.22
-  m_Direction: 2
-  m_Center: {x: 0, y: 0.21, z: -0.1386593}
+  serializedVersion: 3
+  m_Size: {x: 2.202385, y: 0.5999952, z: 2.88}
+  m_Center: {x: 0, y: 0.39472133, z: -0.13865931}
 --- !u!1 &4915230887818450644
 GameObject:
   m_ObjectHideFlags: 0

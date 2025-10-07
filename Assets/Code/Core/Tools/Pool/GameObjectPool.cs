@@ -89,6 +89,33 @@ namespace Code.Core.Tools.Pool
 			gameObject.gameObject.SetActive(true);
 			return gameObject;
 		}
+
+		public GameObject Get(Vector3 position, Transform parent, Quaternion rotate)
+		{
+			if (_disposed)
+				return null;
+				
+			var gameObject = _pool.Get();
+			gameObject.transform.SetParent(parent);
+			gameObject.transform.localPosition = Vector3.zero;
+			gameObject.transform.localRotation = Quaternion.identity;
+			gameObject.transform.position = position;
+			gameObject.transform.rotation = rotate;
+			gameObject.gameObject.SetActive(true);
+			return gameObject;
+		}
+		public GameObject Get(Vector3 position, Quaternion rotate)
+		{
+			if (_disposed)
+				return null;
+				
+			var gameObject = _pool.Get();
+			gameObject.transform.position = position;
+			gameObject.transform.rotation = rotate;
+			
+			gameObject.gameObject.SetActive(true);
+			return gameObject;
+		}
 		public void Return(GameObject element)
 		{
 			if (_disposed)
