@@ -28,6 +28,8 @@ namespace GameShorts.FlyHumans.Gameplay
         private IDisposable _updateSubscription;
         private IDisposable _jumpTrigger;
         private IDisposable _inputSubscription;
+        private IDisposable _resetDelaySubscription;
+        private bool _collided;
 
         public FlyHumansGameplayPm(Ctx ctx)
         {
@@ -46,15 +48,7 @@ namespace GameShorts.FlyHumans.Gameplay
                 _character.RagdollRoot.CollisionEnter = OnRagdollCollision;
                 
                 // Подписываемся на анимацию старта
-                foreach (var obs in _character.Animator.GetBehaviours<ObservableStateMachineTrigger>())
-                {
-                    _jumpTrigger = obs.OnStateEnterAsObservable()
-                        .Subscribe(_ =>
-                        {
-                            InitGravity();
-                            _jumpTrigger?.Dispose();
-                        });
-                }
+                SubscribeToStartAnimation();
                 
                 // Подписываемся на Update
                 _updateSubscription = Observable.EveryUpdate()
@@ -71,7 +65,23 @@ namespace GameShorts.FlyHumans.Gameplay
                 
                 AddDispose(_updateSubscription);
                 AddDispose(_inputSubscription);
-                AddDispose(_jumpTrigger);
+            }
+        }
+        
+        private void SubscribeToStartAnimation()
+        {
+            // Отписываемся от предыдущей подписки, если она есть
+            _jumpTrigger?.Dispose();
+            
+            // Подписываемся на анимацию старта
+            foreach (var obs in _character.Animator.GetBehaviours<ObservableStateMachineTrigger>())
+            {
+                _jumpTrigger = obs.OnStateEnterAsObservable()
+                    .Subscribe(_ =>
+                    {
+                        InitGravity();
+                        _jumpTrigger?.Dispose();
+                    });
             }
         }
 
@@ -100,6 +110,7 @@ namespace GameShorts.FlyHumans.Gameplay
 
         public void StartGame()
         {
+            _collided = false;
             if (_character == null)
             {
                 Debug.LogError("Character is null!");
@@ -140,6 +151,10 @@ namespace GameShorts.FlyHumans.Gameplay
 
         private void OnRagdollCollision()
         {
+            if (_collided)
+                return;
+            _collided = true;
+            
             Jump();
             if (_character != null)
             {
@@ -155,10 +170,41 @@ namespace GameShorts.FlyHumans.Gameplay
                 _ctx.worldBlocksPm.IsMoving = false;
                 Debug.Log("World movement stopped, but traffic continues on existing blocks");
             }
+            
+            // Запускаем автоматический ресет через 2 секунды
+            _resetDelaySubscription?.Dispose();
+            _resetDelaySubscription = Observable.Timer(System.TimeSpan.FromSeconds(2))
+                .Subscribe(_ => ResetGame());
+        }
+        
+        private void ResetGame()
+        {
+            if (_character == null) return;
+            
+            Debug.Log("Resetting game...");
+            
+            // Сбрасываем мир (удаляем все блоки кроме стартового)
+            _ctx.worldBlocksPm?.ResetWorld();
+            
+            // Возвращаем персонажа на стартовую позицию с анимацией idle
+            _character.ResetToInitialPosition();
+            
+            // Сбрасываем камеру в начальное положение
+            _ctx.cameraPm?.ResetCamera();
+            
+            // Переподписываемся на анимацию старта
+            SubscribeToStartAnimation();
+            
+            // Запускаем автоматический старт через 2 секунды
+            _resetDelaySubscription?.Dispose();
+            _resetDelaySubscription = Observable.Timer(System.TimeSpan.FromSeconds(3))
+                .Subscribe(_ => StartGame());
         }
 
         protected override void OnDispose()
         {
+            _resetDelaySubscription?.Dispose();
+            _jumpTrigger?.Dispose();
             base.OnDispose();
         }
     }

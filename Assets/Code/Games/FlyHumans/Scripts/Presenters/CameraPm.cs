@@ -20,6 +20,8 @@ namespace GameShorts.FlyHumans.Presenters
         private Vector3 _currentCameraOffset;
         private bool _isCameraAnimating;
         private Sequence _cameraSequence;
+        private Quaternion _initialCameraRotation;
+        private Vector3 _initialCameraOffset;
 
         public CameraPm(Ctx ctx)
         {
@@ -35,11 +37,16 @@ namespace GameShorts.FlyHumans.Presenters
             if (_ctx.targetTransform != null)
             {
                 _currentCameraOffset = _ctx.cameraView.CameraTransform.position - _ctx.targetTransform.position;
+                _initialCameraOffset = _currentCameraOffset; // Сохраняем начальный offset
             }
             else
             {
                 _currentCameraOffset = _ctx.cameraView.CameraFollowOffset;
+                _initialCameraOffset = _ctx.cameraView.CameraFollowOffset;
             }
+            
+            // Запоминаем начальное вращение камеры
+            _initialCameraRotation = _ctx.cameraView.CameraTransform.rotation;
             
             _isCameraAnimating = false;
         }
@@ -109,6 +116,32 @@ namespace GameShorts.FlyHumans.Presenters
                 _cameraSequence = null;
                 _isCameraAnimating = false;
             }
+        }
+        
+        /// <summary>
+        /// Сбрасывает камеру в начальное положение
+        /// </summary>
+        public void ResetCamera()
+        {
+            StopCameraAnimation();
+            
+            if (_ctx.cameraView == null || _ctx.cameraView.CameraTransform == null) return;
+            
+            // Восстанавливаем начальный offset
+            _currentCameraOffset = _initialCameraOffset;
+            
+            // Сбрасываем вращение камеры в начальное
+            _ctx.cameraView.CameraTransform.rotation = _initialCameraRotation;
+            
+            // Явно устанавливаем позицию камеры относительно персонажа
+            if (_ctx.targetTransform != null)
+            {
+                _ctx.cameraView.CameraTransform.position = _ctx.targetTransform.position + _initialCameraOffset;
+            }
+            
+            _isCameraAnimating = false;
+            
+            Debug.Log($"Camera reset: offset={_initialCameraOffset}, rotation={_initialCameraRotation.eulerAngles}");
         }
 
         protected override void OnDispose()

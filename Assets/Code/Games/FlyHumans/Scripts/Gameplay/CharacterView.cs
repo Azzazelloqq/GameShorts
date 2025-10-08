@@ -26,6 +26,7 @@ namespace GameShorts.FlyHumans.Gameplay
         private float _currentGravity;
         private Vector3 _movementDirection;
         private Quaternion _initialRotation;
+        private Vector3 _initialPosition;
 
         // Properties
         public RagdollRoot RagdollRoot => _ragdollRoot;
@@ -61,6 +62,9 @@ namespace GameShorts.FlyHumans.Gameplay
             
             // Запоминаем начальный поворот персонажа
             _initialRotation = transform.rotation;
+            
+            // Запоминаем начальную позицию персонажа
+            _initialPosition = _characterTransform.position;
         }
         
         public void ResetState()
@@ -81,6 +85,34 @@ namespace GameShorts.FlyHumans.Gameplay
             {
                 _flyParticles.Stop();
             }
+        }
+        
+        public void ResetToInitialPosition()
+        {
+            Debug.Log($"Resetting character to initial position: {_initialPosition}");
+            
+            // Возвращаем персонажа в начальную позицию
+            _characterTransform.position = _initialPosition;
+            _characterTransform.rotation = _initialRotation;
+            
+            // Отключаем физику ragdoll
+            foreach (var rigidbody in _rigidbodies)
+            {
+                rigidbody.useGravity = false;
+                rigidbody.linearVelocity = Vector3.zero;
+                rigidbody.angularVelocity = Vector3.zero;
+            }
+            
+            // Сбрасываем состояние
+            ResetState();
+            
+            // Включаем анимацию idle
+            if (_animator != null)
+            {
+                _animator.Play("Idle", 0, 0f);
+            }
+            
+            Debug.Log($"Character reset complete. Current position: {_characterTransform.position}");
         }
         
         public void UpdatePosition(float deltaTime)

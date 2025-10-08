@@ -27,6 +27,7 @@ namespace GameShorts.FlyHumans.Presenters
         private float _speedAcceleration = 10f; // Скорость ускорения в единицах в секунду (быстрое ускорение)
         private readonly IPoolManager _poolManager;
         private readonly Dictionary<WorldBlock, WorldBlockModel> _blockModels = new Dictionary<WorldBlock, WorldBlockModel>();
+        private Vector3 _startBlockInitialPosition;
 
         public bool IsMoving 
         { 
@@ -54,6 +55,9 @@ namespace GameShorts.FlyHumans.Presenters
                 // Создаем модель для стартового блока, если он есть
                 if (_ctx.worldBlocksView.StartBlock != null)
                 {
+                    // Сохраняем начальную позицию стартового блока
+                    _startBlockInitialPosition = _ctx.worldBlocksView.StartBlock.transform.position;
+                    
                     var startBlockModel = new WorldBlockModel(_ctx.worldBlocksView.StartBlock, _poolManager);
                     _blockModels[_ctx.worldBlocksView.StartBlock] = startBlockModel;
                 }
@@ -228,6 +232,9 @@ namespace GameShorts.FlyHumans.Presenters
             // Останавливаем движение
             _isMoving = false;
             
+            // Сбрасываем скорость до нуля
+            _currentSpeed = 0f;
+            
             // Удаляем все заспавненные блоки (кроме стартового)
             var activeBlocks = _ctx.worldBlocksView.ActiveBlocks;
             for (int i = activeBlocks.Count - 1; i >= 0; i--)
@@ -243,8 +250,11 @@ namespace GameShorts.FlyHumans.Presenters
                         _blockModels.Remove(block);
                     }
                     
+                    // Удаляем из списка активных
                     _ctx.worldBlocksView.RemoveActiveBlock(block);
-                    Object.Destroy(block.gameObject);
+                    
+                    // Возвращаем в пул
+                    _poolManager.Return(block.gameObject, block.gameObject);
                 }
             }
             
@@ -252,6 +262,19 @@ namespace GameShorts.FlyHumans.Presenters
             if (_ctx.worldBlocksView.StartBlock != null)
             {
                 _ctx.worldBlocksView.StartBlock.HasSpawnedNext = false;
+                
+                // Возвращаем стартовый блок на начальную позицию
+                _ctx.worldBlocksView.StartBlock.transform.position = _startBlockInitialPosition;
+                
+                // Пересоздаем трафик на стартовом блоке
+                if (_blockModels.TryGetValue(_ctx.worldBlocksView.StartBlock, out var startBlockModel))
+                {
+                    startBlockModel.Dispose();
+                    _blockModels.Remove(_ctx.worldBlocksView.StartBlock);
+                }
+                
+                var newStartBlockModel = new WorldBlockModel(_ctx.worldBlocksView.StartBlock, _poolManager);
+                _blockModels[_ctx.worldBlocksView.StartBlock] = newStartBlockModel;
             }
             
             // Очищаем список активных блоков
