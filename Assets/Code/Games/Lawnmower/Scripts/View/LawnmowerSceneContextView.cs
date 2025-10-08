@@ -17,6 +17,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
         
         [Header("UI")]
         [SerializeField] private Canvas uiCanvas;
+        [SerializeField] private LawnmowerStartScreenView startScreenView;
         [SerializeField] private Transform startScreenParent;
         [SerializeField] private MainGameUIView mainUi;
         [SerializeField] private Transform finishScreenParent;
@@ -36,6 +37,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
         public LevelView CurrentLevel => currentLevelIndex < levels.Length ? levels[currentLevelIndex] : null;
         public int CurrentLevelIndex => currentLevelIndex;
         public Canvas UiCanvas => uiCanvas;
+        public LawnmowerStartScreenView StartScreenView => startScreenView;
         public Transform StartScreenParent => startScreenParent;
         public MainGameUIView MainUi => mainUi;
         public Transform FinishScreenParent => finishScreenParent;

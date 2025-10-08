@@ -54,6 +54,10 @@ namespace Logic.Player.ProjectileWeapon
         
         private void Fire(float deltaTime)
         {
+            // Проверяем, что объекты еще существуют (не уничтожены при свайпе)
+            if (_spawnPosition == null || _ctx.playerView == null)
+                return;
+                
             if (Time.time - _startFire < _ctx.projectileSettings.ProjectileRate)
                 return;
             
@@ -64,6 +68,10 @@ namespace Logic.Player.ProjectileWeapon
         { 
             // Проверяем, что EntitiesController еще существует
             if (_ctx.entitiesController == null)
+                return;
+            
+            // Дополнительная проверка на случай, если объект был уничтожен между вызовами
+            if (_spawnPosition == null)
                 return;
                 
             var position = _spawnPosition.position;

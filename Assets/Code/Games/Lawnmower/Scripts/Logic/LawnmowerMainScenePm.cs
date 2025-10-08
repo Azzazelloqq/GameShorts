@@ -3,6 +3,7 @@ using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
+using Code.Core.ShortGamesCore.Lawnmower.Scripts.UI;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Core;
@@ -26,6 +27,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
 
         private readonly Ctx _ctx;
         private readonly IInputManager _inputManager;
+        private LawnmowerStartScreenPm _startScreenPm;
         private LawnmowerPlayerPm _playerPm;
         private LawnmowerLevelManager _levelManager;
         private LawnmowerCameraPm _cameraPm;
@@ -58,7 +60,28 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             _levelManager = new LawnmowerLevelManager(levelManagerCtx);
             AddDispose(_levelManager);
             
-            StartGame();
+            ShowStartScreen();
+        }
+
+        private void ShowStartScreen()
+        {
+            if (_currentState != LawnmowerGameState.WaitingToStart)
+                return;
+
+            _currentState = LawnmowerGameState.WaitingToStart;
+            _inputManager?.SetJoystickOptions(AxisOptions.None);
+
+            LawnmowerStartScreenPm.Ctx startScreenCtx = new LawnmowerStartScreenPm.Ctx
+            {
+                sceneContextView = _ctx.sceneContextView,
+                startGameClicked = StartGame,
+                cancellationToken = _ctx.cancellationToken
+            };
+            
+            _startScreenPm = new LawnmowerStartScreenPm(startScreenCtx);
+            AddDispose(_startScreenPm);
+            
+            Debug.Log("Lawnmower: Start screen created");
         }
 
         private void InitializeCamera()
@@ -83,6 +106,12 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
 
             _inputManager.SetJoystickOptions(AxisOptions.Both);
             _currentState = LawnmowerGameState.Playing;
+
+            // Убираем стартовый экран
+            _startScreenPm?.Dispose();
+            _startScreenPm = null;
+
+            Debug.Log("Lawnmower: Game started!");
 
             // Создаем игрока
             LawnmowerPlayerPm.Ctx playerCtx = new LawnmowerPlayerPm.Ctx

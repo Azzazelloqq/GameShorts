@@ -25,4 +25,4 @@ MonoBehaviour:
   emptyingTime: 3
   grassPerTile: 1
   farmerUIPrefab: {fileID: 1781872534228891129, guid: 02cc686abd158974e93aa0c972833eb7, type: 3}
-  farmerUIOffset: {x: 0, y: 50}
+  farmerUIOffset: {x: 0, y: 100}

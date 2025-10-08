@@ -122,10 +122,10 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
+			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
 			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main}
 		};
 	}
@@ -134,10 +134,10 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
-			typeof(AsteroidsGame),
 			typeof(BoxTower),
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
+			typeof(AsteroidsGame),
 			typeof(Game2048)
 		};
 	}
