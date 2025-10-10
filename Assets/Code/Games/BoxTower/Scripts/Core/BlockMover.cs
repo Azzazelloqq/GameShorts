@@ -57,10 +57,23 @@ namespace Code.Core.ShortGamesCore.Game2
             // Check boundaries and reverse direction
             float currentPosition = (axis == Axis.X) ? transform.position.x : transform.position.z;
             float startPos = (axis == Axis.X) ? startPosition.x : startPosition.z;
+            float distance = currentPosition - startPos;
             
-            if (Mathf.Abs(currentPosition - startPos) > limit)
+            if (Mathf.Abs(distance) >= limit)
             {
+                // Reverse direction
                 direction *= -1f;
+                
+                // Clamp position to stay within bounds
+                float clampedDistance = Mathf.Sign(distance) * limit;
+                if (axis == Axis.X)
+                {
+                    transform.position = new Vector3(startPos + clampedDistance, transform.position.y, transform.position.z);
+                }
+                else
+                {
+                    transform.position = new Vector3(transform.position.x, transform.position.y, startPos + clampedDistance);
+                }
             }
         }
     }

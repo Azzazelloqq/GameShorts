@@ -7,6 +7,7 @@ using Code.Games.Game2.Scripts.Core;
 using LightDI.Runtime;
 using UnityEngine;
 using R3;
+using TickHandler;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -28,18 +29,20 @@ namespace Code.Core.ShortGamesCore.Game2
         private List<GameObject> _fallingBlocks = new List<GameObject>(); // Track falling blocks for cleanup
         private GameObject _currentMovingBlock;
         private BlockMover _currentMover;
+        private readonly ITickHandler _tickHandler;
 
         public BoxTowerTowerPm(Ctx ctx,
-            [Inject] IPoolManager poolManager)
+            [Inject] IPoolManager poolManager,[Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             _poolManager = poolManager;
             // Subscribe to model events
             AddDispose(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
             _ctx.towerModel.OnChunkCreated += CreateChunk;
             
             // Subscribe to scene updates
-            _ctx.sceneContextView.OnUpdated += OnSceneUpdate;
+            _tickHandler.FrameUpdate += OnSceneUpdate;
         }
 
         private void OnGameStateChanged(GameState state)
@@ -372,7 +375,7 @@ namespace Code.Core.ShortGamesCore.Game2
             }
         }
 
-        private void OnSceneUpdate()
+        private void OnSceneUpdate(float deltaTime)
         {
             // Update tower height based on placed blocks
             if (_placedBlocks.Count > 0)
@@ -444,7 +447,7 @@ namespace Code.Core.ShortGamesCore.Game2
         protected override void OnDispose()
         {
             // Unsubscribe from events
-            _ctx.sceneContextView.OnUpdated -= OnSceneUpdate;
+            _tickHandler.FrameUpdate -= OnSceneUpdate;
             if (_ctx.towerModel != null)
             {
                 _ctx.towerModel.OnChunkCreated -= CreateChunk;

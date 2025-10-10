@@ -79,7 +79,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 towerModel = _towerModel,
                 cancellationToken = _ctx.cancellationToken
             };
-            _cameraPresenter = new BoxTowerCameraPm(cameraCtx);
+            _cameraPresenter =  BoxTowerCameraPmFactory.CreateBoxTowerCameraPm(cameraCtx);
             AddDispose(_cameraPresenter);
         }
 

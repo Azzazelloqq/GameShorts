@@ -1,8 +1,10 @@
 using System;
 using System.Threading;
 using Code.Core.BaseDMDisposable.Scripts;
+using LightDI.Runtime;
 using UnityEngine;
 using R3;
+using TickHandler;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -20,10 +22,12 @@ namespace Code.Core.ShortGamesCore.Game2
         private Quaternion _initialCameraRotation;
         private readonly float _followSpeed = 2f;
         private readonly float _verticalOffset = 5f;
+        private readonly ITickHandler _tickHandler;
 
-        public BoxTowerCameraPm(Ctx ctx)
+        public BoxTowerCameraPm(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             
             // Store initial camera position and setup 45-degree view
             if (_ctx.sceneContextView.MainCamera != null)
@@ -31,12 +35,15 @@ namespace Code.Core.ShortGamesCore.Game2
                 // Position camera at an angle to view tower at 45 degrees
                 var camera = _ctx.sceneContextView.MainCamera;
                 
-                // Set camera position for 45-degree diagonal view
-                Vector3 cameraOffset = new Vector3(4f, 6f, 4f); // Diagonal position, a bit further and higher
-                camera.transform.position = cameraOffset;
+                // Get tower root position to properly center the camera on it
+                Vector3 towerPosition = _ctx.sceneContextView.TowerRoot.position;
                 
-                // Look at a point slightly below center to see the tower better
-                Vector3 lookAtPoint = new Vector3(0f, -1f, 0f);
+                // Set camera position for 45-degree diagonal view relative to tower
+                Vector3 cameraOffset = new Vector3(4f, 6f, 4f); // Diagonal position, a bit further and higher
+                camera.transform.position = towerPosition + cameraOffset;
+                
+                // Look at a point slightly below tower center to see the tower better
+                Vector3 lookAtPoint = towerPosition + new Vector3(0f, -1f, 0f);
                 camera.transform.LookAt(lookAtPoint);
                 
                 _initialCameraPosition = camera.transform.position;
@@ -52,7 +59,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 .Subscribe(_ => ResetCameraPosition()));
             
             // Subscribe to scene updates for smooth camera movement
-            _ctx.sceneContextView.OnUpdated += UpdateCamera;
+            _tickHandler.FrameLateUpdate += UpdateCamera;
         }
 
         private void OnTowerHeightChanged(float newHeight)
@@ -60,7 +67,7 @@ namespace Code.Core.ShortGamesCore.Game2
             // Camera will smoothly follow in UpdateCamera
         }
 
-        private void UpdateCamera()
+        private void UpdateCamera(float deltaTime)
         {
             if (_ctx.sceneContextView.MainCamera == null) return;
 
@@ -80,7 +87,7 @@ namespace Code.Core.ShortGamesCore.Game2
             camera.transform.position = Vector3.Lerp(
                 camera.transform.position, 
                 targetPosition, 
-                _followSpeed * Time.deltaTime);
+                _followSpeed * deltaTime);
             
             // Keep the initial rotation fixed - no dynamic LookAt
             camera.transform.rotation = _initialCameraRotation;
@@ -99,7 +106,7 @@ namespace Code.Core.ShortGamesCore.Game2
         protected override void OnDispose()
         {
             // Unsubscribe from scene updates
-            _ctx.sceneContextView.OnUpdated -= UpdateCamera;
+            _tickHandler.FrameLateUpdate -= UpdateCamera;
             
             base.OnDispose();
         }

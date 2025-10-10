@@ -64,9 +64,6 @@ namespace Code.Core.ShortGamesCore.Game2
         
         public Button FullScreenTapButton => fullScreenTapButton;
 
-        // Events
-        public event Action OnUpdated;
-
         protected override void Awake()
         {
             base.Awake();
@@ -76,11 +73,6 @@ namespace Code.Core.ShortGamesCore.Game2
             {
                 towerRoot.rotation = Quaternion.Euler(0f, 45f, 0f);
             }
-        }
-
-        private void Update()
-        {
-            OnUpdated?.Invoke();
         }
     }
 }
