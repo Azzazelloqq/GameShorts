@@ -48,6 +48,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: AngryHumans::Code.Games.AngryHumans.DestructibleBlock
   _isDestructible: 1
   _minHitVelocity: 2
+  _activateConnectedStructure: 1
+  _cacheZoneShape: 1
+  _cacheZoneSize: {x: 2, y: 5, z: 2}
+  _cacheZoneOffset: {x: 0, y: 0, z: 0}
+  _cachedConnectedObjects: []
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3

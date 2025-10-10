@@ -159,6 +159,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: AngryHumans::Code.Games.AngryHumans.Target
   _scoreValue: 100
   _minHitVelocity: 2
+  _activateConnectedStructure: 1
+  _cacheZoneShape: 0
+  _cacheZoneSize: {x: 0.7, y: 0.7, z: 0.7}
+  _cacheZoneOffset: {x: 0, y: 0, z: 0}
+  _cachedConnectedObjects: []
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
