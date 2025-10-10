@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Code.Games.AngryHumans
 {
-internal class Human : MonoBehaviour
+internal class Human : MonoBehaviour, IPhysicsActivatable
 {
 	[SerializeField]
 	private Transform[] _grabPoints;
@@ -223,5 +223,15 @@ internal class Human : MonoBehaviour
 
 	public bool IsLaunched => _isLaunched;
 	public bool IsOnPlatform => _isOnPlatform;
+	
+	// Реализация интерфейса IPhysicsActivatable
+	// Человечек всегда считается активированным после запуска
+	public bool IsPhysicsActivated => _isLaunched;
+	
+	public void ActivatePhysics()
+	{
+		// Человечек не может быть активирован извне, только через Launch
+		// Метод оставляем пустым для соответствия интерфейсу
+	}
 }
 }
