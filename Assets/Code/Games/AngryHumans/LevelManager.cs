@@ -35,6 +35,7 @@ namespace Code.Games.AngryHumans
         private LevelConfig _currentLevelConfig;
         private GameObject _currentLevelInstance;
         private readonly List<AsyncOperationHandle<GameObject>> _loadedAssets = new();
+        private bool _isLoading = false;
         
         /// <summary>
         /// Событие при начале загрузки уровня
@@ -73,6 +74,25 @@ namespace Code.Games.AngryHumans
             if (_levelConfigs == null || _levelConfigs.Length == 0)
             {
                 Debug.LogError("LevelManager: No level configurations found!");
+                return;
+            }
+            
+            // Проверяем на дублирование конфигов
+            for (int i = 0; i < _levelConfigs.Length; i++)
+            {
+                if (_levelConfigs[i] == null)
+                {
+                    Debug.LogError($"LevelManager: Level config at index {i} is null!");
+                    continue;
+                }
+                
+                for (int j = i + 1; j < _levelConfigs.Length; j++)
+                {
+                    if (_levelConfigs[i] == _levelConfigs[j])
+                    {
+                        Debug.LogWarning($"LevelManager: Duplicate level config '{_levelConfigs[i].LevelName}' at indices {i} and {j}");
+                    }
+                }
             }
         }
         
@@ -87,24 +107,40 @@ namespace Code.Games.AngryHumans
                 return;
             }
             
-            _currentLevelIndex = levelIndex;
-            _currentLevelConfig = _levelConfigs[levelIndex];
+            // Защита от повторной загрузки
+            if (_isLoading)
+            {
+                Debug.LogWarning($"LevelManager: Already loading a level, skipping request for level {levelIndex}");
+                return;
+            }
             
-            OnLevelLoadStarted?.Invoke(_currentLevelConfig);
+            _isLoading = true;
             
-            // Очищаем предыдущий уровень
-            ClearCurrentLevel();
-            
-            // Применяем настройки уровня
-            ApplyLevelSettings(_currentLevelConfig);
-            
-            // Загружаем и спавним префаб уровня
-            await LoadLevelPrefab();
-            
-            // Регистрируем все структуры в уровне
-            RegisterLevelStructures();
-            
-            OnLevelLoaded?.Invoke(_currentLevelConfig);
+            try
+            {
+                _currentLevelIndex = levelIndex;
+                _currentLevelConfig = _levelConfigs[levelIndex];
+                
+                OnLevelLoadStarted?.Invoke(_currentLevelConfig);
+                
+                // Очищаем предыдущий уровень
+                ClearCurrentLevel();
+                
+                // Применяем настройки уровня
+                ApplyLevelSettings(_currentLevelConfig);
+                
+                // Загружаем и спавним префаб уровня
+                await LoadLevelPrefab();
+                
+                // Регистрируем все структуры в уровне
+                RegisterLevelStructures();
+                
+                OnLevelLoaded?.Invoke(_currentLevelConfig);
+            }
+            finally
+            {
+                _isLoading = false;
+            }
         }
         
         /// <summary>
@@ -185,25 +221,25 @@ namespace Code.Games.AngryHumans
             }
         }
         
-        /// <summary>
-        /// Регистрирует все структуры в загруженном уровне
-        /// </summary>
-        private void RegisterLevelStructures()
-        {
-            if (_currentLevelInstance == null || _targetManager == null)
-                return;
-            
-            // Находим все TargetStructure в уровне
-            var structures = _currentLevelInstance.GetComponentsInChildren<TargetStructure>();
-            
-            foreach (var structure in structures)
-            {
-                structure.Initialize();
-                _targetManager.RegisterStructure(structure);
-            }
-            
-            Debug.Log($"LevelManager: Registered {structures.Length} structures in level");
-        }
+	/// <summary>
+	/// Регистрирует все структуры в загруженном уровне
+	/// </summary>
+	private void RegisterLevelStructures()
+	{
+		if (_currentLevelInstance == null || _targetManager == null)
+			return;
+		
+		// Находим все TargetStructure в уровне
+		var structures = _currentLevelInstance.GetComponentsInChildren<TargetStructure>();
+		
+		foreach (var structure in structures)
+		{
+			// Не вызываем Initialize() здесь, так как он уже вызван в Awake()
+			_targetManager.RegisterStructure(structure);
+		}
+		
+		Debug.Log($"LevelManager: Registered {structures.Length} structures in level");
+	}
         
         /// <summary>
         /// Очищает текущий уровень
