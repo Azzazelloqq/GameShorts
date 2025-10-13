@@ -43,6 +43,7 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 	private RenderTexture _renderTexture;
 	private bool _isGameActive;
 	private bool _isPaused;
+	private bool _isStarting;
 	private int _currentScore = 0;
 
 	public bool IsPreloaded { get; private set; }
@@ -71,6 +72,14 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public async void StartGame()
 	{
+		// Защита от повторного вызова во время загрузки
+		if (_isStarting)
+		{
+			Debug.LogWarning("StartGame called while already starting, ignoring...");
+			return;
+		}
+		
+		_isStarting = true;
 		_isGameActive = true;
 		_isPaused = false;
 		_currentScore = 0;
@@ -117,6 +126,7 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		}
 
 		SpawnNewHuman();
+		_isStarting = false;
 	}
 
 	public void PauseGame()

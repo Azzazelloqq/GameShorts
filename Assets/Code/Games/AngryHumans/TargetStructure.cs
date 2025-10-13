@@ -64,6 +64,13 @@ public class TargetStructure : MonoBehaviour
 	/// </summary>
 	public void Initialize()
 	{
+		// Защита от повторной инициализации
+		if (_totalTargets > 0 && _aliveTargets.Count > 0)
+		{
+			Debug.LogWarning($"[{_structureName}] Already initialized, skipping...");
+			return;
+		}
+		
 		// Находим все цели в дочерних объектах, если не заданы вручную
 		if (_targets == null || _targets.Length == 0)
 		{
@@ -82,8 +89,10 @@ public class TargetStructure : MonoBehaviour
 		{
 			if (target != null)
 			{
-				_aliveTargets.Add(target);
+				// Отписываемся перед подпиской, чтобы избежать дублирования
+				target.OnTargetDestroyed -= HandleTargetDestroyed;
 				target.OnTargetDestroyed += HandleTargetDestroyed;
+				_aliveTargets.Add(target);
 			}
 		}
 

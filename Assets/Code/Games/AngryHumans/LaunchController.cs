@@ -341,13 +341,16 @@ internal class LaunchController : MonoBehaviour
 		// Горизонтальное направление камеры (без наклона)
 		var horizontalForward = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
 		
-		// Преобразуем экранную скорость в мировое направление
+		// Нормализуем направление свайпа, сохраняя его величину
+		var swipeMagnitude = screenVelocity.magnitude;
+		var swipeDirection = screenVelocity.normalized;
+		
+		// Преобразуем нормализованное направление в мировые координаты
 		// X экрана → влево/вправо (camera.right)
-		var rightComponent = cameraRight * screenVelocity.x;
+		var rightComponent = cameraRight * swipeDirection.x;
 		
 		// Y экрана → комбинация вверх и вперед в зависимости от _verticalToForwardRatio
-		// Положительный Y (свайп вверх) всегда учитываем
-		var verticalInput = screenVelocity.y;
+		var verticalInput = swipeDirection.y;
 		
 		// Вертикальная компонента (вверх в мире)
 		var upComponent = Vector3.up * verticalInput * _verticalToForwardRatio;
@@ -355,10 +358,11 @@ internal class LaunchController : MonoBehaviour
 		// Компонента вперед (горизонтальное направление камеры)
 		var forwardComponent = horizontalForward * verticalInput * (1f - _verticalToForwardRatio);
 		
-		// Суммируем все компоненты
-		var worldVelocity = rightComponent + upComponent + forwardComponent;
+		// Суммируем компоненты направления и умножаем на величину свайпа
+		var worldDirection = (rightComponent + upComponent + forwardComponent).normalized;
+		var worldVelocity = worldDirection * swipeMagnitude;
 		
-		// Добавляем базовую силу вперед
+		// Добавляем базовую силу вперед (независимо от направления свайпа)
 		worldVelocity += horizontalForward * _baseForwardForce;
 		
 		Debug.Log($"Screen swipe: {screenDelta} = X:{screenVelocity.x:F0} Y:{screenVelocity.y:F0} px/s");
