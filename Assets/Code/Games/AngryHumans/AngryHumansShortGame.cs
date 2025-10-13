@@ -13,6 +13,9 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 	private Camera _camera;
 
 	[SerializeField]
+	private Camera _uiCamera;
+	
+	[SerializeField]
 	private GraphicRaycaster _graphicRaycaster;
 
 	[Header("Game Components")]
@@ -31,6 +34,12 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 	[SerializeField]
 	private TargetManager _targetManager;
 
+	[SerializeField]
+	private ScoreController _scoreController;
+	
+	[SerializeField]
+	private LevelManager _levelManager;
+
 	private RenderTexture _renderTexture;
 	private bool _isGameActive;
 	private bool _isPaused;
@@ -40,16 +49,11 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
-		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-
+		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera, _uiCamera);
+		
 		if (_humanFactory != null)
 		{
 			await _humanFactory.PreloadHumansAsync(cancellationToken);
-		}
-
-		if (_targetManager != null)
-		{
-			await _targetManager.PreloadStructuresAsync(cancellationToken);
 		}
 
 		IsPreloaded = true;
@@ -65,19 +69,51 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		_renderTexture = null;
 	}
 
-	public void StartGame()
+	public async void StartGame()
 	{
 		_isGameActive = true;
 		_isPaused = false;
 		_currentScore = 0;
+
+		// Инициализируем контроллер счета
+		if (_scoreController != null)
+		{
+			_scoreController.Initialize(_camera);
+			_scoreController.ResetScore();
+			
+			// Подписываемся на события
+			_scoreController.OnGameOver += HandleGameOver;
+			_scoreController.OnRestartRequested += RestartGame;
+		}
+		
+		// Если есть LevelManager, загружаем уровень
+		if (_levelManager != null)
+		{
+			await _levelManager.LoadCurrentLevel();
+		}
+		else
+		{
+			// Используем старую систему без конфигов
+			if (_scoreController != null)
+			{
+				_scoreController.ResetAttempts();
+			}
+		}
 
 		// Подписываемся на события целей
 		if (_targetManager != null)
 		{
 			_targetManager.OnScoreChanged += HandleScoreChanged;
 			_targetManager.OnAllStructuresCompleted += HandleAllStructuresCompleted;
+			
+			// Подписываемся на события для отображения очков
+			if (_scoreController != null)
+			{
+				_targetManager.OnTargetDestroyed += HandleTargetDestroyedForScore;
+				_targetManager.OnStructureCompleted += _scoreController.OnStructureCompleted;
+			}
+			
 			_targetManager.ResetScore();
-			_targetManager.SpawnLevel();
 		}
 
 		SpawnNewHuman();
@@ -109,7 +145,23 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		{
 			_targetManager.OnScoreChanged -= HandleScoreChanged;
 			_targetManager.OnAllStructuresCompleted -= HandleAllStructuresCompleted;
+			
+			// Отписываемся от событий для отображения очков
+			if (_scoreController != null)
+			{
+				_targetManager.OnTargetDestroyed -= HandleTargetDestroyedForScore;
+				_targetManager.OnStructureCompleted -= _scoreController.OnStructureCompleted;
+			}
+			
 			_targetManager.ClearAllStructures();
+		}
+
+		// Сбрасываем контроллер счета
+		if (_scoreController != null)
+		{
+			_scoreController.ResetScore();
+			_scoreController.OnGameOver -= HandleGameOver;
+			_scoreController.OnRestartRequested -= RestartGame;
 		}
 
 		if (_launchPlatform != null)
@@ -169,7 +221,21 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 	{
 		if (_isGameActive && !_isPaused)
 		{
-			SpawnNewHuman();
+			// Используем попытку при падении человечка
+			if (_scoreController != null)
+			{
+				_scoreController.UseAttempt();
+				
+				// Если игра не закончилась, спавним нового человечка
+				if (!_scoreController.IsGameOver)
+				{
+					SpawnNewHuman();
+				}
+			}
+			else
+			{
+				SpawnNewHuman();
+			}
 		}
 	}
 
@@ -177,14 +243,37 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 	{
 		if (_isGameActive && !_isPaused)
 		{
-			SpawnNewHuman();
+			// При успешной посадке не тратим попытку, просто спавним нового
+			if (_scoreController != null && !_scoreController.IsGameOver)
+			{
+				SpawnNewHuman();
+			}
+			else if (_scoreController == null)
+			{
+				SpawnNewHuman();
+			}
 		}
 	}
 
 	private void HandleScoreChanged(int newScore)
 	{
 		_currentScore = newScore;
+		
+		// Обновляем отображение счета
+		if (_scoreController != null)
+		{
+			_scoreController.UpdateScore(newScore);
+		}
+		
 		Debug.Log($"Score updated: {_currentScore}");
+	}
+	
+	private void HandleTargetDestroyedForScore(TargetStructure structure, Target target, int scoreValue)
+	{
+		if (_scoreController != null && target != null)
+		{
+			_scoreController.OnTargetDestroyed(target, scoreValue);
+		}
 	}
 
 	private void HandleAllStructuresCompleted()
@@ -194,6 +283,18 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		// Например, показать экран победы или загрузить следующий уровень
 	}
 
+	private void HandleGameOver()
+	{
+		Debug.Log("Game Over! No attempts left.");
+		_isGameActive = false;
+		
+		// Останавливаем все активные снаряды
+		if (_launchController != null)
+		{
+			_launchController.Reset();
+		}
+	}
+	
 	public int GetCurrentScore()
 	{
 		return _currentScore;

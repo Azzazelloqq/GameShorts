@@ -13,53 +13,11 @@ namespace Code.Games.AngryHumans
 /// </summary>
 public class TargetManager : MonoBehaviour
 {
-	[Serializable]
-	public struct StructurePreset
-	{
-		[SerializeField]
-		private string _name;
-
-		[SerializeField]
-		[Tooltip("Ссылка на префаб структуры")]
-		private AssetReference _structurePrefabReference;
-
-		[SerializeField]
-		[Tooltip("Сложность структуры (1-10)")]
-		private int _difficulty;
-
-		public string Name => _name;
-		public AssetReference StructurePrefabReference => _structurePrefabReference;
-		public int Difficulty => _difficulty;
-
-		public StructurePreset(string name, AssetReference structurePrefabReference, int difficulty)
-		{
-			_name = name;
-			_structurePrefabReference = structurePrefabReference;
-			_difficulty = difficulty;
-		}
-	}
-
-	[Header("Structure Presets")]
+	[Header("Debug Settings")]
 	[SerializeField]
-	[Tooltip("Доступные пресеты структур")]
-	private StructurePreset[] _structurePresets;
+	[Tooltip("Отображать отладочную информацию")]
+	private bool _showDebugInfo = false;
 
-	[Header("Spawn Settings")]
-	[SerializeField]
-	[Tooltip("Позиция спавна структур")]
-	private Transform _spawnPoint;
-
-	[SerializeField]
-	[Tooltip("Расстояние между структурами")]
-	private float _structureSpacing = 10f;
-
-	[Header("Game Settings")]
-	[SerializeField]
-	[Tooltip("Количество структур на уровень")]
-	private int _structuresPerLevel = 3;
-
-	private readonly Dictionary<string, GameObject> _loadedPrefabs = new();
-	private readonly List<AsyncOperationHandle<GameObject>> _handles = new();
 	private readonly List<TargetStructure> _activeStructures = new();
 	
 	private int _currentScore = 0;
@@ -91,120 +49,43 @@ public class TargetManager : MonoBehaviour
 	public int TotalStructuresCompleted => _totalStructuresCompleted;
 	public int ActiveStructuresCount => _activeStructures.Count;
 	public int CompletedStructuresCount => _totalStructuresCompleted;
-
-#if UNITY_EDITOR
-	private void OnValidate()
-	{
-		for (var i = 0; i < _structurePresets.Length; i++)
-		{
-			var preset = _structurePresets[i];
-
-			if (!string.IsNullOrEmpty(preset.Name))
-			{
-				continue;
-			}
-
-			if (preset.StructurePrefabReference == null)
-			{
-				continue;
-			}
-
-			_structurePresets[i] = new StructurePreset(
-				preset.StructurePrefabReference.editorAsset.name,
-				preset.StructurePrefabReference,
-				preset.Difficulty);
-		}
-	}
-#endif
-
+	
 	/// <summary>
-	/// Предзагрузка префабов структур
+	/// Получает количество завершенных структур в текущем уровне
 	/// </summary>
-	public async Task PreloadStructuresAsync(CancellationToken cancellationToken = default)
+	public int GetCompletedStructuresCount()
 	{
-		foreach (var preset in _structurePresets)
+		int completed = 0;
+		foreach (var structure in _activeStructures)
 		{
-			if (cancellationToken.IsCancellationRequested)
+			if (structure != null && structure.IsCompleted)
 			{
-				break;
-			}
-
-			var handle = Addressables.LoadAssetAsync<GameObject>(preset.StructurePrefabReference);
-			_handles.Add(handle);
-
-			var prefab = await handle.Task;
-
-			if (!cancellationToken.IsCancellationRequested && prefab != null)
-			{
-				_loadedPrefabs[preset.Name] = prefab;
+				completed++;
 			}
 		}
-
-		Debug.Log($"TargetManager: Preloaded {_loadedPrefabs.Count} structure prefabs");
+		return completed;
 	}
 
-	/// <summary>
-	/// Создает случайную структуру
-	/// </summary>
-	public TargetStructure SpawnRandomStructure(Vector3? position = null)
-	{
-		if (_loadedPrefabs.Count == 0)
-		{
-			Debug.LogWarning("TargetManager: No structure prefabs loaded!");
-			return null;
-		}
 
-		var keys = new List<string>(_loadedPrefabs.Keys);
-		var randomKey = keys[UnityEngine.Random.Range(0, keys.Count)];
-
-		return SpawnStructure(randomKey, position);
-	}
 
 	/// <summary>
-	/// Создает структуру по имени
+	/// Регистрирует структуру (используется LevelManager)
 	/// </summary>
-	public TargetStructure SpawnStructure(string presetName, Vector3? position = null)
+	public void RegisterStructure(TargetStructure structure)
 	{
-		if (!_loadedPrefabs.TryGetValue(presetName, out var prefab))
-		{
-			Debug.LogWarning($"TargetManager: Structure prefab '{presetName}' not found!");
-			return null;
-		}
-
-		var spawnPosition = position ?? GetNextSpawnPosition();
-		var instance = Instantiate(prefab, spawnPosition, Quaternion.identity, transform);
-		var structure = instance.GetComponent<TargetStructure>();
-
 		if (structure != null)
 		{
-			structure.Initialize();
 			structure.OnTargetDestroyed += HandleTargetDestroyed;
 			structure.OnStructureCompleted += HandleStructureCompleted;
 			_activeStructures.Add(structure);
-
-			Debug.Log($"TargetManager: Spawned structure '{presetName}' at {spawnPosition}");
-		}
-		else
-		{
-			Debug.LogWarning($"TargetManager: Structure prefab '{presetName}' doesn't have TargetStructure component!");
-		}
-
-		return structure;
-	}
-
-	/// <summary>
-	/// Создает набор структур для уровня
-	/// </summary>
-	public void SpawnLevel()
-	{
-		ClearAllStructures();
-
-		for (var i = 0; i < _structuresPerLevel; i++)
-		{
-			SpawnRandomStructure();
+			
+			if (_showDebugInfo)
+			{
+				Debug.Log($"TargetManager: Registered structure {structure.name}");
+			}
 		}
 	}
-
+	
 	/// <summary>
 	/// Очищает все активные структуры
 	/// </summary>
@@ -216,7 +97,7 @@ public class TargetManager : MonoBehaviour
 			{
 				structure.OnTargetDestroyed -= HandleTargetDestroyed;
 				structure.OnStructureCompleted -= HandleStructureCompleted;
-				Destroy(structure.gameObject);
+				// Не удаляем GameObject, так как это теперь делает LevelManager
 			}
 		}
 
@@ -272,54 +153,6 @@ public class TargetManager : MonoBehaviour
 			Debug.Log("TargetManager: All structures completed!");
 		}
 	}
-
-	private Vector3 GetNextSpawnPosition()
-	{
-		if (_spawnPoint != null)
-		{
-			var offset = _activeStructures.Count * _structureSpacing;
-			return _spawnPoint.position + Vector3.right * offset;
-		}
-
-		return Vector3.zero + Vector3.right * _activeStructures.Count * _structureSpacing;
-	}
-
-	private void OnDestroy()
-	{
-		// Освобождаем ресурсы Addressables
-		foreach (var handle in _handles)
-		{
-			if (handle.IsValid())
-			{
-				Addressables.Release(handle);
-			}
-		}
-
-		_handles.Clear();
-		_loadedPrefabs.Clear();
-	}
-
-#if UNITY_EDITOR
-	[ContextMenu("Spawn Test Level")]
-	private void EditorSpawnTestLevel()
-	{
-		// Для тестирования в редакторе без Addressables
-		var structures = _structurePresets;
-		if (structures.Length == 0)
-		{
-			Debug.LogWarning("No structure presets configured!");
-			return;
-		}
-
-		ClearAllStructures();
-
-		for (var i = 0; i < Mathf.Min(_structuresPerLevel, structures.Length); i++)
-		{
-			// В редакторе можем использовать прямую ссылку
-			Debug.Log($"Would spawn structure: {structures[i].Name}");
-		}
-	}
-#endif
 }
 }
 

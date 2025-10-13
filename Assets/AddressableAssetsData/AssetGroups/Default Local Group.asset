@@ -21,6 +21,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c646ebee7daa6154cacd817911931edc
+    m_Address: Assets/Games/AngryHumans/Content/Targets/LevelStructures/FirstLevel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
   m_SchemaSet:
