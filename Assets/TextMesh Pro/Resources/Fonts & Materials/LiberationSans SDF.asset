@@ -11,7 +11,9 @@ Material:
   m_Shader: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
   m_Parent: {fileID: 2100000, guid: 6aeac70036274db42bcba35c1f731a73, type: 2}
   m_ModifiedSerializedProperties: 2
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - OUTLINE_ON
+  - UNDERLAY_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
@@ -30,12 +32,17 @@ Material:
     m_Ints: []
     m_Floats:
     - _GradientScale: 10
+    - _OutlineWidth: 0.161
     - _ScaleRatioA: 0.9
     - _ScaleRatioC: 0.73125
     - _TextureHeight: 1024
     - _TextureWidth: 1024
+    - _UnderlayOffsetX: -0.769
+    - _UnderlayOffsetY: -0.744
     - _WeightBold: 0.75
-    m_Colors: []
+    m_Colors:
+    - _FaceColor: {r: 0.1273585, g: 1, b: 0.41532764, a: 1}
+    - _OutlineColor: {r: 0.010768958, g: 0.20754719, b: 0.07694996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &11400000

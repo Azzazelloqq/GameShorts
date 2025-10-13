@@ -34,20 +34,6 @@ namespace SurvivalDuck
             }
         }
 
-        private void Start()
-        {
-            // Ищем FloatingJoystick на сцене, если не назначен
-            if (joystick == null)
-            {
-                joystick = FindObjectOfType<FloatingJoystick>();
-                
-                if (joystick == null)
-                {
-                    Debug.LogWarning("PlayerController: FloatingJoystick not found on scene!");
-                }
-            }
-        }
-
         private void Update()
         {
             UpdateAnimation();
@@ -70,62 +56,30 @@ namespace SurvivalDuck
         }
 
         private void Move()
-            {
+        {
             if (_isMoving)
             {
-                // Конвертируем 2D input в 3D направление относительно камеры
-                Vector3 moveDirection = GetCameraRelativeDirection(_inputDirection);
+                // Поворот по оси X джойстика
+                float rotationInput = _inputDirection.x;
+                if (Mathf.Abs(rotationInput) > 0.1f)
+                {
+                    float rotation = rotationInput * rotationSpeed * Time.deltaTime;
+                    _viewPlayer.Rotate(Vector3.up, rotation);
+                }
                 
-                // Перемещение персонажа
-                Vector3 move = moveDirection * (moveSpeed * Time.fixedDeltaTime);
-                _characterController.Move(move);
-                
-                // Поворот персонажа в направлении движения
-                RotateTowardsDirection(moveDirection);
+                // Движение вперед/назад по оси Y джойстика
+                float moveInput = _inputDirection.y;
+                if (Mathf.Abs(moveInput) > 0.1f)
+                {
+                    // Движение относительно текущего направления персонажа
+                    Vector3 moveDirection = _viewPlayer.forward * moveInput;
+                    Vector3 move = moveDirection * (moveSpeed * Time.fixedDeltaTime);
+                    _characterController.Move(move);
+                }
             }
 
             // Применяем гравитацию
             ApplyGravity();
-        }
-
-        private Vector3 GetCameraRelativeDirection(Vector2 input)
-        {
-            Camera mainCamera = Camera.main;
-            
-            // Если камеры нет, используем world space направление
-            if (mainCamera == null)
-            {
-                return new Vector3(input.x, 0f, input.y).normalized;
-            }
-
-            // Получаем направления вперед и вправо от камеры
-            Vector3 cameraForward = mainCamera.transform.forward;
-            Vector3 cameraRight = mainCamera.transform.right;
-            
-            // Игнорируем вертикальную составляющую камеры
-            cameraForward.y = 0f;
-            cameraRight.y = 0f;
-            cameraForward.Normalize();
-            cameraRight.Normalize();
-
-            // Вычисляем направление движения относительно камеры
-            Vector3 direction = cameraForward * input.y + cameraRight * input.x;
-            return direction.normalized;
-        }
-
-        private void RotateTowardsDirection(Vector3 direction)
-        {
-            if (direction.magnitude < 0.1f) return;
-
-            // Вычисляем целевой поворот
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            
-            // Плавно поворачиваем персонажа
-            _viewPlayer.rotation = Quaternion.Slerp(
-                _viewPlayer.rotation, 
-                targetRotation, 
-                rotationSpeed * Time.deltaTime
-            );
         }
 
         private void ApplyGravity()
