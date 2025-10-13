@@ -45,11 +45,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6c862a2ec7bc28340a3a9ef465788c40
-    m_Address: Towers/TowerBase
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7ce4a52227c4efa46b9cbc2f0354d9bd
     m_Address: Content/Human3
     m_ReadOnly: 0
@@ -92,11 +87,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cef6c635c01e4d545920f25f93bac6a5
     m_Address: Content/Human9
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cf44835814a9e8941b353c19093852f7
-    m_Address: Towers/FirstLevelTower
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

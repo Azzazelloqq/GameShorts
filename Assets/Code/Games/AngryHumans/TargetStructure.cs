@@ -45,6 +45,14 @@ public class TargetStructure : MonoBehaviour
 	public int TotalTargets => _totalTargets;
 	public int AliveTargetsCount => _aliveTargets.Count;
 	public bool IsCompleted => _isCompleted;
+	
+	/// <summary>
+	/// Устанавливает бонус за завершение структуры
+	/// </summary>
+	public void SetCompletionBonus(int bonus)
+	{
+		_completionBonusScore = bonus;
+	}
 
 	private void Awake()
 	{

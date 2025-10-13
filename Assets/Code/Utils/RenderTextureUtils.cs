@@ -4,11 +4,11 @@ namespace Code.Utils
 {
 public static class RenderTextureUtils
 {
-	public static RenderTexture GetRenderTextureForShortGame(Camera camera)
+	public static RenderTexture GetRenderTextureForShortGame(Camera mainGameCamera, Camera uiCamera = null)
 	{
-		if (camera != null)
+		if (mainGameCamera != null)
 		{
-			camera.targetTexture = null;
+			mainGameCamera.targetTexture = null;
 		}
 
 		var width = Screen.width;
@@ -24,11 +24,16 @@ public static class RenderTextureUtils
 		renderTexture.Create();
 
 		// Assign the RenderTexture to the camera
-		if (camera != null)
+		if (mainGameCamera != null)
 		{
-			camera.targetTexture = renderTexture;
+			mainGameCamera.targetTexture = renderTexture;
 			// Set camera aspect ratio to match screen
-			camera.aspect = (float)width / height;
+			mainGameCamera.aspect = (float)width / height;
+		}
+
+		if (uiCamera != null)
+		{
+			uiCamera.targetTexture = renderTexture;
 		}
 
 		return renderTexture;

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f5c9d3a4b7e6f748a9e4c2d5a0f2e8e, type: 3}
+  m_Name: Level01_Easy
+  m_EditorClassIdentifier: 
+  _levelName: Simple Start
+  _levelDescription: Your first mission! Destroy the simple wooden structure with
+    3 attempts.
+  _levelNumber: 1
+  _maxAttempts: 3
+  _threeStarsScore: 3000
+  _twoStarsScore: 2000
+  _oneStarScore: 1000
+  _levelPrefabReference:
+    m_AssetGUID: c646ebee7daa6154cacd817911931edc
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  _backgroundColor: {r: 0.5, g: 0.7, b: 1, a: 1}
+  _baseReward: 100
+  _perfectMultiplier: 2
