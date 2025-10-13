@@ -668,7 +668,6 @@ GameObject:
   - component: {fileID: 7472339112659327366}
   - component: {fileID: 7136296140998240550}
   - component: {fileID: 4439534651572777762}
-  - component: {fileID: 2153048092568445836}
   - component: {fileID: 7962202022187649927}
   m_Layer: 0
   m_Name: AngryHumans
@@ -871,21 +870,6 @@ MonoBehaviour:
   _launchPlatform: {fileID: 3714849172571880035}
   _dragForce: 500
   _dragDamping: 10
---- !u!114 &2153048092568445836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5813369731126633682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e39ee72b7915da49a6ddf351126b5bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AngryHumans::Code.Games.AngryHumans.TrajectoryDisplay
-  _lineRenderer: {fileID: 5256399413416349741}
-  _trajectoryPointsCount: 30
-  _timeStep: 0.1
 --- !u!114 &7962202022187649927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1335,7 +1319,7 @@ Transform:
   m_GameObject: {fileID: 8921076476413084198}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 62.91}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

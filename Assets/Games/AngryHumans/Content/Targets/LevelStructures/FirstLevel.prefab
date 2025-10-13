@@ -163,7 +163,16 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.22, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7735311120877740488}
+  - {fileID: 5200494180488585715}
+  - {fileID: 692911399749446192}
+  - {fileID: 5891511694139401499}
+  - {fileID: 7408309362035744550}
+  - {fileID: 5233176620378260318}
+  - {fileID: 3241478423882920885}
+  - {fileID: 2142107386220839069}
+  - {fileID: 7285758446531477032}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -470,7 +479,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1885707519789685031}
+  - {fileID: 4884937826213055791}
+  - {fileID: 7669842380560595258}
+  - {fileID: 8684404908971591327}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -666,7 +679,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1682109484714280321}
+  - {fileID: 4890721890914573101}
+  - {fileID: 5116026695388007560}
+  - {fileID: 2864376072668032639}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -751,7 +768,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8439471838661156190}
+  - {fileID: 1655446173756146061}
+  - {fileID: 302009298190671145}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -836,7 +856,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1655446173756146061}
+  - {fileID: 789158826879580149}
+  - {fileID: 4945345147363682056}
+  - {fileID: 7019410085990175249}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -921,7 +945,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1655446173756146061}
+  - {fileID: 789158826879580149}
+  - {fileID: 251794192522352260}
+  - {fileID: 7401117915905345694}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -1117,7 +1145,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5073875443895363624}
+  - {fileID: 5197173246959761809}
+  - {fileID: 5842558833737926498}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -1202,7 +1233,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8439471838661156190}
+  - {fileID: 1655446173756146061}
+  - {fileID: 3449471437171998396}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -1287,7 +1321,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8347869872214418081}
+  - {fileID: 681848562248546703}
+  - {fileID: 1840473710023081475}
+  - {fileID: 3379872359945059296}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -1372,7 +1410,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4890721890914573101}
+  - {fileID: 4619664468000518415}
+  - {fileID: 8911482344852990157}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -1679,7 +1720,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4884937826213055791}
+  - {fileID: 5073875443895363624}
+  - {fileID: 5899031902365058392}
+  - {fileID: 5004142036885796543}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -1877,6 +1922,10 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 1021747011516608337}
+  - {fileID: 8034759656474005729}
+  - {fileID: 1024886023385709392}
+  - {fileID: 6718020999843439624}
+  - {fileID: 8449088924572693067}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -2516,7 +2565,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3220478304575516407}
+  - {fileID: 8593793411461655006}
+  - {fileID: 8449088924572693067}
+  - {fileID: 4320518019727499580}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -2713,7 +2766,16 @@ MonoBehaviour:
   _cacheZoneSize: {x: 4, y: 0.84, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
+  - {fileID: 7483835715524823774}
   - {fileID: 4394793383402774098}
+  - {fileID: 3056254776346958662}
+  - {fileID: 9099940929818082264}
+  - {fileID: 8340126896570607373}
+  - {fileID: 6444452878728984054}
+  - {fileID: 6859422307687864197}
+  - {fileID: 6314675150699916494}
+  - {fileID: 357646057419461031}
+  - {fileID: 3379872359945059296}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -2798,7 +2860,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 88341757745276719}
+  - {fileID: 5874161349993847938}
+  - {fileID: 5200494180488585715}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -2995,7 +3060,16 @@ MonoBehaviour:
   _cacheZoneSize: {x: 4, y: 0.84, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
+  - {fileID: 8630830393696458515}
   - {fileID: 3917162048502571371}
+  - {fileID: 253284132847668500}
+  - {fileID: 7019410085990175249}
+  - {fileID: 3449471437171998396}
+  - {fileID: 5116026695388007560}
+  - {fileID: 302009298190671145}
+  - {fileID: 7401117915905345694}
+  - {fileID: 6759210844586726393}
+  - {fileID: 2039398996621424150}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -3302,7 +3376,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2043900029392523421}
+  - {fileID: 1885707519789685031}
+  - {fileID: 3101144708899309475}
+  - {fileID: 3406538294418298127}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -3471,7 +3549,7 @@ Transform:
   m_GameObject: {fileID: 865629304781876597}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -55.2, y: 0, z: 0}
+  m_LocalPosition: {x: -28.4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3531,7 +3609,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3519016279858902296}
+  - {fileID: 8347869872214418081}
+  - {fileID: 6859422307687864197}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -4395,6 +4476,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 472421448072505096}
+  - {fileID: 3220478304575516407}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -4478,7 +4560,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 472421448072505096}
+  - {fileID: 3220478304575516407}
+  - {fileID: 3123916319372843190}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -4565,6 +4650,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 5684315584964441103}
+  - {fileID: 2043900029392523421}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -4761,6 +4847,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 3220478304575516407}
+  - {fileID: 8593793411461655006}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -5179,6 +5266,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 2043900029392523421}
+  - {fileID: 1885707519789685031}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -5262,7 +5350,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1791284810051244079}
+  - {fileID: 3195982279648616095}
+  - {fileID: 5999571286729038701}
+  - {fileID: 8707796404311990869}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -5458,7 +5550,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3195982279648616095}
+  - {fileID: 7251594469646063187}
+  - {fileID: 1859661217641997757}
+  - {fileID: 7218568522084022392}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -5767,6 +5863,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 8630830393696458515}
+  - {fileID: 4945345147363682056}
+  - {fileID: 253284132847668500}
+  - {fileID: 352893568331741161}
+  - {fileID: 3449471437171998396}
+  - {fileID: 251794192522352260}
+  - {fileID: 302009298190671145}
+  - {fileID: 2677824030054589969}
+  - {fileID: 6759210844586726393}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -5853,6 +5957,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 3191913694658677878}
+  - {fileID: 7019410085990175249}
+  - {fileID: 2320786702256940944}
+  - {fileID: 5116026695388007560}
+  - {fileID: 217606201308877795}
+  - {fileID: 7401117915905345694}
+  - {fileID: 9142967356359728376}
+  - {fileID: 2039398996621424150}
+  - {fileID: 8911482344852990157}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -5937,7 +6049,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8702068972632086949}
+  - {fileID: 4166013478392548272}
+  - {fileID: 5690357838768241889}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -6134,7 +6249,16 @@ MonoBehaviour:
   _cacheZoneSize: {x: 4, y: 0.84, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
+  - {fileID: 4375246583848073815}
   - {fileID: 5265596007678232675}
+  - {fileID: 5999571286729038701}
+  - {fileID: 1438338056368167874}
+  - {fileID: 4507403849286903551}
+  - {fileID: 4684783603682917660}
+  - {fileID: 5690357838768241889}
+  - {fileID: 8222314129005343425}
+  - {fileID: 3555668291120490850}
+  - {fileID: 1859661217641997757}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -6441,7 +6565,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2120723713801441187}
+  - {fileID: 7030471911745704799}
+  - {fileID: 2353548136606912051}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -6526,7 +6653,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3519016279858902296}
+  - {fileID: 8347869872214418081}
+  - {fileID: 357646057419461031}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -6611,7 +6741,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1791284810051244079}
+  - {fileID: 3195982279648616095}
+  - {fileID: 3555668291120490850}
+  - {fileID: 1506498818950378427}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -6808,7 +6942,16 @@ MonoBehaviour:
   _cacheZoneSize: {x: 4, y: 0.84, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
+  - {fileID: 1331979837204616454}
   - {fileID: 9034029955124566949}
+  - {fileID: 7669842380560595258}
+  - {fileID: 152675427224783344}
+  - {fileID: 858559154431721215}
+  - {fileID: 3406538294418298127}
+  - {fileID: 4578455529425900276}
+  - {fileID: 5899031902365058392}
+  - {fileID: 6542282382462952707}
+  - {fileID: 7038797081947018235}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -6893,7 +7036,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5684315584964441103}
+  - {fileID: 2043900029392523421}
+  - {fileID: 7669842380560595258}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -7089,7 +7235,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 789158826879580149}
+  - {fileID: 1682109484714280321}
+  - {fileID: 6759210844586726393}
+  - {fileID: 8911482344852990157}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -7176,6 +7326,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 1331979837204616454}
+  - {fileID: 1893937654844887700}
+  - {fileID: 7669842380560595258}
+  - {fileID: 3101144708899309475}
+  - {fileID: 858559154431721215}
+  - {fileID: 3456707269668540347}
+  - {fileID: 4578455529425900276}
+  - {fileID: 7822200272420784097}
+  - {fileID: 6542282382462952707}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -7262,6 +7420,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 7838643778349624572}
+  - {fileID: 88341757745276719}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -7345,7 +7504,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7251594469646063187}
+  - {fileID: 8300826999388041401}
+  - {fileID: 4060494807266191427}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -7430,7 +7592,16 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.22, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3574588534663723886}
+  - {fileID: 6020365266550081679}
+  - {fileID: 5428200851309456932}
+  - {fileID: 5481226838341927419}
+  - {fileID: 6514696685342035843}
+  - {fileID: 2353548136606912051}
+  - {fileID: 1837553644882551766}
+  - {fileID: 4744978599881665561}
+  - {fileID: 2306327832289688293}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -7515,7 +7686,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7838643778349624572}
+  - {fileID: 88341757745276719}
+  - {fileID: 4320518019727499580}
+  - {fileID: 7285758446531477032}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -8266,7 +8441,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2120723713801441187}
+  - {fileID: 7030471911745704799}
+  - {fileID: 4744978599881665561}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -8351,7 +8529,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1682109484714280321}
+  - {fileID: 4890721890914573101}
+  - {fileID: 7019410085990175249}
+  - {fileID: 6292375054706328925}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -8436,7 +8618,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5266954809439871096}
+  - {fileID: 2120723713801441187}
+  - {fileID: 6314675150699916494}
+  - {fileID: 1837553644882551766}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -8521,7 +8707,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4890721890914573101}
+  - {fileID: 4619664468000518415}
+  - {fileID: 9142967356359728376}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -8828,7 +9017,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7251594469646063187}
+  - {fileID: 8300826999388041401}
+  - {fileID: 4991271359516152882}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -9027,7 +9219,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8702068972632086949}
+  - {fileID: 4166013478392548272}
+  - {fileID: 3555668291120490850}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -9334,7 +9529,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8439471838661156190}
+  - {fileID: 1655446173756146061}
+  - {fileID: 6759210844586726393}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -9419,7 +9617,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3519016279858902296}
+  - {fileID: 8347869872214418081}
+  - {fileID: 8340126896570607373}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -9948,7 +10149,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4890721890914573101}
+  - {fileID: 4619664468000518415}
+  - {fileID: 217606201308877795}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -10201,7 +10405,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4884937826213055791}
+  - {fileID: 5073875443895363624}
+  - {fileID: 3406538294418298127}
+  - {fileID: 7753666736115706180}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -10508,7 +10716,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8347869872214418081}
+  - {fileID: 681848562248546703}
+  - {fileID: 5669432162017546628}
+  - {fileID: 9099940929818082264}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -10704,7 +10916,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5684315584964441103}
+  - {fileID: 2043900029392523421}
+  - {fileID: 858559154431721215}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -10789,7 +11004,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3220478304575516407}
+  - {fileID: 8593793411461655006}
+  - {fileID: 1024886023385709392}
+  - {fileID: 6748550206010932763}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -10987,6 +11206,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 5073875443895363624}
+  - {fileID: 5197173246959761809}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -11183,6 +11403,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 1682109484714280321}
+  - {fileID: 4890721890914573101}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -11268,6 +11489,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 9017578695300369582}
+  - {fileID: 1438338056368167874}
+  - {fileID: 8707796404311990869}
+  - {fileID: 4684783603682917660}
+  - {fileID: 4991271359516152882}
+  - {fileID: 8222314129005343425}
+  - {fileID: 4060494807266191427}
+  - {fileID: 1859661217641997757}
+  - {fileID: 1506498818950378427}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -11354,6 +11583,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 1163205311656627516}
+  - {fileID: 8034759656474005729}
+  - {fileID: 5730158592801632876}
+  - {fileID: 1024886023385709392}
+  - {fileID: 3123916319372843190}
+  - {fileID: 6718020999843439624}
+  - {fileID: 8750954725505937136}
+  - {fileID: 8449088924572693067}
+  - {fileID: 656571187336366568}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -11549,7 +11786,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 88341757745276719}
+  - {fileID: 5874161349993847938}
+  - {fileID: 5233176620378260318}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -11718,7 +11958,7 @@ Transform:
   m_GameObject: {fileID: 3292737158897691974}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.4, y: 0, z: 0}
+  m_LocalPosition: {x: -15.6, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11889,7 +12129,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 681848562248546703}
+  - {fileID: 5266954809439871096}
+  - {fileID: 357646057419461031}
+  - {fileID: 4744978599881665561}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -11974,7 +12218,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1885707519789685031}
+  - {fileID: 4884937826213055791}
+  - {fileID: 858559154431721215}
+  - {fileID: 2916900201631537450}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -12317,7 +12565,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1655446173756146061}
+  - {fileID: 789158826879580149}
+  - {fileID: 352893568331741161}
+  - {fileID: 5116026695388007560}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -12402,7 +12654,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5684315584964441103}
+  - {fileID: 2043900029392523421}
+  - {fileID: 4578455529425900276}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -12711,6 +12966,10 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 3565418249632900274}
+  - {fileID: 5669432162017546628}
+  - {fileID: 2707331222935919954}
+  - {fileID: 879353076146058373}
+  - {fileID: 1840473710023081475}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -12795,7 +13054,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4166013478392548272}
+  - {fileID: 1791284810051244079}
+  - {fileID: 2622148580128900755}
+  - {fileID: 1859661217641997757}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -12882,6 +13145,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 3519016279858902296}
+  - {fileID: 8347869872214418081}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -12967,6 +13231,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 2120723713801441187}
+  - {fileID: 7030471911745704799}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -13578,7 +13843,7 @@ Transform:
   m_GameObject: {fileID: 3822634734452198552}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.4, y: 0, z: 12.36}
+  m_LocalPosition: {x: -15.6, y: 0, z: 12.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14084,6 +14349,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 789158826879580149}
+  - {fileID: 1682109484714280321}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -14611,7 +14877,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3195982279648616095}
+  - {fileID: 7251594469646063187}
+  - {fileID: 8222314129005343425}
+  - {fileID: 2118992873711825675}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -14920,6 +15190,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 4375246583848073815}
+  - {fileID: 8904686222320342961}
+  - {fileID: 5999571286729038701}
+  - {fileID: 8729819708215541881}
+  - {fileID: 4507403849286903551}
+  - {fileID: 1739464156095924206}
+  - {fileID: 5690357838768241889}
+  - {fileID: 2622148580128900755}
+  - {fileID: 3555668291120490850}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -15262,7 +15540,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8593793411461655006}
+  - {fileID: 7838643778349624572}
+  - {fileID: 656571187336366568}
+  - {fileID: 2142107386220839069}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -15349,6 +15631,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 4166013478392548272}
+  - {fileID: 1791284810051244079}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -15545,6 +15828,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 681848562248546703}
+  - {fileID: 5266954809439871096}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -15739,7 +16023,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4166013478392548272}
+  - {fileID: 1791284810051244079}
+  - {fileID: 8729819708215541881}
+  - {fileID: 4684783603682917660}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -15797,7 +16085,7 @@ Transform:
   m_GameObject: {fileID: 4549532189740520417}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -78.8, y: 0, z: -0.6}
+  m_LocalPosition: {x: -52, y: 0, z: -0.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15857,7 +16145,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2043900029392523421}
+  - {fileID: 1885707519789685031}
+  - {fileID: 3456707269668540347}
+  - {fileID: 5899031902365058392}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -16164,7 +16456,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.4, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 6292375054706328925}
+  - {fileID: 2864376072668032639}
+  - {fileID: 2378548469122633160}
+  - {fileID: 394352544091457243}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -16471,7 +16767,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8593793411461655006}
+  - {fileID: 7838643778349624572}
+  - {fileID: 8750954725505937136}
+  - {fileID: 5233176620378260318}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -16556,7 +16856,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1791284810051244079}
+  - {fileID: 3195982279648616095}
+  - {fileID: 4507403849286903551}
+  - {fileID: 4991271359516152882}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -16863,7 +17167,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5266954809439871096}
+  - {fileID: 2120723713801441187}
+  - {fileID: 3379872359945059296}
+  - {fileID: 2306327832289688293}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -16948,7 +17256,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5073875443895363624}
+  - {fileID: 5197173246959761809}
+  - {fileID: 8684404908971591327}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17257,6 +17568,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 7597131642882385290}
+  - {fileID: 152675427224783344}
+  - {fileID: 8684404908971591327}
+  - {fileID: 3406538294418298127}
+  - {fileID: 2916900201631537450}
+  - {fileID: 5899031902365058392}
+  - {fileID: 452690907937760974}
+  - {fileID: 7038797081947018235}
+  - {fileID: 5842558833737926498}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17452,7 +17771,16 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.22, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5861713469435996822}
+  - {fileID: 2320786702256940944}
+  - {fileID: 6292375054706328925}
+  - {fileID: 217606201308877795}
+  - {fileID: 2864376072668032639}
+  - {fileID: 9142967356359728376}
+  - {fileID: 2378548469122633160}
+  - {fileID: 8911482344852990157}
+  - {fileID: 394352544091457243}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17537,7 +17865,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8439471838661156190}
+  - {fileID: 1655446173756146061}
+  - {fileID: 253284132847668500}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17622,7 +17953,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3195982279648616095}
+  - {fileID: 7251594469646063187}
+  - {fileID: 4684783603682917660}
+  - {fileID: 2449969924286365066}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17707,7 +18042,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5073875443895363624}
+  - {fileID: 5197173246959761809}
+  - {fileID: 452690907937760974}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17792,7 +18130,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8593793411461655006}
+  - {fileID: 7838643778349624572}
+  - {fileID: 5730158592801632876}
+  - {fileID: 5200494180488585715}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -17988,7 +18330,16 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.22, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3145646766426878992}
+  - {fileID: 8684404908971591327}
+  - {fileID: 4808487752408546147}
+  - {fileID: 2916900201631537450}
+  - {fileID: 7753666736115706180}
+  - {fileID: 452690907937760974}
+  - {fileID: 5004142036885796543}
+  - {fileID: 5842558833737926498}
+  - {fileID: 336305321916830530}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -18075,6 +18426,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 8439471838661156190}
+  - {fileID: 1655446173756146061}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -18158,7 +18510,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 789158826879580149}
+  - {fileID: 1682109484714280321}
+  - {fileID: 3449471437171998396}
+  - {fileID: 217606201308877795}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -18390,7 +18746,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.4, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4808487752408546147}
+  - {fileID: 7753666736115706180}
+  - {fileID: 5004142036885796543}
+  - {fileID: 336305321916830530}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -18475,7 +18835,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7838643778349624572}
+  - {fileID: 88341757745276719}
+  - {fileID: 5036766313744582543}
+  - {fileID: 692911399749446192}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -18560,7 +18924,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7838643778349624572}
+  - {fileID: 88341757745276719}
+  - {fileID: 4670596825587472427}
+  - {fileID: 3241478423882920885}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -18647,6 +19015,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 1791284810051244079}
+  - {fileID: 3195982279648616095}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -18732,6 +19101,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 5723951553222802586}
+  - {fileID: 9099940929818082264}
+  - {fileID: 6020365266550081679}
+  - {fileID: 6444452878728984054}
+  - {fileID: 5481226838341927419}
+  - {fileID: 6314675150699916494}
+  - {fileID: 2353548136606912051}
+  - {fileID: 3379872359945059296}
+  - {fileID: 4744978599881665561}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -19095,7 +19472,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2120723713801441187}
+  - {fileID: 7030471911745704799}
+  - {fileID: 6020365266550081679}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -19291,7 +19671,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5266954809439871096}
+  - {fileID: 2120723713801441187}
+  - {fileID: 6444452878728984054}
+  - {fileID: 6514696685342035843}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -19487,7 +19871,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3519016279858902296}
+  - {fileID: 8347869872214418081}
+  - {fileID: 3056254776346958662}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -19685,6 +20072,10 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 1080455598162415310}
+  - {fileID: 1893937654844887700}
+  - {fileID: 3101144708899309475}
+  - {fileID: 3456707269668540347}
+  - {fileID: 7822200272420784097}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -19769,7 +20160,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4166013478392548272}
+  - {fileID: 1791284810051244079}
+  - {fileID: 1739464156095924206}
+  - {fileID: 8222314129005343425}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -19856,6 +20251,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 5266954809439871096}
+  - {fileID: 2120723713801441187}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -19939,7 +20335,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3220478304575516407}
+  - {fileID: 8593793411461655006}
+  - {fileID: 8034759656474005729}
+  - {fileID: 5036766313744582543}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -20024,7 +20424,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4884937826213055791}
+  - {fileID: 5073875443895363624}
+  - {fileID: 7038797081947018235}
+  - {fileID: 336305321916830530}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -20111,6 +20515,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 7251594469646063187}
+  - {fileID: 8300826999388041401}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -20418,6 +20823,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 4890721890914573101}
+  - {fileID: 4619664468000518415}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -20501,7 +20907,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.4, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 692911399749446192}
+  - {fileID: 7408309362035744550}
+  - {fileID: 3241478423882920885}
+  - {fileID: 7285758446531477032}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -20697,7 +21107,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7838643778349624572}
+  - {fileID: 88341757745276719}
+  - {fileID: 6748550206010932763}
+  - {fileID: 7408309362035744550}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -20782,7 +21196,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1885707519789685031}
+  - {fileID: 4884937826213055791}
+  - {fileID: 4578455529425900276}
+  - {fileID: 452690907937760974}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -21089,7 +21507,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4166013478392548272}
+  - {fileID: 1791284810051244079}
+  - {fileID: 8904686222320342961}
+  - {fileID: 1438338056368167874}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -21174,7 +21596,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5266954809439871096}
+  - {fileID: 2120723713801441187}
+  - {fileID: 9099940929818082264}
+  - {fileID: 5428200851309456932}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -21925,7 +22351,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4890721890914573101}
+  - {fileID: 4619664468000518415}
+  - {fileID: 2320786702256940944}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -22010,7 +22439,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 681848562248546703}
+  - {fileID: 5266954809439871096}
+  - {fileID: 6859422307687864197}
+  - {fileID: 2353548136606912051}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -22428,7 +22861,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 681848562248546703}
+  - {fileID: 5266954809439871096}
+  - {fileID: 8340126896570607373}
+  - {fileID: 5481226838341927419}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -22513,7 +22950,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2120723713801441187}
+  - {fileID: 7030471911745704799}
+  - {fileID: 5481226838341927419}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -22820,7 +23260,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2043900029392523421}
+  - {fileID: 1885707519789685031}
+  - {fileID: 7822200272420784097}
+  - {fileID: 7038797081947018235}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -23052,7 +23496,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 472421448072505096}
+  - {fileID: 3220478304575516407}
+  - {fileID: 8750954725505937136}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -23137,7 +23584,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8593793411461655006}
+  - {fileID: 7838643778349624572}
+  - {fileID: 3123916319372843190}
+  - {fileID: 5891511694139401499}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -23333,7 +23784,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1655446173756146061}
+  - {fileID: 789158826879580149}
+  - {fileID: 2677824030054589969}
+  - {fileID: 2039398996621424150}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -23529,7 +23984,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8347869872214418081}
+  - {fileID: 681848562248546703}
+  - {fileID: 879353076146058373}
+  - {fileID: 6314675150699916494}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -23836,7 +24295,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 789158826879580149}
+  - {fileID: 1682109484714280321}
+  - {fileID: 253284132847668500}
+  - {fileID: 2320786702256940944}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -23921,7 +24384,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.4, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5428200851309456932}
+  - {fileID: 6514696685342035843}
+  - {fileID: 1837553644882551766}
+  - {fileID: 2306327832289688293}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -24006,7 +24473,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1885707519789685031}
+  - {fileID: 4884937826213055791}
+  - {fileID: 6542282382462952707}
+  - {fileID: 5842558833737926498}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -24535,7 +25006,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7251594469646063187}
+  - {fileID: 8300826999388041401}
+  - {fileID: 8707796404311990869}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -24620,7 +25094,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7251594469646063187}
+  - {fileID: 8300826999388041401}
+  - {fileID: 1506498818950378427}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -24705,7 +25182,16 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.22, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5850666209788996564}
+  - {fileID: 8707796404311990869}
+  - {fileID: 7213225843978946683}
+  - {fileID: 4991271359516152882}
+  - {fileID: 2449969924286365066}
+  - {fileID: 4060494807266191427}
+  - {fileID: 2118992873711825675}
+  - {fileID: 1506498818950378427}
+  - {fileID: 7218568522084022392}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -24790,7 +25276,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 88341757745276719}
+  - {fileID: 5874161349993847938}
+  - {fileID: 2142107386220839069}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -25097,7 +25586,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 789158826879580149}
+  - {fileID: 1682109484714280321}
+  - {fileID: 302009298190671145}
+  - {fileID: 9142967356359728376}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -25182,7 +25675,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 88341757745276719}
+  - {fileID: 5874161349993847938}
+  - {fileID: 5891511694139401499}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -25269,6 +25765,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 8593793411461655006}
+  - {fileID: 7838643778349624572}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -25354,6 +25851,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 8347869872214418081}
+  - {fileID: 681848562248546703}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -25661,6 +26159,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 4884937826213055791}
+  - {fileID: 5073875443895363624}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -25855,7 +26354,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 2043900029392523421}
+  - {fileID: 1885707519789685031}
+  - {fileID: 1893937654844887700}
+  - {fileID: 152675427224783344}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -26106,6 +26609,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 88341757745276719}
+  - {fileID: 5874161349993847938}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -26411,7 +26915,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5073875443895363624}
+  - {fileID: 5197173246959761809}
+  - {fileID: 2916900201631537450}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -26496,7 +27003,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 5684315584964441103}
+  - {fileID: 2043900029392523421}
+  - {fileID: 6542282382462952707}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -26583,6 +27093,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 2110738962529097419}
+  - {fileID: 5036766313744582543}
+  - {fileID: 5200494180488585715}
+  - {fileID: 6748550206010932763}
+  - {fileID: 5891511694139401499}
+  - {fileID: 4670596825587472427}
+  - {fileID: 5233176620378260318}
+  - {fileID: 4320518019727499580}
+  - {fileID: 2142107386220839069}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -27444,7 +27962,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 472421448072505096}
+  - {fileID: 3220478304575516407}
+  - {fileID: 5730158592801632876}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -27502,7 +28023,7 @@ Transform:
   m_GameObject: {fileID: 8061235508910886688}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -61.7, y: 0, z: 12.36}
+  m_LocalPosition: {x: -34.9, y: 0, z: 12.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -27895,7 +28416,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1791284810051244079}
+  - {fileID: 3195982279648616095}
+  - {fileID: 5690357838768241889}
+  - {fileID: 4060494807266191427}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -28091,7 +28616,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4, y: 0.4, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 7213225843978946683}
+  - {fileID: 2449969924286365066}
+  - {fileID: 2118992873711825675}
+  - {fileID: 7218568522084022392}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -28178,6 +28707,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 8702068972632086949}
+  - {fileID: 4166013478392548272}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -28261,7 +28791,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8347869872214418081}
+  - {fileID: 681848562248546703}
+  - {fileID: 2707331222935919954}
+  - {fileID: 6444452878728984054}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -28348,6 +28882,14 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 7483835715524823774}
+  - {fileID: 5669432162017546628}
+  - {fileID: 3056254776346958662}
+  - {fileID: 2707331222935919954}
+  - {fileID: 8340126896570607373}
+  - {fileID: 879353076146058373}
+  - {fileID: 6859422307687864197}
+  - {fileID: 1840473710023081475}
+  - {fileID: 357646057419461031}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -28545,6 +29087,10 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 5108896985122152018}
+  - {fileID: 4945345147363682056}
+  - {fileID: 352893568331741161}
+  - {fileID: 251794192522352260}
+  - {fileID: 2677824030054589969}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -28851,7 +29397,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 472421448072505096}
+  - {fileID: 3220478304575516407}
+  - {fileID: 656571187336366568}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -29084,7 +29633,16 @@ MonoBehaviour:
   _cacheZoneSize: {x: 4, y: 0.84, z: 5.5}
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
+  - {fileID: 1163205311656627516}
   - {fileID: 7456118292766362794}
+  - {fileID: 5730158592801632876}
+  - {fileID: 5036766313744582543}
+  - {fileID: 3123916319372843190}
+  - {fileID: 6748550206010932763}
+  - {fileID: 8750954725505937136}
+  - {fileID: 4670596825587472427}
+  - {fileID: 656571187336366568}
+  - {fileID: 4320518019727499580}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -29171,6 +29729,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 1655446173756146061}
+  - {fileID: 789158826879580149}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -29254,7 +29813,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 4884937826213055791}
+  - {fileID: 5073875443895363624}
+  - {fileID: 152675427224783344}
+  - {fileID: 4808487752408546147}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -29452,6 +30015,10 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0.8, y: 0, z: -0.5}
   _cachedConnectedObjects:
   - {fileID: 8301751950172073224}
+  - {fileID: 8904686222320342961}
+  - {fileID: 8729819708215541881}
+  - {fileID: 1739464156095924206}
+  - {fileID: 2622148580128900755}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -29536,7 +30103,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3195982279648616095}
+  - {fileID: 7251594469646063187}
+  - {fileID: 1438338056368167874}
+  - {fileID: 7213225843978946683}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -29732,7 +30303,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8702068972632086949}
+  - {fileID: 4166013478392548272}
+  - {fileID: 4507403849286903551}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -29928,7 +30502,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 3220478304575516407}
+  - {fileID: 8593793411461655006}
+  - {fileID: 6718020999843439624}
+  - {fileID: 4670596825587472427}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -30403,7 +30981,10 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 8702068972632086949}
+  - {fileID: 4166013478392548272}
+  - {fileID: 5999571286729038701}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -30488,7 +31069,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1682109484714280321}
+  - {fileID: 4890721890914573101}
+  - {fileID: 2039398996621424150}
+  - {fileID: 394352544091457243}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -30686,6 +31271,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 3195982279648616095}
+  - {fileID: 7251594469646063187}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -30771,6 +31357,7 @@ MonoBehaviour:
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
   _cachedConnectedObjects:
   - {fileID: 1885707519789685031}
+  - {fileID: 4884937826213055791}
   _damageEffectPrefab: {fileID: 0}
   _destroyEffectPrefab: {fileID: 0}
   _destroyOnDeath: 1
@@ -30854,7 +31441,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 681848562248546703}
+  - {fileID: 5266954809439871096}
+  - {fileID: 3056254776346958662}
+  - {fileID: 6020365266550081679}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3
@@ -30939,7 +31530,11 @@ MonoBehaviour:
   _cacheZoneShape: 1
   _cacheZoneSize: {x: 4.5, y: 0.4, z: 7}
   _cacheZoneOffset: {x: 0, y: 0, z: 0}
-  _cachedConnectedObjects: []
+  _cachedConnectedObjects:
+  - {fileID: 1682109484714280321}
+  - {fileID: 4890721890914573101}
+  - {fileID: 7401117915905345694}
+  - {fileID: 2378548469122633160}
   _destructionEffectPrefab: {fileID: 0}
   _debrisPrefabs: []
   _debrisCount: 3

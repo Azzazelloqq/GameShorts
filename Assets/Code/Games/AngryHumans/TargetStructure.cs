@@ -4,51 +4,38 @@ using UnityEngine;
 
 namespace Code.Games.AngryHumans
 {
-/// <summary>
-/// Структура с целями - представляет домик/конструкцию с врагами
-/// </summary>
-public class TargetStructure : MonoBehaviour
+internal class TargetStructure : MonoBehaviour
 {
 	[Header("Structure Info")]
 	[SerializeField]
-	[Tooltip("Название структуры (для отладки)")]
+	[Tooltip("Structure name (for debugging)")]
 	private string _structureName = "Structure";
 
 	[SerializeField]
-	[Tooltip("Бонусные очки за полное уничтожение всех целей в структуре")]
+	[Tooltip("Bonus score for destroying all targets in structure")]
 	private int _completionBonusScore = 500;
 
 	[Header("References")]
 	[SerializeField]
-	[Tooltip("Все цели в этой структуре (заполняется автоматически при инициализации)")]
+	[Tooltip("All targets in this structure (filled automatically on initialization)")]
 	private Target[] _targets;
 
 	[SerializeField]
-	[Tooltip("Все разрушаемые блоки в структуре (опционально)")]
+	[Tooltip("All destructible blocks in structure (optional)")]
 	private DestructibleBlock[] _destructibleBlocks;
 
 	private readonly HashSet<Target> _aliveTargets = new();
 	private bool _isCompleted = false;
 	private int _totalTargets = 0;
 
-	/// <summary>
-	/// Вызывается когда цель в структуре уничтожена
-	/// </summary>
 	public event Action<TargetStructure, Target, int> OnTargetDestroyed;
-
-	/// <summary>
-	/// Вызывается когда все цели в структуре уничтожены
-	/// </summary>
 	public event Action<TargetStructure, int> OnStructureCompleted;
 
 	public string StructureName => _structureName;
 	public int TotalTargets => _totalTargets;
 	public int AliveTargetsCount => _aliveTargets.Count;
 	public bool IsCompleted => _isCompleted;
-	
-	/// <summary>
-	/// Устанавливает бонус за завершение структуры
-	/// </summary>
+
 	public void SetCompletionBonus(int bonus)
 	{
 		_completionBonusScore = bonus;
@@ -59,37 +46,28 @@ public class TargetStructure : MonoBehaviour
 		Initialize();
 	}
 
-	/// <summary>
-	/// Инициализирует структуру - находит все цели и блоки
-	/// </summary>
 	public void Initialize()
 	{
-		// Защита от повторной инициализации
 		if (_totalTargets > 0 && _aliveTargets.Count > 0)
 		{
-			Debug.LogWarning($"[{_structureName}] Already initialized, skipping...");
 			return;
 		}
-		
-		// Находим все цели в дочерних объектах, если не заданы вручную
+
 		if (_targets == null || _targets.Length == 0)
 		{
 			_targets = GetComponentsInChildren<Target>();
 		}
 
-		// Находим все разрушаемые блоки
 		if (_destructibleBlocks == null || _destructibleBlocks.Length == 0)
 		{
 			_destructibleBlocks = GetComponentsInChildren<DestructibleBlock>();
 		}
 
-		// Инициализируем список живых целей
 		_aliveTargets.Clear();
 		foreach (var target in _targets)
 		{
 			if (target != null)
 			{
-				// Отписываемся перед подпиской, чтобы избежать дублирования
 				target.OnTargetDestroyed -= HandleTargetDestroyed;
 				target.OnTargetDestroyed += HandleTargetDestroyed;
 				_aliveTargets.Add(target);
@@ -98,13 +76,10 @@ public class TargetStructure : MonoBehaviour
 
 		_totalTargets = _aliveTargets.Count;
 		_isCompleted = false;
-
-		Debug.Log($"[{_structureName}] Initialized with {_totalTargets} targets and {_destructibleBlocks.Length} blocks");
 	}
 
 	private void OnDestroy()
 	{
-		// Отписываемся от событий
 		foreach (var target in _targets)
 		{
 			if (target != null)
@@ -122,13 +97,8 @@ public class TargetStructure : MonoBehaviour
 		}
 
 		_aliveTargets.Remove(target);
-
-		// Уведомляем о уничтожении цели
 		OnTargetDestroyed?.Invoke(this, target, score);
 
-		Debug.Log($"[{_structureName}] Target destroyed! Remaining: {_aliveTargets.Count}/{_totalTargets}");
-
-		// Проверяем, все ли цели уничтожены
 		if (_aliveTargets.Count == 0)
 		{
 			CompleteStructure();
@@ -143,22 +113,14 @@ public class TargetStructure : MonoBehaviour
 		}
 
 		_isCompleted = true;
-
-		Debug.Log($"[{_structureName}] All targets destroyed! Bonus: {_completionBonusScore}");
-
-		// Уведомляем о завершении структуры
 		OnStructureCompleted?.Invoke(this, _completionBonusScore);
 	}
 
-	/// <summary>
-	/// Сбрасывает структуру в исходное состояние
-	/// </summary>
 	public void Reset()
 	{
 		_isCompleted = false;
 		_aliveTargets.Clear();
 
-		// Сбрасываем все цели
 		foreach (var target in _targets)
 		{
 			if (target != null)
@@ -168,7 +130,6 @@ public class TargetStructure : MonoBehaviour
 			}
 		}
 
-		// Сбрасываем все блоки
 		foreach (var block in _destructibleBlocks)
 		{
 			if (block != null)
@@ -178,9 +139,6 @@ public class TargetStructure : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// Получает процент уничтоженных целей (0-1)
-	/// </summary>
 	public float GetCompletionPercentage()
 	{
 		if (_totalTargets == 0)
@@ -188,10 +146,10 @@ public class TargetStructure : MonoBehaviour
 			return 0f;
 		}
 
-		return 1f - ((float)_aliveTargets.Count / _totalTargets);
+		return 1f - (float)_aliveTargets.Count / _totalTargets;
 	}
 
-#if UNITY_EDITOR
+	#if UNITY_EDITOR
 	[ContextMenu("Find All Targets")]
 	private void EditorFindTargets()
 	{
@@ -219,7 +177,6 @@ public class TargetStructure : MonoBehaviour
 			}
 		}
 	}
-#endif
+	#endif
 }
 }
-

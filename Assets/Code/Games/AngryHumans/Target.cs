@@ -4,14 +4,8 @@ using UnityEngine;
 
 namespace Code.Games.AngryHumans
 {
-/// <summary>
-/// Базовый класс цели, которую можно уничтожить попаданием человечка
-/// </summary>
-public class Target : MonoBehaviour, IPhysicsActivatable
+internal class Target : MonoBehaviour, IPhysicsActivatable
 {
-	/// <summary>
-	/// Форма зоны кеширования связанных объектов
-	/// </summary>
 	private enum CacheZoneShape
 	{
 		Sphere,
@@ -20,62 +14,57 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 
 	[Header("Target Settings")]
 	[SerializeField]
-	[Tooltip("Очки за уничтожение этой цели")]
+	[Tooltip("Score value for destroying this target")]
 	private int _scoreValue = 100;
 
 	[SerializeField]
-	[Tooltip("Минимальная скорость столкновения для уничтожения")]
+	[Tooltip("Minimum collision velocity for destruction")]
 	private float _minHitVelocity = 2f;
 
 	[Header("Physics Activation")]
 	[SerializeField]
-	[Tooltip("Активировать все связанные объекты структуры")]
-	private bool _activateConnectedStructure = true; // Активировать всю связанную структуру
+	[Tooltip("Activate all connected structure objects")]
+	private bool _activateConnectedStructure = true;
 
 	[Header("Connection Cache Settings")]
 	[SerializeField]
-	[Tooltip("Форма зоны кеширования")]
+	[Tooltip("Cache zone shape")]
 	private CacheZoneShape _cacheZoneShape = CacheZoneShape.Box;
 
 	[SerializeField]
-	[Tooltip("Радиус сферы или размер бокса для кеширования")]
+	[Tooltip("Sphere radius or box size for caching")]
 	private Vector3 _cacheZoneSize = new(2f, 5f, 2f);
 
 	[SerializeField]
-	[Tooltip("Смещение зоны кеширования относительно центра объекта")]
+	[Tooltip("Cache zone offset relative to object center")]
 	private Vector3 _cacheZoneOffset = Vector3.zero;
 
 	[SerializeField]
-	[Tooltip("Список прекешированных связанных объектов")]
+	[Tooltip("List of precached connected objects")]
 	private List<GameObject> _cachedConnectedObjects = new();
 
 	[Header("Visual Feedback")]
 	[SerializeField]
-	[Tooltip("Эффект при получении урона (опционально)")]
+	[Tooltip("Damage effect prefab (optional)")]
 	private GameObject _damageEffectPrefab;
 
 	[SerializeField]
-	[Tooltip("Эффект при уничтожении (опционально)")]
+	[Tooltip("Destruction effect prefab (optional)")]
 	private GameObject _destroyEffectPrefab;
 
 	[SerializeField]
-	[Tooltip("Должна ли цель исчезнуть при уничтожении")]
+	[Tooltip("Should target disappear on death")]
 	private bool _destroyOnDeath = true;
 
 	[SerializeField]
-	[Tooltip("Задержка перед уничтожением объекта (секунды)")]
+	[Tooltip("Delay before object destruction (seconds)")]
 	private float _destroyDelay = 0.5f;
 
 	private bool _isDestroyed = false;
 	private Rigidbody _rigidbody;
-	private bool _physicsActivated = false; // Флаг активации физики после первого удара
-
-	// Буфер для NonAlloc версии Physics.OverlapSphere (экземплярный для thread-safety)
+	private bool _physicsActivated = false;
 	private Collider[] _nearbyCollidersBuffer;
 
-	/// <summary>
-	/// Вызывается при уничтожении цели. Передает количество очков за уничтожение
-	/// </summary>
 	public event Action<Target, int> OnTargetDestroyed;
 
 	public int ScoreValue => _scoreValue;
@@ -84,70 +73,26 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 	private void Awake()
 	{
 		_rigidbody = GetComponent<Rigidbody>();
-
-		// Инициализируем буфер для поиска коллайдеров
 		_nearbyCollidersBuffer = new Collider[100];
 
-		// Замораживаем цель до первого попадания
 		if (_rigidbody != null)
 		{
 			_rigidbody.isKinematic = true;
 		}
 	}
 
-	#if UNITY_EDITOR
-	private void OnValidate()
-	{
-		// Автоматически кешируем при изменении параметров в редакторе
-		if (!Application.isPlaying)
-		{
-			UnityEditor.EditorApplication.delayCall += () =>
-			{
-				if (this != null)
-				{
-					UpdateConnectedObjectsCache();
-				}
-			};
-		}
-	}
-	#endif
 
-	/// <summary>
-	/// Вычисляет общий Bounds всех коллайдеров объекта и его детей
-	/// </summary>
-	private Bounds GetCompositeBounds()
-	{
-		var colliders = GetComponentsInChildren<Collider>();
-		if (colliders.Length == 0)
-		{
-			return new Bounds(transform.position, Vector3.one);
-		}
-
-		var bounds = colliders[0].bounds;
-		for (var i = 1; i < colliders.Length; i++)
-		{
-			bounds.Encapsulate(colliders[i].bounds);
-		}
-
-		return bounds;
-	}
-
-	/// <summary>
-	/// Обновляет кеш связанных объектов (вызывается из редактора)
-	/// </summary>
 	[ContextMenu("Update Connected Objects Cache")]
 	public void UpdateConnectedObjectsCache()
 	{
 		_cachedConnectedObjects.Clear();
 
 		#if UNITY_EDITOR
-		// Проверяем, находимся ли мы в режиме префаба
 		var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 		var isPrefabMode = prefabStage != null && prefabStage.IsPartOfPrefabContents(gameObject);
 
 		if (!isPrefabMode)
 		{
-			// Проверяем, является ли это префабом в Project view
 			isPrefabMode = UnityEditor.PrefabUtility.IsPartOfPrefabAsset(gameObject);
 		}
 
@@ -157,46 +102,35 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 
 		if (isPrefabMode)
 		{
-			Debug.Log($"[{gameObject.name}] Prefab mode detected - using collider-based search");
-
-			// В режиме префаба используем поиск по коллайдерам
 			var root = transform.root;
 			allColliders = root.GetComponentsInChildren<Collider>();
 
-			// Используем правильный центр с учетом масштаба и смещения
 			scaledOffset = Vector3.Scale(_cacheZoneOffset, transform.lossyScale);
 			center = transform.position + transform.rotation * scaledOffset;
 
-			// Небольшой допуск для касающихся объектов (0.5 единицы)
 			const float touchTolerance = 0.5f;
-
 			var processedRoots = new HashSet<GameObject>();
 
 			foreach (var collider in allColliders)
 			{
-				// Пропускаем коллайдеры этого объекта и его дочерних
 				if (collider.transform == transform || collider.transform.IsChildOf(transform))
 				{
 					continue;
 				}
 
-				// Проверяем пересечение Bounds коллайдера с нашей зоной поиска
 				var isInZone = false;
 
 				if (_cacheZoneShape == CacheZoneShape.Sphere)
 				{
-					// Для сферы - используем Bounds коллайдера для проверки пересечения
 					var scaledRadius = _cacheZoneSize.x *
 										Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
 					var colliderBounds = collider.bounds;
 					var closestPointOnBounds = colliderBounds.ClosestPoint(center);
 					var distance = Vector3.Distance(closestPointOnBounds, center);
-					// Добавляем допуск для касающихся объектов
 					isInZone = distance <= scaledRadius + touchTolerance;
 				}
-				else // Box
+				else
 				{
-					// Для бокса - проверяем пересечение Bounds с учётом масштаба
 					var scaledSize = Vector3.Scale(_cacheZoneSize, transform.lossyScale);
 					var searchBounds = new Bounds(center, scaledSize + Vector3.one * touchTolerance * 2f);
 					var colliderBounds = collider.bounds;
@@ -205,7 +139,6 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 
 				if (isInZone)
 				{
-					// Ищем компонент на объекте коллайдера или его родителях
 					var current = collider.transform;
 					GameObject targetObject = null;
 
@@ -232,63 +165,28 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 				}
 			}
 
-			Debug.Log($"[{gameObject.name}] Prefab cache updated: {_cachedConnectedObjects.Count} objects cached");
 			UnityEditor.EditorUtility.SetDirty(this);
-
-			// НЕ сохраняем автоматически - пусть пользователь сам решит когда сохранять
-			// Это избавит от зависаний после обновления кеша
 			return;
 		}
 		#endif
 
-		// Обычный поиск для объектов на сцене
-		// Синхронизируем физику перед поиском (важно для редактора)
 		Physics.SyncTransforms();
 
-		// Учитываем масштаб при расчете центра и размера зоны
 		scaledOffset = Vector3.Scale(_cacheZoneOffset, transform.lossyScale);
 		center = transform.position + transform.rotation * scaledOffset;
 		Collider[] foundColliders = null;
 
-		// В редакторе используем обычные методы вместо NonAlloc
 		#if UNITY_EDITOR
-		// Сначала проверим, что вообще есть коллайдеры в сцене
 		allColliders = FindObjectsOfType<Collider>();
-		Debug.Log($"[{gameObject.name}] Total colliders in scene: {allColliders.Length}");
-
-		// Проверим ближайшие коллайдеры вручную
-		var nearbyCount = 0;
-		foreach (var col in allColliders)
-		{
-			if (col.gameObject == gameObject)
-			{
-				continue;
-			}
-
-			var distance = Vector3.Distance(col.transform.position, center);
-			if (distance < 10f) // В пределах 10 единиц
-			{
-				nearbyCount++;
-				Debug.Log($"  Nearby collider: {col.gameObject.name} at distance {distance:F2}");
-			}
-		}
-
-		Debug.Log($"[{gameObject.name}] Found {nearbyCount} colliders within 10 units");
 
 		if (_cacheZoneShape == CacheZoneShape.Sphere)
 		{
-			// Учитываем максимальный масштаб для радиуса сферы
 			var scaledRadius = _cacheZoneSize.x *
 								Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
-			// Используем единообразный подход к триггерам
 			foundColliders = Physics.OverlapSphere(center, scaledRadius, ~0, QueryTriggerInteraction.Ignore);
-			Debug.Log(
-				$"[{gameObject.name}] Sphere search (Editor): center={center}, radius={scaledRadius}, found={foundColliders.Length} colliders");
 
-			// Если не нашли, пробуем альтернативный способ
 			if (foundColliders.Length == 0)
 			{
-				Debug.LogWarning($"[{gameObject.name}] OverlapSphere found nothing, trying manual search...");
 				var manualList = new List<Collider>();
 				foreach (var col in allColliders)
 				{
@@ -300,19 +198,15 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 					if (Vector3.Distance(col.transform.position, center) <= scaledRadius)
 					{
 						manualList.Add(col);
-						Debug.Log($"  Manual found: {col.gameObject.name}");
 					}
 				}
 
 				foundColliders = manualList.ToArray();
-				Debug.Log($"[{gameObject.name}] Manual search found {foundColliders.Length} colliders");
 			}
 		}
-		else // Box
+		else
 		{
-			// Учитываем масштаб для размера бокса
 			var scaledSize = Vector3.Scale(_cacheZoneSize, transform.lossyScale);
-			// Используем единообразный подход к триггерам
 			foundColliders = Physics.OverlapBox(
 				center,
 				scaledSize / 2f,
@@ -320,11 +214,8 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 				~0,
 				QueryTriggerInteraction.Ignore
 			);
-			Debug.Log(
-				$"[{gameObject.name}] Box search (Editor): center={center}, size={scaledSize}, found={foundColliders.Length} colliders");
 		}
 		#else
-		// В игре используем NonAlloc версии для производительности
 		if (_nearbyCollidersBuffer == null)
 		{
 			_nearbyCollidersBuffer = new Collider[100];
@@ -333,15 +224,13 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 		int hitCount = 0;
 		if (_cacheZoneShape == CacheZoneShape.Sphere)
 		{
-			// Учитываем максимальный масштаб для радиуса
 			var scaledRadius =
  _cacheZoneSize.x * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
 			hitCount =
  Physics.OverlapSphereNonAlloc(center, scaledRadius, _nearbyCollidersBuffer, ~0, QueryTriggerInteraction.Ignore);
 		}
-		else // Box
+		else
 		{
-			// Учитываем масштаб для размера бокса
 			var scaledSize = Vector3.Scale(_cacheZoneSize, transform.lossyScale);
 			hitCount = Physics.OverlapBoxNonAlloc(
 				center,
@@ -353,7 +242,6 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 			);
 		}
 		
-		// Создаём массив из буфера для единообразной обработки
 		foundColliders = new Collider[hitCount];
 		for (int i = 0; i < hitCount; i++)
 		{
@@ -361,8 +249,6 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 		}
 		#endif
 
-		// Добавляем найденные объекты в кеш
-		var addedCount = 0;
 		var addedRoots = new HashSet<GameObject>();
 
 		foreach (var collider in foundColliders)
@@ -372,20 +258,16 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 				continue;
 			}
 
-			// Пропускаем коллайдеры, принадлежащие этому же объекту или его дочерним
 			if (collider.transform.IsChildOf(transform) || collider.transform == transform)
 			{
-				Debug.Log($"  Skipping self or child: {collider.gameObject.name}");
 				continue;
 			}
 
-			// Ищем компонент IPhysicsActivatable на самом коллайдере и всех его родителях
 			GameObject targetObject = null;
 			var current = collider.transform;
 
 			while (current != null)
 			{
-				// Проверяем наличие нужных компонентов
 				var activatable = current.GetComponent<IPhysicsActivatable>();
 				var block = current.GetComponent<DestructibleBlock>();
 				var target = current.GetComponent<Target>();
@@ -393,45 +275,28 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 				if (activatable != null || block != null || target != null)
 				{
 					targetObject = current.gameObject;
-					Debug.Log($"  Found component on: {current.name} (collider was on: {collider.name})");
 					break;
 				}
 
 				current = current.parent;
 			}
 
-			// Если нашли подходящий объект и ещё не добавляли его
 			if (targetObject != null && !addedRoots.Contains(targetObject))
 			{
 				_cachedConnectedObjects.Add(targetObject);
 				addedRoots.Add(targetObject);
-				addedCount++;
-				Debug.Log($"  Added root object: {targetObject.name} (from collider: {collider.name})");
-			}
-			else if (targetObject == null)
-			{
-				Debug.Log(
-					$"  Skipped: {collider.gameObject.name} - no IPhysicsActivatable/DestructibleBlock/Target found in hierarchy");
 			}
 		}
-
-		Debug.Log(
-			$"[{gameObject.name}] Cache updated: {addedCount} objects cached out of {foundColliders?.Length ?? 0} found");
 
 		#if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(this);
 		#endif
 	}
 
-	/// <summary>
-	/// Визуализация зоны кеширования в редакторе
-	/// </summary>
 	private void OnDrawGizmosSelected()
 	{
-		// Рисуем зону кеширования - синий цвет чтобы отличать от зелёных коллайдеров
-		Gizmos.color = new Color(0, 0.5f, 1f, 0.4f); // Синий полупрозрачный
+		Gizmos.color = new Color(0, 0.5f, 1f, 0.4f);
 
-		// Учитываем масштаб при отображении
 		var scaledOffset = Vector3.Scale(_cacheZoneOffset, transform.lossyScale);
 		var center = transform.position + transform.rotation * scaledOffset;
 
@@ -440,35 +305,31 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 			var scaledRadius = _cacheZoneSize.x *
 								Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
 			Gizmos.DrawWireSphere(center, scaledRadius);
-			// Добавляем заливку для лучшей видимости
 			Gizmos.color = new Color(0, 0.5f, 1f, 0.1f);
 			Gizmos.DrawSphere(center, scaledRadius);
 		}
-		else // Box
+		else
 		{
 			var scaledSize = Vector3.Scale(_cacheZoneSize, transform.lossyScale);
 			var oldMatrix = Gizmos.matrix;
 			Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
 			Gizmos.DrawWireCube(Vector3.zero, scaledSize);
-			// Добавляем заливку для лучшей видимости
 			Gizmos.color = new Color(0, 0.5f, 1f, 0.1f);
 			Gizmos.DrawCube(Vector3.zero, scaledSize);
 			Gizmos.matrix = oldMatrix;
 		}
 
-		// Рисуем связи с кешированными объектами - жёлтые линии
 		if (_cachedConnectedObjects != null && _cachedConnectedObjects.Count > 0)
 		{
-			Gizmos.color = new Color(1, 1, 0, 0.8f); // Жёлтый
+			Gizmos.color = new Color(1, 1, 0, 0.8f);
 			foreach (var connected in _cachedConnectedObjects)
 			{
 				if (connected != null)
 				{
 					Gizmos.DrawLine(transform.position, connected.transform.position);
-					// Добавляем маленькую сферу на конце для видимости
-					Gizmos.color = new Color(1, 0.5f, 0, 1f); // Оранжевый
+					Gizmos.color = new Color(1, 0.5f, 0, 1f);
 					Gizmos.DrawSphere(connected.transform.position, 0.1f);
-					Gizmos.color = new Color(1, 1, 0, 0.8f); // Возвращаем жёлтый
+					Gizmos.color = new Color(1, 1, 0, 0.8f);
 				}
 			}
 		}
@@ -481,22 +342,18 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 			return;
 		}
 
-		// Активируем физику при первом попадании
 		if (!_physicsActivated && _rigidbody != null)
 		{
 			_physicsActivated = true;
 			_rigidbody.isKinematic = false;
 
-			// Применяем импульс от столкновения
 			var contactPoint = collision.GetContact(0);
 			var impulse = collision.impulse;
 			_rigidbody.AddForceAtPosition(impulse, contactPoint.point, ForceMode.Impulse);
 
-			// Активируем физику у связанной структуры
 			ActivateConnectedStructure();
 		}
 
-		// Проверяем скорость столкновения
 		var impactVelocity = collision.relativeVelocity.magnitude;
 
 		if (impactVelocity < _minHitVelocity)
@@ -504,30 +361,20 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 			return;
 		}
 
-		// Любое попадание с достаточной скоростью уничтожает цель
 		DestroyTarget(collision.GetContact(0).point);
 	}
 
-	/// <summary>
-	/// Принудительно активирует физику цели (вызывается извне или при активации соседей)
-	/// </summary>
 	public void ActivatePhysics()
 	{
 		if (_physicsActivated || _rigidbody == null)
 		{
-			return; // Уже активирован - защита от повторной активации
+			return;
 		}
 
 		_physicsActivated = true;
 		_rigidbody.isKinematic = false;
-
-		// При активации физики можно активировать связанную структуру (закомментировано для избежания дублирования)
-		// ActivateConnectedStructure();
 	}
 
-	/// <summary>
-	/// Активирует физику у всей связанной структуры
-	/// </summary>
 	private void ActivateConnectedStructure()
 	{
 		if (!_activateConnectedStructure)
@@ -535,7 +382,6 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 			return;
 		}
 
-		// Активируем все прекешированные связанные объекты
 		foreach (var connectedObject in _cachedConnectedObjects)
 		{
 			if (connectedObject == null)
@@ -549,14 +395,12 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 				activatable.ActivatePhysics();
 			}
 
-			// Также активируем связанные объекты у каждой связанной цели
 			var connectedTarget = connectedObject.GetComponent<Target>();
 			if (connectedTarget != null)
 			{
 				connectedTarget.ActivateConnectedObjectsFromCache();
 			}
 
-			// Также проверяем блоки
 			var connectedBlock = connectedObject.GetComponent<DestructibleBlock>();
 			if (connectedBlock != null)
 			{
@@ -565,12 +409,8 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 		}
 	}
 
-	/// <summary>
-	/// Активирует прекешированные связанные объекты (вызывается из других объектов)
-	/// </summary>
 	public void ActivateConnectedObjectsFromCache()
 	{
-		// Просто активируем все объекты из кеша
 		foreach (var connectedObject in _cachedConnectedObjects)
 		{
 			if (connectedObject == null)
@@ -586,9 +426,6 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 		}
 	}
 
-	/// <summary>
-	/// Уничтожает цель
-	/// </summary>
 	private void DestroyTarget(Vector3 hitPoint)
 	{
 		if (_isDestroyed)
@@ -597,40 +434,31 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 		}
 
 		_isDestroyed = true;
-
-		// Активируем физику у связанной структуры при уничтожении
 		ActivateConnectedStructure();
-
-		// Вызываем событие уничтожения
 		OnTargetDestroyed?.Invoke(this, _scoreValue);
 
-		// Создаем эффект попадания
 		if (_damageEffectPrefab != null)
 		{
 			Instantiate(_damageEffectPrefab, hitPoint, Quaternion.identity);
 		}
 
-		// Создаем эффект уничтожения
 		if (_destroyEffectPrefab != null)
 		{
 			Instantiate(_destroyEffectPrefab, transform.position, Quaternion.identity);
 		}
 
-		// Уничтожаем объект или деактивируем его
 		if (_destroyOnDeath)
 		{
 			Destroy(gameObject, _destroyDelay);
 		}
 		else
 		{
-			// Можно добавить визуальную индикацию уничтожения (изменение цвета, отключение коллайдера и т.д.)
 			var colliders = GetComponentsInChildren<Collider>();
 			foreach (var col in colliders)
 			{
 				col.enabled = false;
 			}
 
-			// Отключаем физику
 			if (_rigidbody != null)
 			{
 				_rigidbody.isKinematic = true;
@@ -638,25 +466,20 @@ public class Target : MonoBehaviour, IPhysicsActivatable
 		}
 	}
 
-	/// <summary>
-	/// Сбрасывает цель в исходное состояние
-	/// </summary>
 	public void Reset()
 	{
 		_isDestroyed = false;
 		_physicsActivated = false;
 
-		// Включаем коллайдеры обратно
 		var colliders = GetComponentsInChildren<Collider>();
 		foreach (var col in colliders)
 		{
 			col.enabled = true;
 		}
 
-		// Замораживаем физику снова
 		if (_rigidbody != null)
 		{
-			_rigidbody.isKinematic = true; // Замораживаем снова
+			_rigidbody.isKinematic = true;
 			_rigidbody.linearVelocity = Vector3.zero;
 			_rigidbody.angularVelocity = Vector3.zero;
 		}
