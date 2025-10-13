@@ -1,5 +1,5 @@
 {
-    "name": "SurvivalDuck",
+    "name": "Lightseeker",
     "rootNamespace": "",
     "references": [
         "LightDI",
@@ -8,7 +8,8 @@
         "Unity.TextMeshPro",
         "Core.ShortGame",
         "AddressablesGroups",
-        "Code.Core.InputManager"
+        "Code.Core.InputManager",
+        "BaseDMDisposable"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
