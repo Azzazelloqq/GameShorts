@@ -1,0 +1,22 @@
+{
+    "name": "SurvivalDuck",
+    "rootNamespace": "",
+    "references": [
+        "LightDI",
+        "TickHandler",
+        "Utils",
+        "Unity.TextMeshPro",
+        "Core.ShortGame",
+        "AddressablesGroups",
+        "Code.Core.InputManager"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

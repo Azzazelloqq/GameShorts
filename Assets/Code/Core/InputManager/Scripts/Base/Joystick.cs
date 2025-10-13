@@ -143,11 +143,33 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
     {
         Vector2 localPoint = Vector2.zero;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(baseRect, screenPosition, cam, out localPoint))
+        RectTransform parent = baseRect;
+        
+        // Инициализируем камеру, если нужно (как в OnDrag)
+        Camera currentCam = null;
+        if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+            currentCam = canvas.worldCamera;
+        
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, screenPosition, currentCam, out localPoint))
         {
-            Vector2 pivotOffset = baseRect.pivot * baseRect.sizeDelta;
-            return localPoint - (background.anchorMax * baseRect.sizeDelta) + pivotOffset;
+            // localPoint в локальных координатах parent (baseRect) относительно его pivot
+            // Нужно конвертировать в anchoredPosition относительно якорей background
+            
+            Rect parentRect = parent.rect;
+            Vector2 anchorMin = background.anchorMin;
+            Vector2 anchorMax = background.anchorMax;
+            Vector2 anchorCenter = (anchorMin + anchorMax) * 0.5f;
+            
+            // Позиция якоря в локальных координатах parent
+            Vector2 anchorPos = new Vector2(
+                parentRect.x + anchorCenter.x * parentRect.width,
+                parentRect.y + anchorCenter.y * parentRect.height
+            );
+            
+            // anchoredPosition = позиция клика - позиция якоря
+            return localPoint - anchorPos;
         }
+        
         return Vector2.zero;
     }
 }
