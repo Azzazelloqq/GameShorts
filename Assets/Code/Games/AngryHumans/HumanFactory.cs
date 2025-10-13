@@ -16,10 +16,10 @@ internal class HumanFactory : MonoBehaviour
 	{
 		[SerializeField]
 		private string _name;
-		
+
 		[SerializeField]
 		private AssetReference _humanPrefabReference;
-		
+
 		public string Name => _name;
 		public AssetReference HumanPrefabReference => _humanPrefabReference;
 

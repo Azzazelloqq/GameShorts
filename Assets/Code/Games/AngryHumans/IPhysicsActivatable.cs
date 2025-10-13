@@ -9,7 +9,7 @@ public interface IPhysicsActivatable
 	/// Активирована ли уже физика
 	/// </summary>
 	bool IsPhysicsActivated { get; }
-	
+
 	/// <summary>
 	/// Активировать физику объекта
 	/// </summary>

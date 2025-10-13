@@ -47,13 +47,12 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 
 	private void Update()
 	{
-		// Проверяем падение ниже платформы на 10 единиц
 		if (_isLaunched && !_isOnPlatform)
 		{
 			if (transform.position.y < _platformY - FallThreshold)
 			{
 				OnFellBelowPlatform?.Invoke();
-				_isLaunched = false; // Чтобы не вызывать событие несколько раз
+				_isLaunched = false;
 			}
 		}
 	}
@@ -68,7 +67,7 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 			DisableRagdoll();
 			EnableAnimation();
 			_platformY = transform.position.y;
-			
+
 			if (_mainRigidbody != null)
 			{
 				_mainRigidbody.isKinematic = true;
@@ -85,7 +84,7 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 
 		_ragdollEnabled = true;
 		DisableAnimation();
-		
+
 		foreach (var rb in _ragdollRigidbodies)
 		{
 			rb.isKinematic = false;
@@ -101,7 +100,7 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 			rb.linearVelocity = Vector3.zero;
 			rb.angularVelocity = Vector3.zero;
 		}
-		
+
 		if (_mainRigidbody != null)
 		{
 			_mainRigidbody.isKinematic = true;
@@ -140,9 +139,6 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 	{
 		_isOnPlatform = false;
 		_platformY = transform.position.y;
-		
-		// Включаем ragdoll - все rigidbodies становятся физическими
-		// Анимация отключается внутри EnableRagdoll()
 		EnableRagdoll();
 	}
 
@@ -172,7 +168,6 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 		_isLaunched = true;
 		_isOnPlatform = false;
 
-		// Делаем главный rigidbody НЕ кинематическим перед броском
 		if (_mainRigidbody != null)
 		{
 			_mainRigidbody.isKinematic = false;
@@ -180,7 +175,6 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 
 		EnableRagdoll();
 
-		// Apply velocity to the grabbed rigidbody
 		var grabRigidbody = grabPoint.GetComponent<Rigidbody>();
 		if (grabRigidbody == null)
 		{
@@ -189,9 +183,6 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 
 		if (grabRigidbody != null)
 		{
-			Debug.Log($"Launching with velocity: {launchVelocity.magnitude:F1}, rigidbody: {grabRigidbody.name}");
-			
-			// Обнуляем все скорости перед броском
 			foreach (var rb in _ragdollRigidbodies)
 			{
 				if (rb != null && !rb.isKinematic)
@@ -200,8 +191,7 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 					rb.angularVelocity = Vector3.zero;
 				}
 			}
-			
-			// Применяем полную скорость броска ко всем частям ragdoll для согласованного полета
+
 			foreach (var rb in _ragdollRigidbodies)
 			{
 				if (rb != null && !rb.isKinematic)
@@ -212,26 +202,20 @@ internal class Human : MonoBehaviour, IPhysicsActivatable
 		}
 		else if (_mainRigidbody != null)
 		{
-			Debug.Log($"Launching main rigidbody with velocity: {launchVelocity.magnitude:F1}");
 			_mainRigidbody.linearVelocity = launchVelocity;
 		}
 		else
 		{
-			Debug.LogWarning("No rigidbody found to launch!");
+			Debug.LogError("[Human] No rigidbody found to launch!");
 		}
 	}
 
 	public bool IsLaunched => _isLaunched;
 	public bool IsOnPlatform => _isOnPlatform;
-	
-	// Реализация интерфейса IPhysicsActivatable
-	// Человечек всегда считается активированным после запуска
 	public bool IsPhysicsActivated => _isLaunched;
-	
+
 	public void ActivatePhysics()
 	{
-		// Человечек не может быть активирован извне, только через Launch
-		// Метод оставляем пустым для соответствия интерфейсу
 	}
 }
 }
