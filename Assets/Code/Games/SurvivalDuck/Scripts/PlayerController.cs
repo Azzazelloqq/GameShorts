@@ -69,6 +69,7 @@ namespace SurvivalDuck
                 
                 // Движение вперед/назад по оси Y джойстика
                 float moveInput = _inputDirection.y;
+                moveInput = moveInput > 0 ? 1 : moveInput;
                 if (Mathf.Abs(moveInput) > 0.1f)
                 {
                     // Движение относительно текущего направления персонажа
