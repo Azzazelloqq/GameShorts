@@ -7,7 +7,6 @@
         "LightDI",
         "TickHandler",
         "BaseDMDisposable",
-        "R3.Unity",
         "ResourceLoader",
         "AddressablesGroups",
         "Tools",
