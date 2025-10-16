@@ -4,11 +4,15 @@ namespace Code.Generated.Addressables
 {
     public class GameAngryHumans
     {
-        public string AngryHumansMainGame = "AngryHumansMainGame";
+        public string Target = "Target";
+        public string Block = "Block";
+        public string MainGame = "MainGame";
 
         public readonly ContentSubGroup Content = new ContentSubGroup();
+        public readonly AnimationControllersSubGroup AnimationControllers = new AnimationControllersSubGroup();
         public readonly AnimationsSubGroup Animations = new AnimationsSubGroup();
         public readonly MaterialsSubGroup Materials = new MaterialsSubGroup();
+        public readonly AssetsSubGroup Assets = new AssetsSubGroup();
 
         public class ContentSubGroup
         {
@@ -30,6 +34,11 @@ namespace Code.Generated.Addressables
             public string Human12 = "Content/Human12";
         }
 
+        public class AnimationControllersSubGroup
+        {
+            public string Idle = "AnimationControllers/Idle";
+        }
+
         public class AnimationsSubGroup
         {
             public string Idle = "Animations/Idle";
@@ -38,6 +47,26 @@ namespace Code.Generated.Addressables
         public class MaterialsSubGroup
         {
             public string TrajectoryMaterialDefault = "Materials/TrajectoryMaterialDefault";
+        }
+
+        public class AssetsSubGroup
+        {
+            public class GamesSubGroup
+            {
+                public class AngryHumansSubGroup
+                {
+                    public class ContentSubGroup
+                    {
+                        public class TargetsSubGroup
+                        {
+                            public class LevelStructuresSubGroup
+                            {
+                                public string FirstLevelPrefab = "Assets/Games/AngryHumans/Content/Targets/LevelStructures/FirstLevel.prefab";
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

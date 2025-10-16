@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
+#endif 
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -92,6 +94,10 @@ internal class DestructibleBlock : MonoBehaviour, IPhysicsActivatable
 	{
 		_cachedConnectedObjects.Clear();
 
+		Vector3 center;
+		Vector3 scaledOffset;
+		Collider[] allColliders;
+		
 		#if UNITY_EDITOR
 		var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
 		var isPrefabMode = prefabStage != null && prefabStage.IsPartOfPrefabContents(gameObject);
@@ -101,9 +107,6 @@ internal class DestructibleBlock : MonoBehaviour, IPhysicsActivatable
 			isPrefabMode = PrefabUtility.IsPartOfPrefabAsset(gameObject);
 		}
 
-		Vector3 center;
-		Vector3 scaledOffset;
-		Collider[] allColliders;
 		if (isPrefabMode)
 		{
 			var root = transform.root;

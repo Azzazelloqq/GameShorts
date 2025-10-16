@@ -16,7 +16,8 @@
         "2048.Game",
         "EscapeFromDark",
         "ShortGame2048",
-        "FlyHumans"
+        "FlyHumans",
+        "Lightseeker"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

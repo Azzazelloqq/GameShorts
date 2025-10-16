@@ -1,15 +1,18 @@
 {
     "name": "Lightseeker",
-    "rootNamespace": "",
+    "rootNamespace": "Lightseeker",
     "references": [
+        "Core.ShortGame",
+        "BaseDMDisposable",
         "LightDI",
         "TickHandler",
-        "Utils",
+        "ResourceLoader",
+        "Tools",
         "Unity.TextMeshPro",
-        "Core.ShortGame",
-        "AddressablesGroups",
         "Code.Core.InputManager",
-        "BaseDMDisposable"
+        "Logger",
+        "AddressablesGroups",
+        "Utils"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

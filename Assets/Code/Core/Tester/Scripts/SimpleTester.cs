@@ -15,6 +15,7 @@ using Code.Generated.Addressables;
 using GameShorts.FlyHumans;
 using InGameLogger;
 using LightDI.Runtime;
+using Lightseeker;
 using ResourceLoader;
 using ResourceLoader.AddressableResourceLoader;
 using TickHandler;
@@ -140,6 +141,7 @@ internal class SimpleTester : MonoBehaviour
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),
 			typeof(FlyHumansGame),
+			typeof(LightseekerGame),
 		};
 
 		_gameTypes.AddRange(types);
@@ -155,7 +157,8 @@ internal class SimpleTester : MonoBehaviour
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
 			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main},
-			{ typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain}
+			{ typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain},
+			{ typeof(LightseekerGame), ResourceIdsContainer.GameLightseeker.LightseekerMain}
 		};
 	}
 

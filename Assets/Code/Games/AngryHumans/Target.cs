@@ -87,6 +87,10 @@ internal class Target : MonoBehaviour, IPhysicsActivatable
 	{
 		_cachedConnectedObjects.Clear();
 
+		Vector3 center;
+		Vector3 scaledOffset;
+		Collider[] allColliders;
+		
 		#if UNITY_EDITOR
 		var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 		var isPrefabMode = prefabStage != null && prefabStage.IsPartOfPrefabContents(gameObject);
@@ -96,9 +100,6 @@ internal class Target : MonoBehaviour, IPhysicsActivatable
 			isPrefabMode = UnityEditor.PrefabUtility.IsPartOfPrefabAsset(gameObject);
 		}
 
-		Vector3 center;
-		Vector3 scaledOffset;
-		Collider[] allColliders;
 
 		if (isPrefabMode)
 		{

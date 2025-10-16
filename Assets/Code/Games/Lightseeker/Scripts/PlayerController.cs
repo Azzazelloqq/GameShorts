@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SurvivalDuck
+namespace Lightseeker
 {
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
