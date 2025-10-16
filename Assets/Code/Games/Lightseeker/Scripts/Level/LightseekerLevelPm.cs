@@ -47,42 +47,21 @@ namespace Lightseeker
             
             int currentLevel = _ctx.gameModel.CurrentLevel.Value;
             var sections = _ctx.sceneContextView.LevelSections;
-            
-            Debug.Log($"LightseekerLevelPm: UpdateActiveSections - CurrentLevel: {currentLevel}, Total sections: {sections.Count}");
-            
-            // Отключаем пройденные секции (уровни, которые уже прошли)
-            // currentLevel 1 = все секции активны
-            // currentLevel 2 = секция 0 отключена, остальные активны
-            // currentLevel 3 = секции 0,1 отключены, остальные активны
-            // и т.д.
             for (int i = 0; i < sections.Count; i++)
             {
-                bool shouldBeActive = i >= currentLevel - 1;
-                
-                // Отключаем секции с индексом меньше (currentLevel - 1)
-                // т.е. пройденные секции
+                bool shouldBeActive = i <= currentLevel - 1;
+                sections[i].SetActive(!shouldBeActive);
                 if (shouldBeActive)
                 {
-                    sections[i].SetActive(true);
                     _activeSections.Add(sections[i]);
-                    Debug.Log($"LightseekerLevelPm: Section {i} ACTIVATED, SpawnPoints count: {sections[i].SpawnPoints.Count}");
-                }
-                else
-                {
-                    sections[i].SetActive(false);
-                    Debug.Log($"LightseekerLevelPm: Section {i} DEACTIVATED (passed level)");
                 }
             }
             
-            Debug.Log($"LightseekerLevelPm: Level {currentLevel}, Active sections: {_activeSections.Count}/{sections.Count}");
         }
 
         private void SpawnStars()
         {
-            // Очищаем старые звезды
             ClearStars();
-            
-            Debug.Log($"LightseekerLevelPm: SpawnStars - Active sections count: {_activeSections.Count}");
             
             // Собираем все доступные точки спавна из активных секций
             var allSpawnPoints = new List<Transform>();
@@ -91,8 +70,6 @@ namespace Lightseeker
                 Debug.Log($"LightseekerLevelPm: Collecting spawn points from section, count: {section.SpawnPoints.Count}");
                 allSpawnPoints.AddRange(section.SpawnPoints);
             }
-            
-            Debug.Log($"LightseekerLevelPm: Total spawn points collected: {allSpawnPoints.Count}");
             
             if (allSpawnPoints.Count == 0)
             {
@@ -105,7 +82,6 @@ namespace Lightseeker
             
             // Спавним 4 звезды
             int starsToSpawn = Mathf.Min(LightseekerGameModel.StarsPerLevel, shuffledPoints.Count);
-            Debug.Log($"LightseekerLevelPm: Spawning {starsToSpawn} stars");
             for (int i = 0; i < starsToSpawn; i++)
             {
                 Debug.Log($"LightseekerLevelPm: Spawning star {i+1} at position: {shuffledPoints[i].position}");
