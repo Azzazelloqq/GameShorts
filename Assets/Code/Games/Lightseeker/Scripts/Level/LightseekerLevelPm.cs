@@ -49,9 +49,8 @@ namespace Lightseeker
             var sections = _ctx.sceneContextView.LevelSections;
             for (int i = 0; i < sections.Count; i++)
             {
-                bool shouldBeActive = i <= currentLevel - 1;
-                sections[i].SetActive(!shouldBeActive);
-                if (shouldBeActive)
+                sections[i].SetActive(currentLevel <= i + 1);
+                if (i <= currentLevel - 1)
                 {
                     _activeSections.Add(sections[i]);
                 }
