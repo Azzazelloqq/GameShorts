@@ -52,6 +52,11 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 	[Tooltip("Enable color feedback")]
 	private bool _useColorFeedback = true;
 
+	[Header("Gooey Effect (Optional)")]
+	[SerializeField]
+	[Tooltip("Optional: GooeyJoystickEffect component for viscous liquid effect")]
+	private GooeyJoystickEffect _gooeyEffect;
+
 	private Image _innerCircleImage;
 	private bool _isDragging;
 	private bool _isEnabled = true;
@@ -298,6 +303,12 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		if (_outerCircle != null)
 		{
 			_outerCircle.gameObject.SetActive(_isEnabled);
+		}
+
+		// Update gooey effect visibility
+		if (_gooeyEffect != null)
+		{
+			_gooeyEffect.gameObject.SetActive(_isEnabled);
 		}
 	}
 
