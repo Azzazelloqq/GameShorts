@@ -146,13 +146,66 @@ public class GameEntryPoint : MonoBehaviour
 
 	private void OnDestroy()
 	{
+		_logger?.Log("GameEntryPoint OnDestroy - starting cleanup");
+		
 		_cancellationTokenSource?.Cancel();
 
-		_gameSwiperController?.Dispose();
-		_shortGameServiceProvider?.Dispose();
-		_cancellationTokenSource?.Dispose();
-		_poolObjects?.Dispose();
-		_globalGameDiContainer?.Dispose();
+		// Dispose in correct order to prevent errors
+		try
+		{
+			_gameSwiperController?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing GameSwiperController: {ex.Message}");
+		}
+
+		try
+		{
+			_shortGameServiceProvider?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing ShortGameServiceProvider: {ex.Message}");
+		}
+
+		try
+		{
+			_resourceLoader?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing ResourceLoader: {ex.Message}");
+		}
+
+		try
+		{
+			_cancellationTokenSource?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing CancellationTokenSource: {ex.Message}");
+		}
+
+		try
+		{
+			_poolObjects?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing PoolObjects: {ex.Message}");
+		}
+
+		try
+		{
+			_globalGameDiContainer?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing GlobalGameDiContainer: {ex.Message}");
+		}
+
+		_logger?.Log("GameEntryPoint OnDestroy - cleanup completed");
 	}
 }
 }

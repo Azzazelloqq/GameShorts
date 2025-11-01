@@ -360,6 +360,8 @@ internal class SimpleTester : MonoBehaviour
 
 	private void OnDestroy()
 	{
+		_logger?.Log("SimpleTester OnDestroy - starting cleanup");
+		
 		_cancellationTokenSource?.Cancel();
 
 		// Останавливаем текущую игру
@@ -390,9 +392,48 @@ internal class SimpleTester : MonoBehaviour
 			restartButton.onClick.RemoveListener(OnRestartButtonClick);
 		}
 
-		_gameFactory?.Dispose();
-		_cancellationTokenSource?.Dispose();
-		_globalGameDiContainer?.Dispose();
+		// Dispose resources in correct order
+		// 1. First dispose factory (stops creating new resources)
+		try
+		{
+			_gameFactory?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing factory: {ex.Message}");
+		}
+
+		// 2. Then dispose resource loader (releases all handles)
+		try
+		{
+			_resourceLoader?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing resource loader: {ex.Message}");
+		}
+
+		// 3. Dispose cancellation token
+		try
+		{
+			_cancellationTokenSource?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing cancellation token: {ex.Message}");
+		}
+
+		// 4. Finally dispose DI container (cleans up all registered services)
+		try
+		{
+			_globalGameDiContainer?.Dispose();
+		}
+		catch (System.Exception ex)
+		{
+			_logger?.LogError($"Error disposing DI container: {ex.Message}");
+		}
+
+		_logger?.Log("SimpleTester OnDestroy - cleanup completed");
 	}
 }
 }

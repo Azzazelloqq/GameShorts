@@ -60,7 +60,6 @@ public class AddressableShortGameFactory : IShortGameFactory
 	{
 		if (_disposed)
 		{
-			_logger.LogError("AddressableShortGameFactory already disposed, skipping");
 			return;
 		}
 
@@ -294,8 +293,15 @@ public class AddressableShortGameFactory : IShortGameFactory
 		{
 			if (_preloadedPrefabs.TryGetValue(gameType, out var prefab))
 			{
-				_resourceLoader.ReleaseResource(prefab);
-				_logger.Log($"Unloaded resources for {gameType.Name}");
+				try
+				{
+					_resourceLoader.ReleaseResource(prefab);
+					_logger.Log($"Unloaded resources for {gameType.Name}");
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Failed to unload resources for {gameType.Name}: {ex.Message}");
+				}
 			}
 
 			_preloadedPrefabs.Remove(gameType);
@@ -314,16 +320,12 @@ public class AddressableShortGameFactory : IShortGameFactory
 			return;
 		}
 
-		foreach (var prefab in _preloadedPrefabs.Values)
-		{
-			if (prefab == null)
-			{
-				continue;
-			}
-
-			_resourceLoader.ReleaseResource(prefab);
-		}
-
+		// Note: We don't call ReleaseResource for individual prefabs here because
+		// the AddressableResourceLoader tracks handles internally and will release them
+		// when it's disposed. Calling ReleaseResource with GameObject causes
+		// "invalid operation handle" errors.
+		_logger.Log($"Clearing {_preloadedPrefabs.Count} preloaded prefabs");
+		
 		_preloadedPrefabs.Clear();
 		_preloadRefCount.Clear();
 	}

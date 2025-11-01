@@ -2,7 +2,8 @@
     "name": "EditorTools",
     "rootNamespace": "",
     "references": [
-        "Unity.Addressables.Editor"
+        "GUID:69448af7b92c7f342b298e06a37122aa",
+        "GUID:c9f76ac6b5b2484789d93f0d3960dc33"
     ],
     "includePlatforms": [
         "Editor"
