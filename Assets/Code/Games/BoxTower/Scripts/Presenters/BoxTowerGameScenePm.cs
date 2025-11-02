@@ -118,6 +118,12 @@ namespace Code.Core.ShortGamesCore.Game2
             // Handled by tower presenter
         }
 
+        public void ResetForNewSession()
+        {
+            _towerPresenter?.ResetForNewSession();
+            _gameModel?.RestartGame();
+        }
+
         protected override void OnDispose()
         {
             // Unsubscribe from events

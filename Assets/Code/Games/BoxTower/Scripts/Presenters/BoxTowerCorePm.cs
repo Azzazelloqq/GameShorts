@@ -16,7 +16,7 @@ namespace Code.Core.ShortGamesCore.Game2
         }
 
         private readonly Ctx _ctx;
-        private IDisposable _gameScene;
+        private BoxTowerGameScenePm _gameScene;
         private readonly IDiContainer _diContainer;
         private readonly IPoolManager _poolManager;
 
@@ -36,6 +36,11 @@ namespace Code.Core.ShortGamesCore.Game2
             };
             _gameScene = new BoxTowerGameScenePm(gameSceneCtx);
             AddDispose(_gameScene);
+        }
+
+        public void ResetForNewSession()
+        {
+            _gameScene?.ResetForNewSession();
         }
 
         protected override void OnDispose()

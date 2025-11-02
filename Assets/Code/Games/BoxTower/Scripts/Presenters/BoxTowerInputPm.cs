@@ -55,6 +55,9 @@ namespace Code.Core.ShortGamesCore.Game2
 
         private void PlaceCurrentBlock()
         {
+            if (_ctx.gameModel.IsPaused.Value)
+                return;
+
             if (_ctx.gameModel.CurrentState.Value != GameState.Running || _towerPresenter == null) 
                 return;
 
