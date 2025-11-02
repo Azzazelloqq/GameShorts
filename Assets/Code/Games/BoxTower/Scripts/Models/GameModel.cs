@@ -10,6 +10,7 @@ namespace Code.Core.ShortGamesCore.Game2
         public ReactiveProperty<int> Score { get; } = new ReactiveProperty<int>(0);
         public ReactiveProperty<int> BestScore { get; } = new ReactiveProperty<int>(0);
         public ReactiveProperty<bool> IsFirstPlay { get; } = new ReactiveProperty<bool>(true);
+        public ReactiveProperty<bool> IsPaused { get; } = new ReactiveProperty<bool>(false);
         
         public event Action OnGameOver;
         public event Action OnBlockPlaced;
@@ -24,6 +25,7 @@ namespace Code.Core.ShortGamesCore.Game2
         public void TriggerGameOver()
         {
             CurrentState.Value = GameState.GameOver;
+            IsPaused.Value = false;
             
             // Update best score
             if (Score.Value > BestScore.Value)
@@ -40,12 +42,14 @@ namespace Code.Core.ShortGamesCore.Game2
             CurrentState.Value = GameState.Running;
             Score.Value = 0;
             IsFirstPlay.Value = false;
+            IsPaused.Value = false;
         }
 
         public void RestartGame()
         {
             CurrentState.Value = GameState.Ready;
             Score.Value = 0;
+            IsPaused.Value = false;
             OnGameRestarted?.Invoke();
         }
 
@@ -54,6 +58,26 @@ namespace Code.Core.ShortGamesCore.Game2
             BestScore.Value = Save.BestScore;
             CurrentState.Value = GameState.Ready;
             Score.Value = 0;
+            IsPaused.Value = false;
+        }
+
+        public void TogglePause()
+        {
+            if (CurrentState.Value != GameState.Running)
+                return;
+
+            IsPaused.Value = !IsPaused.Value;
+        }
+
+        public void SetPause(bool pause)
+        {
+            if (CurrentState.Value != GameState.Running && pause)
+                return;
+
+            if (IsPaused.Value != pause)
+            {
+                IsPaused.Value = pause;
+            }
         }
     }
 }
