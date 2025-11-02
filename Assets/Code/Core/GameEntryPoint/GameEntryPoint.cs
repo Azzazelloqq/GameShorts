@@ -123,6 +123,7 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
+			{ typeof(GameGardneer), ResourceIdsContainer.GameGardneer.GardenerGame },
 			{ typeof(AngryHumansShortGame), ResourceIdsContainer.GameAngryHumans.MainGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
@@ -136,6 +137,7 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
+			typeof(GameGardneer),
 			typeof(BoxTower),
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),

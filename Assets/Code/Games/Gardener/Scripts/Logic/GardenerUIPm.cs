@@ -96,11 +96,19 @@ namespace GameShorts.Gardener.Logic
         {
             if (mode == null)
             {
-                // Если режим не активен, скрываем панель
+                // Если режим не активен, скрываем панель и очищаем UI
                 if (_ctx.PlaceableItemsPanel != null)
                 {
                     _ctx.PlaceableItemsPanel.Hide();
                 }
+                
+                // Сбрасываем отображение активного режима
+                if (_ctx.MainUIView != null)
+                {
+                    _ctx.MainUIView.ClearActiveMode();
+                }
+                
+                Debug.Log("Mode deactivated");
                 return;
             }
             

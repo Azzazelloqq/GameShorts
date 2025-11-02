@@ -89,7 +89,7 @@ namespace Code.Games
             _isDisposed = true;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             // Гарантируем, что Dispose вызывается при уничтожении GameObject
             // Это важно для корректного возврата кубов в пул

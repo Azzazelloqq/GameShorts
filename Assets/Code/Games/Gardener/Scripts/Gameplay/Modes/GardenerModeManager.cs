@@ -36,7 +36,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
         }
         
         /// <summary>
-        /// Переключает на указанный режим
+        /// Переключает на указанный режим или отключает его, если он уже активен (работает как toggle)
         /// </summary>
         public void SwitchMode(string modeName)
         {
@@ -46,9 +46,17 @@ namespace GameShorts.Gardener.Gameplay.Modes
                 return;
             }
             
+            // Если режим уже активен, выключаем его (toggle behavior)
             if (_currentMode == newMode)
+            {
+                UnityEngine.Debug.Log($"Deactivating mode: {modeName}");
+                _currentMode.OnExit();
+                _currentMode = null;
+                _activeModeProperty.Value = null;
                 return;
+            }
             
+            // Переключаемся на новый режим
             _currentMode?.OnExit();
             _currentMode = newMode;
             _currentMode.OnEnter();

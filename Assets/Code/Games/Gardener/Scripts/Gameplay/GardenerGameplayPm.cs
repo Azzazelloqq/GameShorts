@@ -182,6 +182,14 @@ namespace GameShorts.Gardener.Gameplay
                 return;
             }
 
+            // Проверяем, нет ли уже грядки в этой позиции
+            float minDistance = .5f; // Минимальное расстояние между грядками
+            if (IsPositionOccupied(worldPosition, minDistance))
+            {
+                Debug.LogWarning($"Cannot place plot at {worldPosition} - position is too close to another plot!");
+                return;
+            }
+
             var plotObject =
                 _poolManager.Get(_ctx.gameSettings.PlotSettings.PlotPrefab, _ctx.sceneContextView.GardenGrid);
             plotObject.transform.position = worldPosition;
@@ -206,6 +214,22 @@ namespace GameShorts.Gardener.Gameplay
 
             // Создаем UI бар 
            // _plotUIBarManager.CreateBarForPlot(plotPm, plotView.transform);
+        }
+
+        /// <summary>
+        /// Проверяет, занята ли позиция другой грядкой
+        /// </summary>
+        private bool IsPositionOccupied(Vector3 position, float minDistance)
+        {
+            foreach (var plot in _plots)
+            {
+                float distance = Vector3.Distance(plot.WorldPosition, position);
+                if (distance < minDistance)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void OnItemPlaced(PlaceableItem item, Vector3 worldPosition)

@@ -44,11 +44,26 @@ namespace GameShorts.Gardener.UI
         {
             if (_currentModeText != null)
             {
-                _currentModeText.text = $"Режим: {modeName}";
+                _currentModeText.gameObject.SetActive(!string.IsNullOrEmpty(modeName));
+                _currentModeText.text = string.IsNullOrEmpty(modeName) ? "Режим: Нет" : $"Режим: {modeName}";
             }
             
             // Обновляем цвета кнопок
             UpdateModeButtonColors(modeName);
+        }
+        
+        /// <summary>
+        /// Сбрасывает активный режим
+        /// </summary>
+        public void ClearActiveMode()
+        {
+            if (_currentModeText != null)
+            {
+                _currentModeText.gameObject.SetActive(false);
+            }
+            
+            // Сбрасываем цвета всех кнопок
+            UpdateModeButtonColors(null);
         }
         
         private void UpdateModeButtonColors(string activeMode)
@@ -57,7 +72,7 @@ namespace GameShorts.Gardener.UI
             if (_harveyModeButton != null)
             {
                 var colors = _harveyModeButton.colors;
-                colors.normalColor = activeMode == "Harvey" ? _activeModeColor : _inactiveModeColor;
+                colors.normalColor = (activeMode == "Harvey") ? _activeModeColor : _inactiveModeColor;
                 _harveyModeButton.colors = colors;
             }
             
@@ -65,7 +80,7 @@ namespace GameShorts.Gardener.UI
             if (_wateringModeButton != null)
             {
                 var colors = _wateringModeButton.colors;
-                colors.normalColor = activeMode == "Watering" ? _activeModeColor : _inactiveModeColor;
+                colors.normalColor = (activeMode == "Watering") ? _activeModeColor : _inactiveModeColor;
                 _wateringModeButton.colors = colors;
             }
             
@@ -73,7 +88,7 @@ namespace GameShorts.Gardener.UI
             if (_inventoryModeButton != null)
             {
                 var colors = _inventoryModeButton.colors;
-                colors.normalColor = activeMode == "Inventory" ? _activeModeColor : _inactiveModeColor;
+                colors.normalColor = (activeMode == "Inventory") ? _activeModeColor : _inactiveModeColor;
                 _inventoryModeButton.colors = colors;
             }
         }

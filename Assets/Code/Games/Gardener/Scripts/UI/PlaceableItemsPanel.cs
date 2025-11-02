@@ -18,11 +18,14 @@ namespace GameShorts.Gardener.UI
         [SerializeField] private PlaceableItemView _itemPrefab;
         [SerializeField] private Canvas _canvas;
         [SerializeField] private Camera _worldCamera;
+        [SerializeField] private Animator _animator;
         
         private GardenBounds _gardenBounds;
         private Action<PlaceableItem, Vector3> _onItemPlaced;
         private readonly List<PlaceableItemPm> _itemPresenters = new List<PlaceableItemPm>();
-        
+        private int _openAnimHash;
+        private int _closeAnimHash;
+
         /// <summary>
         /// Инициализирует панель
         /// </summary>
@@ -31,6 +34,8 @@ namespace GameShorts.Gardener.UI
             _worldCamera = worldCamera;
             _gardenBounds = gardenBounds;
             _gardenBounds.Init();
+            _openAnimHash = Animator.StringToHash("Open");
+            _closeAnimHash = Animator.StringToHash("Close");
             
             if (_canvas == null)
                 _canvas = GetComponentInParent<Canvas>();
@@ -102,7 +107,7 @@ namespace GameShorts.Gardener.UI
         public void Show()
         {
             if (_rootPanel != null)
-                _rootPanel.SetActive(true);
+                _animator.Play(_openAnimHash);
         }
         
         /// <summary>
@@ -111,7 +116,7 @@ namespace GameShorts.Gardener.UI
         public void Hide()
         {
             if (_rootPanel != null)
-                _rootPanel.SetActive(false);
+                _animator.Play(_closeAnimHash);
         }
         
         protected override void OnDestroy()

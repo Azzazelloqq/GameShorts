@@ -263,3 +263,4 @@ public void DeserializeInventory(Dictionary<string, int> data);
 
 Код написан с учетом лучших практик, использует реактивное программирование и легко расширяется.
 
+

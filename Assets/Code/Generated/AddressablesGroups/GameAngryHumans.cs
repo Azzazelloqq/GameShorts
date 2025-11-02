@@ -5,14 +5,14 @@ namespace Code.Generated.Addressables
     public class GameAngryHumans
     {
         public string Target = "Target";
-        public string Block = "Block";
         public string MainGame = "MainGame";
+        public string Block = "Block";
 
         public readonly ContentSubGroup Content = new ContentSubGroup();
         public readonly AnimationControllersSubGroup AnimationControllers = new AnimationControllersSubGroup();
         public readonly AnimationsSubGroup Animations = new AnimationsSubGroup();
+        public readonly PrefabsSubGroup Prefabs = new PrefabsSubGroup();
         public readonly MaterialsSubGroup Materials = new MaterialsSubGroup();
-        public readonly AssetsSubGroup Assets = new AssetsSubGroup();
 
         public class ContentSubGroup
         {
@@ -44,29 +44,14 @@ namespace Code.Generated.Addressables
             public string Idle = "Animations/Idle";
         }
 
+        public class PrefabsSubGroup
+        {
+            public string FirstLevel = "Prefabs/FirstLevel";
+        }
+
         public class MaterialsSubGroup
         {
             public string TrajectoryMaterialDefault = "Materials/TrajectoryMaterialDefault";
-        }
-
-        public class AssetsSubGroup
-        {
-            public class GamesSubGroup
-            {
-                public class AngryHumansSubGroup
-                {
-                    public class ContentSubGroup
-                    {
-                        public class TargetsSubGroup
-                        {
-                            public class LevelStructuresSubGroup
-                            {
-                                public string FirstLevelPrefab = "Assets/Games/AngryHumans/Content/Targets/LevelStructures/FirstLevel.prefab";
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
