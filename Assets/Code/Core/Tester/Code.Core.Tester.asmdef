@@ -17,7 +17,8 @@
         "EscapeFromDark",
         "ShortGame2048",
         "FlyHumans",
-        "Lightseeker"
+        "Lightseeker",
+        "Gardener"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

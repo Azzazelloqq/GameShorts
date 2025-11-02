@@ -1,0 +1,23 @@
+{
+    "name": "Gardener",
+    "rootNamespace": "",
+    "references": [
+        "BaseDMDisposable",
+        "Core.ShortGame",
+        "LightDI",
+        "Utils",
+        "TickHandler",
+        "Tools",
+        "Unity.TextMeshPro",
+        "R3.Unity"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

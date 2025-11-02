@@ -13,6 +13,7 @@ using Code.Core.Tools.Pool;
 using Code.Games;
 using Code.Generated.Addressables;
 using GameShorts.FlyHumans;
+using GameShorts.Gardener;
 using InGameLogger;
 using LightDI.Runtime;
 using Lightseeker;
@@ -25,338 +26,314 @@ using UnityEngine.UI;
 
 namespace Code.Core.Tester
 {
-internal class SimpleTester : MonoBehaviour
-{
-	[SerializeField]
-	private GamePositioningConfig  _gamePositioningConfig;
-	
-	[Header("Settings")]
-	[SerializeField]
-	private Transform _gamesParent;
+    internal class SimpleTester : MonoBehaviour
+    {
+        [SerializeField] private GamePositioningConfig _gamePositioningConfig;
 
-	[Header("UI Settings")]
-	[SerializeField]
-	private Transform gameListContainer;
+        [Header("Settings")] [SerializeField] private Transform _gamesParent;
 
-	[SerializeField]
-	private GameItemButton buttonPrefab;
+        [Header("UI Settings")] [SerializeField]
+        private Transform gameListContainer;
 
-	[SerializeField]
-	private Transform buttonsContainer;
+        [SerializeField] private GameItemButton buttonPrefab;
 
-	[Header("Functional Buttons")]
-	[SerializeField]
-	private Transform functionalButtonsContainer;
+        [SerializeField] private Transform buttonsContainer;
 
-	[SerializeField]
-	private Button toggleFunctionalButtonsUI;
+        [Header("Functional Buttons")] [SerializeField]
+        private Transform functionalButtonsContainer;
 
-	[SerializeField]
-	private Button homeButton;
+        [SerializeField] private Button toggleFunctionalButtonsUI;
 
-	[SerializeField]
-	private Button restartButton;
-	
-	private IShortGameFactory _gameFactory;
-	private CancellationTokenSource _cancellationTokenSource;
-	private IDiContainer _globalGameDiContainer;
-	private UnityInGameLogger _logger;
-	private AddressableResourceLoader _resourceLoader;
-	private IShortGame _currentGame;
+        [SerializeField] private Button homeButton;
 
-	private readonly List<GameItemButton> _createdButtons = new();
-	private readonly List<Type> _gameTypes = new();
+        [SerializeField] private Button restartButton;
 
-	private bool _functionalButtonsVisible = false;
-	private bool _isGameRunning = false;
-	private SimpleShortGamePool _pool;
-	private PoolManager _poolObjects;
-	private UnityTickHandler _tickHandler;
+        private IShortGameFactory _gameFactory;
+        private CancellationTokenSource _cancellationTokenSource;
+        private IDiContainer _globalGameDiContainer;
+        private UnityInGameLogger _logger;
+        private AddressableResourceLoader _resourceLoader;
+        private IShortGame _currentGame;
 
-	private async void Start()
-	{
-		Application.targetFrameRate = 60;
- 		_cancellationTokenSource = new CancellationTokenSource();
-		var exitGameCancellationToken = Application.exitCancellationToken;
+        private readonly List<GameItemButton> _createdButtons = new();
+        private readonly List<Type> _gameTypes = new();
 
-		if (_gamesParent == null)
-		{
-			_gamesParent = transform;
-		}
+        private bool _functionalButtonsVisible = false;
+        private SimpleShortGamePool _pool;
+        private PoolManager _poolObjects;
+        private UnityTickHandler _tickHandler;
 
-		_globalGameDiContainer = DiContainerFactory.CreateContainer();
+        private void Start()
+        {
+            Application.targetFrameRate = 60;
+            _cancellationTokenSource = new CancellationTokenSource();
 
-		await InitializeAsync(exitGameCancellationToken);
-	}
+            if (_gamesParent == null)
+            {
+                _gamesParent = transform;
+            }
 
-	private async Task InitializeAsync(CancellationToken cancellationToken)
-	{
-		_logger = new UnityInGameLogger();
-		_globalGameDiContainer.RegisterAsSingleton<IInGameLogger>(_logger);
+            _globalGameDiContainer = DiContainerFactory.CreateContainer();
+            Initialize();
+        }
 
-		_pool = new SimpleShortGamePool(_logger);
-		_globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
+        private void Initialize()
+        {
+            _logger = new UnityInGameLogger();
+            _globalGameDiContainer.RegisterAsSingleton<IInGameLogger>(_logger);
 
-		_poolObjects = new PoolManager();
-		_globalGameDiContainer.RegisterAsSingleton<IPoolManager>(_poolObjects);
+            _pool = new SimpleShortGamePool(_logger);
+            _globalGameDiContainer.RegisterAsSingleton<IShortGamesPool>(_pool);
 
-		_resourceLoader = new AddressableResourceLoader();
-		_globalGameDiContainer.RegisterAsSingleton<IResourceLoader>(_resourceLoader);
+            _poolObjects = new PoolManager();
+            _globalGameDiContainer.RegisterAsSingleton<IPoolManager>(_poolObjects);
 
-		var dispatcher = gameObject.AddComponent<UnityDispatcherBehaviour>();
-		_tickHandler = new UnityTickHandler(dispatcher);
-		_globalGameDiContainer.RegisterAsSingleton<ITickHandler>(_tickHandler);
+            _resourceLoader = new AddressableResourceLoader();
+            _globalGameDiContainer.RegisterAsSingleton<IResourceLoader>(_resourceLoader);
 
-		var resourceMapping = GetResourceMapping();
-		_gameFactory =
-			AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping, _gamePositioningConfig);
-		_globalGameDiContainer.RegisterAsSingleton(_gameFactory);
+            var dispatcher = gameObject.AddComponent<UnityDispatcherBehaviour>();
+            _tickHandler = new UnityTickHandler(dispatcher);
+            _globalGameDiContainer.RegisterAsSingleton<ITickHandler>(_tickHandler);
 
-		var games = GetGameTypes();
-		foreach (var gameType in games)
-		{
-			try
-			{
-				await _gameFactory.PreloadGameResourcesAsync(gameType, cancellationToken);
-				_logger.Log($"Preloaded resources for {gameType.Name}");
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Failed to preload {gameType.Name}: {ex.Message}");
-			}
-		}
+            var resourceMapping = GetResourceMapping();
+            _gameFactory =
+                AddressableShortGameFactoryFactory.CreateAddressableShortGameFactory(_gamesParent, resourceMapping,
+                    _gamePositioningConfig);
+            _globalGameDiContainer.RegisterAsSingleton(_gameFactory);
 
-		CreateGameButtons();
+            var games = GetGameTypes();
+            // foreach (var gameType in games)
+            // {
+            //     try
+            //     {
+            //         await _gameFactory.PreloadGameResourcesAsync(gameType, cancellationToken);
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         _logger.LogError($"Failed to preload {gameType.Name}: {ex.Message}");
+            //     }
+            // }
 
-		InitializeFunctionalButtons();
-	}
+            CreateGameButtons();
 
-	private IReadOnlyList<Type> GetGameTypes()
-	{
-		var types = new[]
-		{
-			typeof(AsteroidsGame),
-			typeof(BoxTower),
-			typeof(LawnmowerGame),
-			typeof(EscapeFromDarkGame),
-			typeof(Game2048),
-			typeof(FlyHumansGame),
-			typeof(LightseekerGame),
-		};
+            InitializeFunctionalButtons();
+        }
 
-		_gameTypes.AddRange(types);
-		return types;
-	}
+        private IReadOnlyList<Type> GetGameTypes()
+        {
+            var types = new[]
+            {
+                typeof(AsteroidsGame),
+                typeof(BoxTower),
+                typeof(LawnmowerGame),
+                typeof(EscapeFromDarkGame),
+                typeof(Game2048),
+                typeof(FlyHumansGame),
+                typeof(LightseekerGame),
+                typeof(GardenerGame),
+            };
 
-	private Dictionary<Type, string> GetResourceMapping()
-	{
-		return new Dictionary<Type, string>
-		{
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
-			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
-			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
-			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
-			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main},
-			{ typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain},
-			{ typeof(LightseekerGame), ResourceIdsContainer.GameLightseeker.LightseekerMain}
-		};
-	}
+            _gameTypes.AddRange(types);
+            return types;
+        }
 
-	private void CreateGameButtons()
-	{
-		if (buttonPrefab == null || buttonsContainer == null)
-		{
-			Debug.LogError("Button prefab or container not assigned!");
-			return;
-		}
+        private Dictionary<Type, string> GetResourceMapping()
+        {
+            return new Dictionary<Type, string>
+            {
+                { typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
+                { typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
+                { typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
+                { typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
+                { typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main },
+                { typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain },
+                { typeof(LightseekerGame), ResourceIdsContainer.GameLightseeker.LightseekerMain },
+                { typeof(GardenerGame), ResourceIdsContainer.GameGardneer.GardenerGame },
+            };
+        }
 
-		foreach (var gameType in _gameTypes)
-		{
-			var button = Instantiate(buttonPrefab, buttonsContainer);
-			button.name = $"Button_{gameType.Name}";
-			button.Setup(gameType.Name);
-			button.OnButtonClicked += OnGameButtonClick;
-			_createdButtons.Add(button);
+        private void CreateGameButtons()
+        {
+            if (buttonPrefab == null || buttonsContainer == null)
+            {
+                Debug.LogError("Button prefab or container not assigned!");
+                return;
+            }
 
-			_logger.Log($"Created button for {gameType.Name}");
-		}
-	}
+            foreach (var gameType in _gameTypes)
+            {
+                var button = Instantiate(buttonPrefab, buttonsContainer);
+                button.name = $"Button_{gameType.Name}";
+                button.Setup(gameType.Name);
+                button.OnButtonClicked += OnGameButtonClick;
+                _createdButtons.Add(button);
+            }
+        }
 
-	private void InitializeFunctionalButtons()
-	{
-		// Инициализация кнопки переключения функциональных кнопок
-		if (toggleFunctionalButtonsUI != null)
-		{
-			toggleFunctionalButtonsUI.onClick.AddListener(ToggleFunctionalButtons);
-		}
+        private void InitializeFunctionalButtons()
+        {
+            // Инициализация кнопки переключения функциональных кнопок
+            if (toggleFunctionalButtonsUI != null)
+            {
+                toggleFunctionalButtonsUI.onClick.AddListener(ToggleFunctionalButtons);
+            }
 
-		// Инициализация кнопки Home
-		if (homeButton != null)
-		{
-			homeButton.onClick.AddListener(OnHomeButtonClick);
-		}
+            // Инициализация кнопки Home
+            if (homeButton != null)
+            {
+                homeButton.onClick.AddListener(OnHomeButtonClick);
+            }
 
-		// Инициализация кнопки Restart
-		if (restartButton != null)
-		{
-			restartButton.onClick.AddListener(OnRestartButtonClick);
-		}
+            // Инициализация кнопки Restart
+            if (restartButton != null)
+            {
+                restartButton.onClick.AddListener(OnRestartButtonClick);
+            }
 
-		// Устанавливаем начальное состояние UI
-		SetInitialUIState();
-	}
+            // Устанавливаем начальное состояние UI
+            SetInitialUIState();
+        }
 
-	private void SetInitialUIState()
-	{
-		// При первом запуске игра не запущена
-		_isGameRunning = false;
+        private void SetInitialUIState()
+        {
+            // Показываем контейнер списка игр
+            if (gameListContainer != null)
+            {
+                gameListContainer.gameObject.SetActive(true);
+            }
 
-		// Показываем контейнер списка игр
-		if (gameListContainer != null)
-		{
-			gameListContainer.gameObject.SetActive(true);
-		}
+            // Скрываем контейнер функциональных элементов
+            if (functionalButtonsContainer != null)
+            {
+                functionalButtonsContainer.gameObject.SetActive(false);
+            }
 
-		// Скрываем контейнер функциональных элементов
-		if (functionalButtonsContainer != null)
-		{
-			functionalButtonsContainer.gameObject.SetActive(false);
-		}
+            _logger.Log("Initial UI state set - showing game list, hiding functional container");
+        }
 
-		_logger.Log("Initial UI state set - showing game list, hiding functional container");
-	}
+        private void ToggleFunctionalButtons()
+        {
+            _functionalButtonsVisible = !_functionalButtonsVisible;
+            UpdateFunctionalButtonsVisibility();
+            _logger.Log($"Functional buttons visibility: {_functionalButtonsVisible}");
+        }
 
-	private void ToggleFunctionalButtons()
-	{
-		_functionalButtonsVisible = !_functionalButtonsVisible;
-		UpdateFunctionalButtonsVisibility();
-		_logger.Log($"Functional buttons visibility: {_functionalButtonsVisible}");
-	}
+        private void UpdateFunctionalButtonsVisibility()
+        {
+            functionalButtonsContainer.gameObject.SetActive(_functionalButtonsVisible);
+        }
 
-	private void UpdateFunctionalButtonsVisibility()
-	{
-		functionalButtonsContainer.gameObject.SetActive(_functionalButtonsVisible);
-	}
+        private void OnHomeButtonClick()
+        {
+            _logger.Log("Home button clicked - stopping current game and showing game list");
 
-	private void OnHomeButtonClick()
-	{
-		_logger.Log("Home button clicked - stopping current game and showing game list");
+            // Останавливаем текущую игру
+            StopCurrentGame();
 
-		// Останавливаем текущую игру
-		StopCurrentGame();
+            // Переключаем контейнеры: показываем список игр, скрываем функциональные элементы
+            if (gameListContainer != null)
+            {
+                gameListContainer.gameObject.SetActive(true);
+            }
 
-		// Обновляем состояние
-		_isGameRunning = false;
+            if (functionalButtonsContainer != null)
+            {
+                functionalButtonsContainer.gameObject.SetActive(false);
+            }
+        }
 
-		// Переключаем контейнеры: показываем список игр, скрываем функциональные элементы
-		if (gameListContainer != null)
-		{
-			gameListContainer.gameObject.SetActive(true);
-		}
+        private void OnRestartButtonClick()
+        {
+            _logger.Log("Restart button clicked - restarting current game");
 
-		if (functionalButtonsContainer != null)
-		{
-			functionalButtonsContainer.gameObject.SetActive(false);
-		}
-	}
+            if (_currentGame != null)
+            {
+                // Перезапускаем игру
+                _currentGame.StopGame();
+                _currentGame.StartGame();
+                _logger.Log("Game restarted successfully");
 
-	private void OnRestartButtonClick()
-	{
-		_logger.Log("Restart button clicked - restarting current game");
+                // Сбрасываем видимость функциональных кнопок при рестарте
+                _functionalButtonsVisible = false;
+                UpdateFunctionalButtonsVisibility();
+            }
+            else
+            {
+                _logger.LogWarning("No current game to restart");
+            }
+        }
 
-		if (_currentGame != null)
-		{
-			// Перезапускаем игру
-			_currentGame.StopGame();
-			_currentGame.StartGame();
-			_logger.Log("Game restarted successfully");
+        private async void OnGameButtonClick(string gameName)
+        {
+            _logger.Log($"Loading game: {gameName}");
 
-			// Сбрасываем видимость функциональных кнопок при рестарте
-			_functionalButtonsVisible = false;
-			UpdateFunctionalButtonsVisibility();
-		}
-		else
-		{
-			_logger.LogWarning("No current game to restart");
-		}
-	}
+            // Найдем тип игры по имени
+            var gameType = _gameTypes.Find(t => t.Name == gameName);
+            if (gameType == null)
+            {
+                _logger.LogError($"Game type not found: {gameName}");
+                return;
+            }
 
-	private async void OnGameButtonClick(string gameName)
-	{
-		_logger.Log($"Loading game: {gameName}");
+            // Останавливаем текущую игру перед загрузкой новой
+            StopCurrentGame();
 
-		// Найдем тип игры по имени
-		var gameType = _gameTypes.Find(t => t.Name == gameName);
-		if (gameType == null)
-		{
-			_logger.LogError($"Game type not found: {gameName}");
-			return;
-		}
+            // Создаем новую игру через фабрику
+            var game = await _gameFactory.CreateShortGameAsync(gameType, _cancellationTokenSource.Token);
+            if (game != null)
+            {
+                // Сохраняем ссылку на текущую игру
+                _currentGame = game;
 
-		// Останавливаем текущую игру перед загрузкой новой
-		StopCurrentGame();
+                // Запускаем игру
+                _currentGame.StartGame();
 
-		// Создаем новую игру через фабрику
-		var game = await _gameFactory.CreateShortGameAsync(gameType, _cancellationTokenSource.Token);
-		if (game != null)
-		{
-			_logger.Log($"Successfully created game: {gameName}");
 
-			// Сохраняем ссылку на текущую игру
-			_currentGame = game;
+                // Сбрасываем видимость функциональных кнопок при запуске новой игры
+                _functionalButtonsVisible = false;
 
-			// Запускаем игру
-			_currentGame.StartGame();
-			_logger.Log($"Started game: {gameName}");
+                // Переключаем контейнеры: скрываем список игр, показываем функциональные элементы
+                if (gameListContainer != null)
+                {
+                    gameListContainer.gameObject.SetActive(false);
+                }
 
-			// Обновляем состояние - игра запущена
-			_isGameRunning = true;
+                if (functionalButtonsContainer != null)
+                {
+                    functionalButtonsContainer.gameObject.SetActive(true);
+                }
 
-			// Сбрасываем видимость функциональных кнопок при запуске новой игры
-			_functionalButtonsVisible = false;
+                // Обновляем видимость функциональных кнопок внутри контейнера (скроет Home/Restart)
+                UpdateFunctionalButtonsVisibility();
+            }
+            else
+            {
+                _logger.LogError($"Failed to create game: {gameName}");
+            }
+        }
 
-			// Переключаем контейнеры: скрываем список игр, показываем функциональные элементы
-			if (gameListContainer != null)
-			{
-				gameListContainer.gameObject.SetActive(false);
-			}
+        private void StopCurrentGame()
+        {
+            if (_currentGame == null)
+            {
+                return;
+            }
 
-			if (functionalButtonsContainer != null)
-			{
-				functionalButtonsContainer.gameObject.SetActive(true);
-			}
+            _logger.Log($"Stopping current game: {_currentGame.GetType().Name}");
 
-			// Обновляем видимость функциональных кнопок внутри контейнера (скроет Home/Restart)
-			UpdateFunctionalButtonsVisibility();
-		}
-		else
-		{
-			_logger.LogError($"Failed to create game: {gameName}");
-		}
-	}
+            // Останавливаем игру
+            _currentGame.StopGame();
 
-	private void StopCurrentGame()
-	{
-		if (_currentGame == null)
-		{
-			return;
-		}
+            // Удаляем префаб игры если это MonoBehaviour
+            if (_currentGame is MonoBehaviour gameMonoBehaviour && gameMonoBehaviour != null)
+            {
+                _logger.Log($"Destroying game prefab: {gameMonoBehaviour.name}");
+                Destroy(gameMonoBehaviour.gameObject);
+            }
 
-		_logger.Log($"Stopping current game: {_currentGame.GetType().Name}");
-
-		// Останавливаем игру
-		_currentGame.StopGame();
-
-		// Удаляем префаб игры если это MonoBehaviour
-		if (_currentGame is MonoBehaviour gameMonoBehaviour && gameMonoBehaviour != null)
-		{
-			_logger.Log($"Destroying game prefab: {gameMonoBehaviour.name}");
-			Destroy(gameMonoBehaviour.gameObject);
-		}
-
-		// Очищаем ссылку
-		_currentGame = null;
-	}
+            // Очищаем ссылку
+            _currentGame = null;
+        }
 
 	private void OnDestroy()
 	{
@@ -364,33 +341,33 @@ internal class SimpleTester : MonoBehaviour
 		
 		_cancellationTokenSource?.Cancel();
 
-		// Останавливаем текущую игру
-		StopCurrentGame();
+            // Останавливаем текущую игру
+            StopCurrentGame();
 
-		// Отписываемся от событий кнопок игр
-		foreach (var button in _createdButtons)
-		{
-			if (button != null)
-			{
-				button.OnButtonClicked -= OnGameButtonClick;
-			}
-		}
+            // Отписываемся от событий кнопок игр
+            foreach (var button in _createdButtons)
+            {
+                if (button != null)
+                {
+                    button.OnButtonClicked -= OnGameButtonClick;
+                }
+            }
 
-		// Отписываемся от функциональных кнопок
-		if (toggleFunctionalButtonsUI != null)
-		{
-			toggleFunctionalButtonsUI.onClick.RemoveListener(ToggleFunctionalButtons);
-		}
+            // Отписываемся от функциональных кнопок
+            if (toggleFunctionalButtonsUI != null)
+            {
+                toggleFunctionalButtonsUI.onClick.RemoveListener(ToggleFunctionalButtons);
+            }
 
-		if (homeButton != null)
-		{
-			homeButton.onClick.RemoveListener(OnHomeButtonClick);
-		}
+            if (homeButton != null)
+            {
+                homeButton.onClick.RemoveListener(OnHomeButtonClick);
+            }
 
-		if (restartButton != null)
-		{
-			restartButton.onClick.RemoveListener(OnRestartButtonClick);
-		}
+            if (restartButton != null)
+            {
+                restartButton.onClick.RemoveListener(OnRestartButtonClick);
+            }
 
 		// Dispose resources in correct order
 		// 1. First dispose factory (stops creating new resources)

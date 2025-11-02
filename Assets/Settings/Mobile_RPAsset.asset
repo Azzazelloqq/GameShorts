@@ -21,6 +21,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cbed2be973f0eeb4c8e750eb1434ae4d, type: 2}
   - {fileID: 11400000, guid: 1337e89614c261b4faafe03fe6a602f6, type: 2}
   - {fileID: 11400000, guid: 0c40f1571f1e5614fa69bdd13dbbc847, type: 2}
+  - {fileID: 11400000, guid: 79d09886ebee4b2458c40a6c34a0aa79, type: 2}
   m_DefaultRendererIndex: 0
   m_RequireDepthTexture: 1
   m_RequireOpaqueTexture: 0
@@ -50,7 +51,7 @@ MonoBehaviour:
   m_AdditionalLightsRenderingMode: 1
   m_AdditionalLightsPerObjectLimit: 4
   m_AdditionalLightShadowsSupported: 1
-  m_AdditionalLightsShadowmapResolution: 2048
+  m_AdditionalLightsShadowmapResolution: 1024
   m_AdditionalLightsShadowResolutionTierLow: 256
   m_AdditionalLightsShadowResolutionTierMedium: 512
   m_AdditionalLightsShadowResolutionTierHigh: 1024
@@ -58,11 +59,11 @@ MonoBehaviour:
   m_ReflectionProbeBoxProjection: 1
   m_ReflectionProbeAtlas: 1
   m_ShadowDistance: 100
-  m_ShadowCascadeCount: 4
-  m_Cascade2Split: 0.25
+  m_ShadowCascadeCount: 2
+  m_Cascade2Split: 0.085
   m_Cascade3Split: {x: 0.1, y: 0.3}
-  m_Cascade4Split: {x: 0.1791282, y: 0.516, z: 0.808}
-  m_CascadeBorder: 0
+  m_Cascade4Split: {x: 0.087, y: 0.45099998, z: 0.808}
+  m_CascadeBorder: 0.292
   m_ShadowDepthBias: 0
   m_ShadowNormalBias: 0
   m_AnyShadowsSupported: 1

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2555838da5e5074a99077fa0691073f, type: 3}
+  m_Name: GardenerGameSettings
+  m_EditorClassIdentifier: Gardener::GameShorts.Gardener.Data.GardenerGameSettings
+  _startingCapital: 100
+  _plotSettings: {fileID: 11400000, guid: aa930f5a1cbcebf478dfc2e14174d1ac, type: 2}
+  _plotPreparationTime: 3
+  _harvestHoldTime: 2
+  _waterDepletionTime: 30
+  _rotationSensitivity: 0.1
+  _minVerticalAngle: 0
+  _maxVerticalAngle: 0
