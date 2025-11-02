@@ -135,6 +135,7 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 			UpdateInnerCirclePosition();
 			UpdateVisualFeedback();
+			ReportDragProgress(CalculateVerticalProgress());
 		}
 	}
 
@@ -228,12 +229,8 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		// Update visual position
 		UpdateInnerCirclePosition();
 
-		// Calculate progress for vertical movement only
-		var verticalDistance = _currentDragOffset.y;
-		var swipeThreshold = _outerCircleRadius * _swipeThresholdInRadii;
-		var progress = Mathf.Clamp(verticalDistance / swipeThreshold, -1f, 1f);
-
 		// Report progress (inverted: positive = up = next game)
+		var progress = CalculateVerticalProgress();
 		ReportDragProgress(progress);
 
 		// Update visual feedback
@@ -242,7 +239,7 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		if (_showDebug)
 		{
 			Debug.Log($"Joystick - Offset: {_currentDragOffset}, Progress: {progress:F2}, " +
-					$"Distance: {_currentDragOffset.magnitude:F0}, Threshold: {swipeThreshold:F0}");
+				$"Distance: {_currentDragOffset.magnitude:F0}, Threshold: {GetSwipeThreshold():F0}");
 		}
 	}
 
@@ -257,9 +254,9 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 		// Calculate if swipe threshold was met (vertical only)
 		var verticalDistance = _currentDragOffset.y;
-		var swipeThreshold = _outerCircleRadius * _swipeThresholdInRadii;
+		var swipeThreshold = GetSwipeThreshold();
 
-		if (Mathf.Abs(verticalDistance) >= swipeThreshold)
+		if (swipeThreshold > Mathf.Epsilon && Mathf.Abs(verticalDistance) >= swipeThreshold)
 		{
 			if (verticalDistance > 0 && _canGoNext)
 			{
@@ -325,14 +322,37 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 		// Check if we've reached the swipe threshold
 		var verticalDistance = Mathf.Abs(_currentDragOffset.y);
-		var swipeThreshold = _outerCircleRadius * _swipeThresholdInRadii;
+		var swipeThreshold = GetSwipeThreshold();
 
-		var isReady = verticalDistance >= swipeThreshold;
+		var isReady = swipeThreshold > Mathf.Epsilon && verticalDistance >= swipeThreshold;
 
 		// Interpolate color based on progress
-		var progress = Mathf.Clamp01(verticalDistance / swipeThreshold);
+		var progress = swipeThreshold > Mathf.Epsilon
+			? Mathf.Clamp01(verticalDistance / swipeThreshold)
+			: 0f;
 		_innerCircleImage.color = Color.Lerp(_idleColor, _readyColor, progress);
 		_gooeyEffect?.UpdateEffect();
+	}
+
+	private float CalculateVerticalProgress()
+	{
+		var swipeThreshold = GetSwipeThreshold();
+		if (swipeThreshold <= Mathf.Epsilon)
+		{
+			return 0f;
+		}
+
+		return Mathf.Clamp(_currentDragOffset.y / swipeThreshold, -1f, 1f);
+	}
+
+	private float GetSwipeThreshold()
+	{
+		if (_outerCircleRadius <= Mathf.Epsilon)
+		{
+			return 0f;
+		}
+
+		return _outerCircleRadius * _swipeThresholdInRadii;
 	}
 
 	private void UpdateJoystickVisibility()
