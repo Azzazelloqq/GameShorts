@@ -57,8 +57,10 @@ MonoBehaviour:
   _swipeThresholdInRadii: 1.75
   _dragSensitivity: 1
   _maxDragDistanceInRadii: 2.15
+  _maxSwipeAngleFromVertical: 30
+  _alignmentTolerance: 0.05
   _returnSpeed: 10
-  _showDebug: 0
+  _showDebug: 1
   _idleColor: {r: 1, g: 1, b: 1, a: 1}
   _readyColor: {r: 0, g: 1, b: 0, a: 1}
   _useColorFeedback: 1
@@ -1017,7 +1019,7 @@ MonoBehaviour:
   _bottomImage: {fileID: 4348960899372195221}
   _inputHandlers:
   - {fileID: 8886100168630118364}
-  - {fileID: 8886100168630118364}
+  - {fileID: 9205531070952551618}
   _loadingIndicator: {fileID: 2993805290359252451}
   _animationDuration: 0.3
   _animationEase: 6
