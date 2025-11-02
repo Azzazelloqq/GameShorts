@@ -32,16 +32,6 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 	private float _maxDragDistanceInRadii = 2.5f;
 
 	[SerializeField]
-	[Tooltip("Maximum allowed angle from vertical (degrees) to treat drag as swipe up/down")]
-	[Range(0f, 89f)]
-	private float _maxSwipeAngleFromVertical = 30f;
-
-	[SerializeField]
-	[Tooltip("Additional tolerance subtracted from alignment threshold (0..1)")]
-	[Range(0f, 1f)]
-	private float _alignmentTolerance = 0.05f;
-
-	[SerializeField]
 	[Tooltip("Speed at which joystick returns to center when released")]
 	private float _returnSpeed = 10f;
 
@@ -67,6 +57,11 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 	[Tooltip("Optional: GooeyJoystickEffect component for viscous liquid effect")]
 	private GooeyJoystickEffect _gooeyEffect;
 
+	[Header("Behaviour")]
+	[SerializeField]
+	[Tooltip("Hide joystick visuals when input is disabled")] 
+	private bool _hideWhenDisabled = false;
+
 	private Image _innerCircleImage;
 	private bool _isDragging;
 	private bool _isEnabled = true;
@@ -76,13 +71,17 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 	private float _outerCircleRadius;
 	private Vector2 _currentDragOffset;
 	private bool _isReturning;
-	private float _minVerticalAlignment; // Cached cos(angle) threshold
 
 	public override bool IsEnabled
 	{
 		get => _isEnabled;
 		set
 		{
+			if (_isEnabled == value)
+			{
+				return;
+			}
+
 			_isEnabled = value;
 			if (!_isEnabled && _isDragging)
 			{
@@ -90,6 +89,15 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 			}
 
 			UpdateJoystickVisibility();
+
+			if (_isEnabled)
+			{
+				CalculateCircleParameters();
+				UpdateInnerCirclePosition();
+				UpdateVisualFeedback();
+			}
+
+			_gooeyEffect?.UpdateEffect();
 		}
 	}
 
@@ -105,7 +113,6 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		}
 
 		CalculateCircleParameters();
-		UpdateAlignmentThreshold();
 	}
 
 	private void Start()
@@ -139,12 +146,27 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 	public override void ResetInputState()
 	{
+		ResetInputStateInternal(forceInstant: false);
+	}
+
+	private void ResetInputStateInternal(bool forceInstant)
+	{
 		_isDragging = false;
-		_isReturning = true;
-		_currentDragOffset = Vector2.zero;
+
+		if (forceInstant)
+		{
+			_isReturning = false;
+			_currentDragOffset = Vector2.zero;
+		}
+		else
+		{
+			_isReturning = _currentDragOffset.sqrMagnitude > Mathf.Epsilon;
+		}
+
 		UpdateInnerCirclePosition();
 		ReportDragProgress(0f);
 		UpdateVisualFeedback();
+		_gooeyEffect?.UpdateEffect();
 	}
 
 	public void OnPointerDown(PointerEventData eventData)
@@ -206,8 +228,10 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		// Update visual position
 		UpdateInnerCirclePosition();
 
+		// Calculate progress for vertical movement only
+		var verticalDistance = _currentDragOffset.y;
 		var swipeThreshold = _outerCircleRadius * _swipeThresholdInRadii;
-		var progress = CalculateProgress(_currentDragOffset, swipeThreshold);
+		var progress = Mathf.Clamp(verticalDistance / swipeThreshold, -1f, 1f);
 
 		// Report progress (inverted: positive = up = next game)
 		ReportDragProgress(progress);
@@ -217,11 +241,8 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 		if (_showDebug)
 		{
-			var alignment = GetVerticalAlignment(_currentDragOffset, out _);
 			Debug.Log($"Joystick - Offset: {_currentDragOffset}, Progress: {progress:F2}, " +
-				$"Distance: {_currentDragOffset.magnitude:F0}, Threshold: {swipeThreshold:F0}, " +
-				$"Alignment: {alignment:F2}, EffectiveThreshold: {GetEffectiveAlignmentThreshold():F2}, " +
-				$"Vertical: {_currentDragOffset.y:F2}");
+					$"Distance: {_currentDragOffset.magnitude:F0}, Threshold: {swipeThreshold:F0}");
 		}
 	}
 
@@ -234,16 +255,15 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 		_isDragging = false;
 
+		// Calculate if swipe threshold was met (vertical only)
+		var verticalDistance = _currentDragOffset.y;
 		var swipeThreshold = _outerCircleRadius * _swipeThresholdInRadii;
-		var swipeMagnitude = _currentDragOffset.magnitude;
-		var alignment = GetVerticalAlignment(_currentDragOffset, out var hasDirection);
 
-		var vertical = _currentDragOffset.y;
-
-		if (hasDirection && swipeMagnitude >= swipeThreshold && IsWithinAlignment(alignment))
+		if (Mathf.Abs(verticalDistance) >= swipeThreshold)
 		{
-			if (vertical > 0f && _canGoNext)
+			if (verticalDistance > 0 && _canGoNext)
 			{
+				// Dragged up (positive Y) - go to next game
 				if (_showDebug)
 				{
 					Debug.Log("Joystick: Swipe UP (Next Game)");
@@ -251,8 +271,9 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 
 				RequestNextGame();
 			}
-			else if (vertical < 0f && _canGoPrevious)
+			else if (verticalDistance < 0 && _canGoPrevious)
 			{
+				// Dragged down (negative Y) - go to previous game
 				if (_showDebug)
 				{
 					Debug.Log("Joystick: Swipe DOWN (Previous Game)");
@@ -291,6 +312,8 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		{
 			_innerCircle.anchoredPosition = _currentDragOffset;
 		}
+
+		_gooeyEffect?.UpdateEffect();
 	}
 
 	private void UpdateVisualFeedback()
@@ -300,40 +323,54 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 			return;
 		}
 
+		// Check if we've reached the swipe threshold
+		var verticalDistance = Mathf.Abs(_currentDragOffset.y);
 		var swipeThreshold = _outerCircleRadius * _swipeThresholdInRadii;
-		var magnitude = _currentDragOffset.magnitude;
-		if (swipeThreshold <= Mathf.Epsilon)
-		{
-			_innerCircleImage.color = _idleColor;
-			return;
-		}
 
-		var normalizedProgress = Mathf.Clamp01(magnitude / swipeThreshold);
-		var alignment = Mathf.Abs(GetVerticalAlignment(_currentDragOffset, out _));
-		var effectiveThreshold = GetEffectiveAlignmentThreshold();
-		var alignmentFactor = Mathf.InverseLerp(effectiveThreshold, 1f, alignment);
-		var colorProgress = Mathf.Clamp01(normalizedProgress * alignmentFactor);
+		var isReady = verticalDistance >= swipeThreshold;
 
-		_innerCircleImage.color = Color.Lerp(_idleColor, _readyColor, colorProgress);
+		// Interpolate color based on progress
+		var progress = Mathf.Clamp01(verticalDistance / swipeThreshold);
+		_innerCircleImage.color = Color.Lerp(_idleColor, _readyColor, progress);
+		_gooeyEffect?.UpdateEffect();
 	}
 
 	private void UpdateJoystickVisibility()
 	{
 		if (_outerCircle != null)
 		{
-			_outerCircle.gameObject.SetActive(_isEnabled);
+			if (_hideWhenDisabled)
+			{
+				_outerCircle.gameObject.SetActive(_isEnabled);
+			}
+			else if (!_outerCircle.gameObject.activeSelf)
+			{
+				_outerCircle.gameObject.SetActive(true);
+			}
 		}
 
 		// Update gooey effect visibility
 		if (_gooeyEffect != null)
 		{
-			_gooeyEffect.gameObject.SetActive(_isEnabled);
+			if (_hideWhenDisabled)
+			{
+				_gooeyEffect.gameObject.SetActive(_isEnabled);
+			}
+			else if (!_gooeyEffect.gameObject.activeSelf)
+			{
+				_gooeyEffect.gameObject.SetActive(true);
+			}
+
+			if (_isEnabled || !_hideWhenDisabled)
+			{
+				_gooeyEffect.UpdateEffect();
+			}
 		}
 	}
 
 	private void OnDisable()
 	{
-		ResetInputState();
+		ResetInputStateInternal(forceInstant: true);
 	}
 
 	private void OnValidate()
@@ -343,9 +380,6 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 		_maxDragDistanceInRadii = Mathf.Max(_swipeThresholdInRadii, _maxDragDistanceInRadii);
 		_dragSensitivity = Mathf.Max(0.1f, _dragSensitivity);
 		_returnSpeed = Mathf.Max(0.1f, _returnSpeed);
-		_maxSwipeAngleFromVertical = Mathf.Clamp(_maxSwipeAngleFromVertical, 0f, 89f);
-		_alignmentTolerance = Mathf.Clamp01(_alignmentTolerance);
-		UpdateAlignmentThreshold();
 	}
 
 	// Debug visualization
@@ -390,57 +424,6 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 			Gizmos.DrawLine(prevPoint, newPoint);
 			prevPoint = newPoint;
 		}
-	}
-
-	private void UpdateAlignmentThreshold()
-	{
-		_minVerticalAlignment = Mathf.Cos(_maxSwipeAngleFromVertical * Mathf.Deg2Rad);
-	}
-
-	private float CalculateProgress(Vector2 offset, float swipeThreshold)
-	{
-		if (swipeThreshold <= Mathf.Epsilon)
-		{
-			return 0f;
-		}
-
-		var alignment = GetVerticalAlignment(offset, out var hasDirection);
-		if (!hasDirection || !IsWithinAlignment(alignment))
-		{
-			return 0f;
-		}
-
-		var magnitude = offset.magnitude;
-		var verticalSign = Mathf.Sign(offset.y);
-		if (Mathf.Approximately(verticalSign, 0f))
-		{
-			verticalSign = Mathf.Sign(alignment);
-		}
-
-		var progress = verticalSign * (magnitude / swipeThreshold);
-		return Mathf.Clamp(progress, -1f, 1f);
-	}
-
-	private float GetVerticalAlignment(Vector2 offset, out bool hasDirection)
-	{
-		hasDirection = offset.sqrMagnitude > Mathf.Epsilon * Mathf.Epsilon;
-		if (!hasDirection)
-		{
-			return 0f;
-		}
-
-		var direction = offset.normalized;
-		return Vector2.Dot(direction, Vector2.up);
-	}
-
-	private float GetEffectiveAlignmentThreshold()
-	{
-		return Mathf.Clamp01(_minVerticalAlignment - _alignmentTolerance);
-	}
-
-	private bool IsWithinAlignment(float alignment)
-	{
-		return Mathf.Abs(alignment) >= GetEffectiveAlignmentThreshold();
 	}
 }
 }
