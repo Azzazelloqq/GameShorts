@@ -60,11 +60,17 @@ namespace GameShorts.Gardener.UI
             AddDispose(plot.GrowthProgressObservable?.Subscribe(progress => barView.SetGrowthProgress(progress)));
             AddDispose(plot.WaterLevelObservable?.Subscribe(level => barView.SetWaterLevel(level)));
             
-            // Подписываемся на изменение состояния, чтобы скрывать бар для пустых грядок
+            // Подписываемся на изменение состояния, чтобы скрывать бар для пустых грядок, созревших и гнилых растений
             AddDispose(plot.CurrentStateObservable?.Subscribe(state =>
             {
-                // Показываем бар только если грядка не пустая
-                bool shouldBeVisible = state != Data.PlantState.Empty;
+                // Скрываем бар для:
+                // - Пустых грядок (Empty)
+                // - Созревших растений (Fruit/Flowering) - рост завершен
+                // - Гнилых растений (Rotten) - рост прекращен
+                bool shouldBeVisible = state != Data.PlantState.Empty && 
+                                       state != Data.PlantState.Fruit && 
+                                       state != Data.PlantState.Flowering &&
+                                       state != Data.PlantState.Rotten;
                 barView.SetVisible(shouldBeVisible);
             }));
         }

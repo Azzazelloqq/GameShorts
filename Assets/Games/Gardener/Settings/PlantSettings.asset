@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: PlantSettings
   m_EditorClassIdentifier: Gardener::GameShorts.Gardener.Data.PlantSettings
   _plantName: Hydrangea
-  _growthTime: 60
-  _wateringInterval: 30
+  _growthTime: 15
+  _wateringInterval: 10
   _hasFruits: 0
   _seedPrice: 10
   _harvestPrice: 50
   _seedIcon: {fileID: 21300000, guid: 07226bbabd040d84d83a489597f3d7ff, type: 3}
   _seedModel: {fileID: 464523929321355347, guid: d85bb8e9699f43042aa5ad0236622fcd, type: 3}
-  _sproutModel: {fileID: 2370834858386919805, guid: 584bc5d0de28148639f1528511323e7c, type: 3}
-  _bushModel: {fileID: 329528859695212466, guid: 7c51d75c76cf44ae7a358c71c3de3837, type: 3}
+  _sproutModel: {fileID: 329528859695212466, guid: 7c51d75c76cf44ae7a358c71c3de3837, type: 3}
+  _bushModel: {fileID: 2370834858386919805, guid: 584bc5d0de28148639f1528511323e7c, type: 3}
   _floweringModel: {fileID: 1682593054194990011, guid: 9b479d6c09bd64a2e8c2521b8cd1d516, type: 3}
   _fruitModel: {fileID: 0}

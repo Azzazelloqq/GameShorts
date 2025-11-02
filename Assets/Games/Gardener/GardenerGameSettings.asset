@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Gardener::GameShorts.Gardener.Data.GardenerGameSettings
   _startingCapital: 100
   _plotSettings: {fileID: 11400000, guid: aa930f5a1cbcebf478dfc2e14174d1ac, type: 2}
-  _plotPreparationTime: 3
+  _plotPreparationTime: 2
   _harvestHoldTime: 2
-  _waterDepletionTime: 30
   _rotationSensitivity: 0.1
   _minVerticalAngle: 0
   _maxVerticalAngle: 0

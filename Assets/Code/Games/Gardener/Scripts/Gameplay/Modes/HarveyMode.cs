@@ -60,21 +60,28 @@ namespace GameShorts.Gardener.Gameplay.Modes
             }
         }
         
-        public void OnPlotPressed(PlotPm plot, Vector3 worldPosition)
+        public void OnPlotPressed(PlotPm plot, Vector3 worldPosition, Vector2 screenPosition)
         {
             if (plot == null)
                 return;
             
-            // Начинаем удержание
+            // Если растение зрелое - собираем сразу по клику без удержания
+            if (plot.IsPlantMature())
+            {
+                ProcessHarvest(plot);
+                _ctx.onPlotInteraction?.Invoke(plot, worldPosition);
+                return;
+            }
+            
+            // Для незрелых или гнилых растений - начинаем удержание
             _currentHeldPlot = plot;
             _holdPosition = worldPosition;
             _isHolding = true;
             _holdTime = 0f;
             
-            // Показываем прогресс-бар в позиции нажатия
+            // Показываем прогресс-бар в позиции курсора (используем screenPosition напрямую)
             if (_ctx.harvestProgressBar != null)
             {
-                Vector2 screenPosition = _ctx.camera.WorldToScreenPoint(worldPosition);
                 _ctx.harvestProgressBar.Show(screenPosition);
             }
             

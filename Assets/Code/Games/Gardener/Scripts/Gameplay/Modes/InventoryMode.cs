@@ -25,6 +25,10 @@ namespace GameShorts.Gardener.Gameplay.Modes
         
         private readonly Ctx _ctx;
         private PlaceableItem[] _cachedPlaceableItems;
+        
+        // Observable для отслеживания изменений списка элементов
+        private readonly ReactiveProperty<PlaceableItem[]> _placeableItemsChanged = new ReactiveProperty<PlaceableItem[]>(Array.Empty<PlaceableItem>());
+        public ReadOnlyReactiveProperty<PlaceableItem[]> PlaceableItemsChanged => _placeableItemsChanged;
 
         public InventoryMode(Ctx ctx)
         {
@@ -51,7 +55,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
             Debug.Log("Inventory Mode deactivated");
         }
 
-        public void OnPlotPressed(PlotPm plot, Vector3 worldPosition)
+        public void OnPlotPressed(PlotPm plot, Vector3 worldPosition, Vector2 screenPosition)
         {
             // В режиме инвентаря не делаем ничего при клике на грядку
             // Взаимодействие происходит только через drag-and-drop
@@ -117,6 +121,9 @@ namespace GameShorts.Gardener.Gameplay.Modes
             // Уменьшаем количество в инвентаре
             _ctx.inventoryManager.RemoveSeeds(item.PlantSettings, 1);
             _ctx.plotUIBarManager.CreateBarForPlot(plot, plot.GameObject.transform);
+            
+            // Принудительно обновляем список элементов
+            UpdatePlaceableItems();
         }
 
         private void UpdatePlaceableItems()
@@ -124,6 +131,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
             if (_ctx.inventoryManager == null)
             {
                 _cachedPlaceableItems = Array.Empty<PlaceableItem>();
+                _placeableItemsChanged.Value = _cachedPlaceableItems;
                 return;
             }
 
@@ -152,7 +160,8 @@ namespace GameShorts.Gardener.Gameplay.Modes
             }
 
             _cachedPlaceableItems = items.ToArray();
-            Debug.Log($"Updated placeable items: {_cachedPlaceableItems.Length} types");
+            _placeableItemsChanged.Value = _cachedPlaceableItems; // Уведомляем об изменении
+            Debug.Log($"Updated placeable items: {_cachedPlaceableItems.Length} types available");
         }
 
         private Sprite GetSeedIcon(PlantSettings plantSettings)
@@ -163,6 +172,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
 
         protected override void OnDispose()
         {
+            _placeableItemsChanged?.Dispose();
             // Базовый dispose очистит все подписки через AddDispose
         }
     }

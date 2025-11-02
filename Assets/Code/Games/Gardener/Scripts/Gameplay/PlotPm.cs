@@ -19,7 +19,6 @@ namespace GameShorts.Gardener.Gameplay
             public CancellationToken cancellationToken;
             public Action<int> onPlantHarvested;
             public float preparationTime;
-            public float waterDepletionTime;
         }
 
         private readonly Ctx _ctx;
@@ -90,11 +89,19 @@ namespace GameShorts.Gardener.Gameplay
             if (_currentPlantSettings == null)
                 return;
 
+            // Если растение уже зрелое (Fruit или Flowering), оно не растет и не требует воды
+            // Просто ждем когда игрок его соберет
+            if (IsPlantMature())
+            {
+                // Зрелое растение не меняется, не требует воды и не может сгнить
+                return;
+            }
+
             // Обновляем время с последнего полива
             _timeSinceLastWatering += deltaTime;
             
             // Постепенно уменьшаем уровень воды
-            _waterLevel.Value -= deltaTime / _ctx.waterDepletionTime;
+            _waterLevel.Value -= deltaTime / _currentPlantSettings.WateringInterval;
             _waterLevel.Value = Mathf.Max(0f, _waterLevel.Value);
             
             // Если растение не поливали долго, оно гниет
@@ -120,6 +127,9 @@ namespace GameShorts.Gardener.Gameplay
             if (_growthProgress >= 1f)
             {
                 newState = _currentPlantSettings.HasFruits ? PlantState.Fruit : PlantState.Flowering;
+                // Фиксируем прогресс на 100% когда растение созрело
+                _growthProgress = 1f;
+                _growthProgressProperty.Value = 1f;
             }
             else if (_growthProgress >= 0.75f)
             {

@@ -49,8 +49,20 @@ namespace GameShorts.Gardener.UI
             Debug.Log($"Begin drag: {_ctx.item.ItemName}");
             _isDragging = true;
 
-            // Создаем только UI превью (картинку под курсором)
-            _ctx.view.CreateUIPreview(_ctx.item.Icon, _ctx.canvas);
+            // Если есть префаб, создаем 3D превью, иначе UI превью
+            if (_ctx.item.Prefab != null)
+            {
+                // Получаем начальную позицию для 3D превью
+                if (TryGetWorldPosition(eventData, out Vector3 worldPosition))
+                {
+                    _ctx.view.Create3DPreview(_ctx.item.Prefab, worldPosition);
+                }
+            }
+            else
+            {
+                // Создаем UI превью (картинку под курсором) для элементов без префаба
+                _ctx.view.CreateUIPreview(_ctx.item.Icon, _ctx.canvas);
+            }
         }
 
         private void HandleDrag(PointerEventData eventData)
@@ -58,8 +70,19 @@ namespace GameShorts.Gardener.UI
             if (!_isDragging)
                 return;
 
-            // Обновляем только позицию UI превью (картинки)
-            _ctx.view.UpdateUIPreviewPosition(eventData.position);
+            // Если есть префаб, обновляем 3D превью
+            if (_ctx.item.Prefab != null)
+            {
+                if (TryGetWorldPosition(eventData, out Vector3 worldPosition))
+                {
+                    _ctx.view.Update3DPreviewPosition(worldPosition);
+                }
+            }
+            else
+            {
+                // Обновляем UI превью (картинки)
+                _ctx.view.UpdateUIPreviewPosition(eventData.position);
+            }
         }
 
         private void HandleEndDrag(PointerEventData eventData)
@@ -112,8 +135,8 @@ namespace GameShorts.Gardener.UI
 
         private void DestroyPreviews()
         {
-            // Удаляем только UI превью
-            _ctx.view.DestroyUIPreview();
+            // Удаляем все превью (UI и 3D)
+            _ctx.view.DestroyAllPreviews();
         }
 
         protected override void OnDispose()

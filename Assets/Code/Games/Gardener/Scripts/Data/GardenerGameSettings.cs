@@ -17,7 +17,6 @@ namespace GameShorts.Gardener.Data
         [Header("Plot Timings")]
         [SerializeField] private float _plotPreparationTime = 5f;
         [SerializeField] private float _harvestHoldTime = 2f;
-        [SerializeField] private float _waterDepletionTime = 30f;
         
         [Header("Platform Rotation")]
         [SerializeField] private float _rotationSensitivity = 0.5f;
@@ -28,7 +27,6 @@ namespace GameShorts.Gardener.Data
         public PlotSettings PlotSettings => _plotSettings;
         public float PlotPreparationTime => _plotPreparationTime;
         public float HarvestHoldTime => _harvestHoldTime;
-        public float WaterDepletionTime => _waterDepletionTime;
         public float RotationSensitivity => _rotationSensitivity;
         public float MinVerticalAngle => _minVerticalAngle;
         public float MaxVerticalAngle => _maxVerticalAngle;

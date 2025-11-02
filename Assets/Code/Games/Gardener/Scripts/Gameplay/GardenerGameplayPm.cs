@@ -206,8 +206,7 @@ namespace GameShorts.Gardener.Gameplay
                 plotView = plotView,
                 cancellationToken = _ctx.cancellationToken,
                 onPlantHarvested = OnPlantHarvested,
-                preparationTime = _ctx.gameSettings.PlotPreparationTime,
-                waterDepletionTime = _ctx.gameSettings.WaterDepletionTime
+                preparationTime = _ctx.gameSettings.PlotPreparationTime
             });
 
             _plots.Add(plotPm);

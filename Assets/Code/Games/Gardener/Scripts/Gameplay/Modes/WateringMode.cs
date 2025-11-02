@@ -33,7 +33,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
             Debug.Log("Watering Mode deactivated");
         }
         
-        public void OnPlotPressed(PlotPm plot, Vector3 worldPosition)
+        public void OnPlotPressed(PlotPm plot, Vector3 worldPosition, Vector2 screenPosition)
         {
             if (plot == null)
                 return;

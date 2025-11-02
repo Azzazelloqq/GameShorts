@@ -29,6 +29,7 @@ namespace GameShorts.Gardener.Logic
 
         private readonly Ctx _ctx;
         private readonly CompositeDisposable _disposable = new CompositeDisposable();
+        private IDisposable _currentModeSubscription; // Подписка на текущий режим
 
         public GardenerUIPm(Ctx ctx) 
         {
@@ -94,6 +95,10 @@ namespace GameShorts.Gardener.Logic
         
         private void OnModeChanged(IGardenerMode mode)
         {
+            // Отписываемся от предыдущего режима
+            _currentModeSubscription?.Dispose();
+            _currentModeSubscription = null;
+            
             if (mode == null)
             {
                 // Если режим не активен, скрываем панель и очищаем UI
@@ -117,8 +122,20 @@ namespace GameShorts.Gardener.Logic
             // Обновляем UI в зависимости от режима
             UpdateModeUI(mode);
             
+            // Подписываемся на изменения PlaceableItems для InventoryMode
+            if (mode is InventoryMode inventoryMode)
+            {
+                _currentModeSubscription = inventoryMode.PlaceableItemsChanged
+                    .Subscribe(items => UpdatePlaceableItemsPanel(mode, items));
+            }
+            
             // Обновляем панель placeable элементов
             var placeableItems = mode.GetPlaceableItems();
+            UpdatePlaceableItemsPanel(mode, placeableItems);
+        }
+        
+        private void UpdatePlaceableItemsPanel(IGardenerMode mode, PlaceableItem[] placeableItems)
+        {
             if (placeableItems != null && placeableItems.Length > 0)
             {
                 if (_ctx.PlaceableItemsPanel != null)
@@ -163,11 +180,13 @@ namespace GameShorts.Gardener.Logic
         private void BuyPlant(PlantSettings plantSettings)
         {
             _ctx.OnBuyPlant?.Invoke(plantSettings);
-            CloseShop();
+            // Не закрываем магазин, чтобы игрок мог купить еще что-то
+            // CloseShop();
         }
 
         protected override void OnDispose()
         {
+            _currentModeSubscription?.Dispose();
             _disposable.Dispose();
 
             // Отписываемся от событий кнопок

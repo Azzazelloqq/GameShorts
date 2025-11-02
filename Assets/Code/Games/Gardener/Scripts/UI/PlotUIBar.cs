@@ -20,6 +20,7 @@ namespace GameShorts.Gardener.UI
         private Transform _targetPlot;
         private bool _isInitialized;
         private Canvas _parentCanvas;
+        private bool _shouldBeVisible = true; // Флаг желаемой видимости (контролируется извне)
 
         protected override void Awake()
         {
@@ -58,14 +59,15 @@ namespace GameShorts.Gardener.UI
             // Преобразуем мировую позицию в экранную
             Vector3 screenPosition = _worldCamera.WorldToScreenPoint(worldPosition);
             
-            // Если объект за камерой, скрываем UI
+            // Если объект за камерой, скрываем UI независимо от флага
             if (screenPosition.z < 0)
             {
-                SetVisible(false);
+                ApplyVisibility(false);
                 return;
             }
             
-            SetVisible(true);
+            // Применяем желаемую видимость (установленную через SetVisible)
+            ApplyVisibility(_shouldBeVisible);
             
             // Для Screen Space - Overlay Canvas используем прямую экранную позицию
             if (_parentCanvas != null && _parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
@@ -117,13 +119,25 @@ namespace GameShorts.Gardener.UI
         }
         
         /// <summary>
-        /// Показывает или скрывает бар
+        /// Показывает или скрывает бар (устанавливает желаемое состояние видимости)
         /// </summary>
         public void SetVisible(bool visible)
+        {
+            _shouldBeVisible = visible;
+            ApplyVisibility(visible);
+        }
+        
+        /// <summary>
+        /// Применяет фактическую видимость к UI элементу
+        /// </summary>
+        private void ApplyVisibility(bool visible)
         {
             if (_canvasGroup != null)
             {
                 _canvasGroup.alpha = visible ? 1 : 0;
+                // Также отключаем взаимодействие и блокируем raycast когда скрыт
+                _canvasGroup.interactable = visible;
+                _canvasGroup.blocksRaycasts = visible;
             }
             else
             {

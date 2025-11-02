@@ -19,6 +19,8 @@ namespace GameShorts.Gardener.UI
         [SerializeField] private bool _reverseDirection = true; // true: 360 -> 0, false: 0 -> 360
         
         private Material _progressMaterial;
+        private Canvas _parentCanvas;
+        private Camera _canvasCamera;
         private static readonly int Arc2PropertyId = Shader.PropertyToID("_Arc2");
         
         private const float MaxArc = 360f;
@@ -28,6 +30,13 @@ namespace GameShorts.Gardener.UI
         {
             if (_rootTransform == null)
                 _rootTransform = GetComponent<RectTransform>();
+            
+            // Получаем родительский Canvas и его камеру
+            _parentCanvas = GetComponentInParent<Canvas>();
+            if (_parentCanvas != null && _parentCanvas.renderMode == RenderMode.ScreenSpaceCamera)
+            {
+                _canvasCamera = _parentCanvas.worldCamera;
+            }
             
             // Создаем экземпляр материала для этого прогресс-бара
             if (_progressImage != null && _progressImage.material != null)
@@ -51,8 +60,7 @@ namespace GameShorts.Gardener.UI
             if (_rootPanel != null)
                 _rootPanel.SetActive(true);
                 
-            if (_rootTransform != null)
-                _rootTransform.position = screenPosition;
+            SetPosition(screenPosition);
                 
             // Устанавливаем начальное значение прогресса
             UpdateProgress(0f);
@@ -89,8 +97,39 @@ namespace GameShorts.Gardener.UI
         /// </summary>
         public void UpdatePosition(Vector2 screenPosition)
         {
-            if (_rootTransform != null)
+            SetPosition(screenPosition);
+        }
+        
+        /// <summary>
+        /// Устанавливает позицию с учетом типа Canvas
+        /// </summary>
+        private void SetPosition(Vector2 screenPosition)
+        {
+            if (_rootTransform == null)
+                return;
+            
+            // Для Screen Space - Overlay используем прямую экранную позицию
+            if (_parentCanvas == null || _parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
+            {
                 _rootTransform.position = screenPosition;
+            }
+            // Для Screen Space - Camera конвертируем в локальные координаты
+            else if (_parentCanvas.renderMode == RenderMode.ScreenSpaceCamera)
+            {
+                RectTransform canvasRect = _parentCanvas.transform as RectTransform;
+                if (canvasRect != null)
+                {
+                    Vector2 localPoint;
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        canvasRect,
+                        screenPosition,
+                        _canvasCamera,
+                        out localPoint
+                    );
+                    
+                    _rootTransform.anchoredPosition = localPoint;
+                }
+            }
         }
         
         /// <summary>

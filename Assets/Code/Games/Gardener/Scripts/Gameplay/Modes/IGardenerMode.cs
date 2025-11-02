@@ -27,7 +27,10 @@ namespace GameShorts.Gardener.Gameplay.Modes
         /// <summary>
         /// Вызывается при нажатии на грядку
         /// </summary>
-        void OnPlotPressed(PlotPm plot, Vector3 worldPosition);
+        /// <param name="plot">Грядка, на которую нажали</param>
+        /// <param name="worldPosition">3D позиция в мире</param>
+        /// <param name="screenPosition">2D позиция курсора на экране</param>
+        void OnPlotPressed(PlotPm plot, Vector3 worldPosition, Vector2 screenPosition);
         
         /// <summary>
         /// Вызывается при удержании грядки

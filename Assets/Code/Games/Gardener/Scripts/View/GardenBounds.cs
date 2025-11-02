@@ -10,8 +10,9 @@ namespace GameShorts.Gardener.View
     public class GardenBounds : BaseMonoBehaviour
     {
         [SerializeField] private BoxCollider _boundsCollider;
-        [SerializeField] private Vector3 _minBounds = new Vector3(-5, 0, -5);
-        [SerializeField] private Vector3 _maxBounds = new Vector3(5, 0, 5);
+        private Vector3 _minBounds = new Vector3(-5, 0, -5);
+        private Vector3 _maxBounds = new Vector3(5, 0, 5);
+        private bool _isInitialized = false;
         
         
         /// <summary>
@@ -19,6 +20,11 @@ namespace GameShorts.Gardener.View
         /// </summary>
         public bool IsWithinBounds(Vector3 worldPosition)
         {
+            if (!_isInitialized)
+            {
+                Init();
+            }
+            
             Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
             
             return localPosition.x >= _minBounds.x && localPosition.x <= _maxBounds.x &&
@@ -39,25 +45,22 @@ namespace GameShorts.Gardener.View
             return transform.TransformPoint(localPosition);
         }
         
-        /// <summary>
-        /// Визуализация границ в редакторе
-        /// </summary>
-        // private void OnDrawGizmos()
-        // {
-        //     Gizmos.color = Color.green;
-        //     Vector3 min = transform.TransformPoint(_minBounds);
-        //     Vector3 max = transform.TransformPoint(_maxBounds);
-        //     
-        //     Vector3 size = max - min;
-        //     Vector3 center = (min + max) / 2f;
-        //     
-        //     Gizmos.DrawWireCube(center, size);
-        // }
         public void Init()
         {
-            var bounds = _boundsCollider.bounds;
-            _minBounds = transform.InverseTransformPoint(bounds.min);
-            _maxBounds = transform.InverseTransformPoint(bounds.max);
+            if (_boundsCollider == null)
+            {
+                Debug.LogError("GardenBounds: _boundsCollider is null!");
+                return;
+            }
+            
+            // Используем локальные размеры и центр коллайдера
+            // вместо мировых bounds для избежания проблем с rotation/scale
+            Vector3 colliderCenter = _boundsCollider.center;
+            Vector3 colliderSize = _boundsCollider.size;
+            
+            _minBounds = colliderCenter - colliderSize / 2f;
+            _maxBounds = colliderCenter + colliderSize / 2f;
+            _isInitialized = true;
         }
     }
 }

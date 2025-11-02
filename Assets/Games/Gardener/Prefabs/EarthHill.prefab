@@ -118,7 +118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2537292235971983327
 Transform:
   m_ObjectHideFlags: 0
@@ -288,7 +288,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 80c75bfd336f84f58bc34f9c5fa99647, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 4d856157f7c1a4219987a0119d6b987d, type: 2}
+      objectReference: {fileID: 2100000, guid: 0d6da1c51b1b599409b88e6444baa352, type: 2}
     - target: {fileID: 919132149155446097, guid: 80c75bfd336f84f58bc34f9c5fa99647, type: 3}
       propertyPath: m_Name
       value: EarthHill

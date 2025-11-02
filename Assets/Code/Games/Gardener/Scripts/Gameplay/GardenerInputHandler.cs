@@ -28,6 +28,7 @@ namespace GameShorts.Gardener.Gameplay
         private float _holdTime;
         private PlotPm _currentPlot;
         private Vector3 _holdWorldPosition;
+        private Vector2 _holdScreenPosition; // Позиция курсора на экране
         
         public GardenerInputHandler(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
@@ -103,9 +104,10 @@ namespace GameShorts.Gardener.Gameplay
                     _holdTime = 0f;
                     _currentPlot = plot;
                     _holdWorldPosition = worldPosition;
+                    _holdScreenPosition = screenPosition; // Сохраняем позицию курсора
                     
-                    // Передаем событие в текущий режим
-                    _ctx.modeManager.CurrentMode?.OnPlotPressed(plot, worldPosition);
+                    // Передаем событие в текущий режим с экранной позицией
+                    _ctx.modeManager.CurrentMode?.OnPlotPressed(plot, worldPosition, _holdScreenPosition);
                 }
             }
         }
