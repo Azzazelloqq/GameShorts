@@ -22,13 +22,13 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
         {
             _ctx = ctx;
             _view = _ctx.sceneContextView.StartScreenView;
-            
+
             if (_view == null)
             {
                 Debug.LogError("LawnmowerStartScreenPm: StartScreenView is null!");
                 return;
             }
-            
+
             _view.SetCtx(new LawnmowerStartScreenView.Ctx());
             _view.gameObject.SetActive(true);
             CreateView();
@@ -36,14 +36,14 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 
         private void CreateView()
         {
-            if (_view.StartButton != null)
-            {
-                _view.StartButton.onClick.AddListener(OnStartButtonClicked);
-            }
-            else
+            if (_view.StartButton == null)
             {
                 Debug.LogError("LawnmowerStartScreenPm: StartButton is null!");
+                return;
             }
+
+            _view.StartButton.onClick.RemoveListener(OnStartButtonClicked);
+            _view.StartButton.onClick.AddListener(OnStartButtonClicked);
         }
 
         private void OnStartButtonClicked()
@@ -53,15 +53,18 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 
         protected override void OnDispose()
         {
-            if (_view != null && _view.StartButton != null)
+            if (_view == null)
             {
-                _view.StartButton.onClick.RemoveAllListeners();
+                return;
             }
-            
-            if (_view != null)
+
+            if (_view.StartButton != null)
             {
-                UnityEngine.Object.Destroy(_view.gameObject);
+                _view.StartButton.onClick.RemoveListener(OnStartButtonClicked);
             }
+
+            _view.gameObject.SetActive(false);
+            _view = null;
         }
     }
 }
