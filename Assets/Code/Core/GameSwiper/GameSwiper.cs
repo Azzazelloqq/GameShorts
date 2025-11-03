@@ -24,10 +24,6 @@ internal class GameSwiper : MonoBehaviour
 
 	[SerializeField]
 	private RawImage _bottomImage; // Next game (Y: -imageSpacing)
-	
-	private GameSwiperImageFitter _topImageFitter;
-	private GameSwiperImageFitter _centerImageFitter;
-	private GameSwiperImageFitter _bottomImageFitter;
 
 	[Header("Input Handlers")]
 	[SerializeField]
@@ -46,20 +42,25 @@ internal class GameSwiper : MonoBehaviour
 
 	[SerializeField]
 	private bool _useScreenHeight = true; // Use actual screen height for spacing
-	
+
 	[SerializeField]
 	private float _imageSpacing = 1920f; // Default fallback if not using screen height
-	
-	private float ActualImageSpacing => _useScreenHeight ? Screen.height : _imageSpacing;
 
 	// Events for external communication
 	public event Action OnNextGameRequested;
 	public event Action OnPreviousGameRequested;
 
+	private GameSwiperImageFitter _topImageFitter;
+	private GameSwiperImageFitter _centerImageFitter;
+	private GameSwiperImageFitter _bottomImageFitter;
+
+	private float ActualImageSpacing => _useScreenHeight ? Screen.height : _imageSpacing;
+
 	// State
 	private bool _isAnimating;
 	private bool _canGoNext = true;
 	private bool _canGoPrevious = true;
+	private bool _isTransitionRequested; // Flag to prevent position reset during transition
 
 	private void Awake()
 	{
@@ -67,84 +68,94 @@ internal class GameSwiper : MonoBehaviour
 		SetupInitialPositions();
 		SetupInputHandlers();
 	}
-	
+
 	private void SetupImageFitters()
 	{
-		// Add aspect ratio fitters to all images
-		if (_topImage != null)
+		_topImageFitter = _topImage?.GetComponent<GameSwiperImageFitter>();
+		if (_topImageFitter == null && _topImage != null)
 		{
-			_topImageFitter = _topImage.GetComponent<GameSwiperImageFitter>();
-			if (_topImageFitter == null)
-			{
-				_topImageFitter = _topImage.gameObject.AddComponent<GameSwiperImageFitter>();
-			}
+			_topImageFitter = _topImage.gameObject.AddComponent<GameSwiperImageFitter>();
+			// Component will initialize itself via Awake
 		}
-		
-		if (_centerImage != null)
+
+		_centerImageFitter = _centerImage?.GetComponent<GameSwiperImageFitter>();
+		if (_centerImageFitter == null && _centerImage != null)
 		{
-			_centerImageFitter = _centerImage.GetComponent<GameSwiperImageFitter>();
-			if (_centerImageFitter == null)
-			{
-				_centerImageFitter = _centerImage.gameObject.AddComponent<GameSwiperImageFitter>();
-			}
+			_centerImageFitter = _centerImage.gameObject.AddComponent<GameSwiperImageFitter>();
+			// Component will initialize itself via Awake
 		}
-		
-		if (_bottomImage != null)
+
+		_bottomImageFitter = _bottomImage?.GetComponent<GameSwiperImageFitter>();
+		if (_bottomImageFitter == null && _bottomImage != null)
 		{
-			_bottomImageFitter = _bottomImage.GetComponent<GameSwiperImageFitter>();
-			if (_bottomImageFitter == null)
-			{
-				_bottomImageFitter = _bottomImage.gameObject.AddComponent<GameSwiperImageFitter>();
-			}
+			_bottomImageFitter = _bottomImage.gameObject.AddComponent<GameSwiperImageFitter>();
+			// Component will initialize itself via Awake
+		}
+
+		// Initial setup for aspect ratio fitting
+		if (_topImageFitter != null)
+		{
+			_topImageFitter.OnTextureChanged();
+		}
+
+		if (_centerImageFitter != null)
+		{
+			_centerImageFitter.OnTextureChanged();
+		}
+
+		if (_bottomImageFitter != null)
+		{
+			_bottomImageFitter.OnTextureChanged();
 		}
 	}
 
 	private void SetupInitialPositions()
 	{
-		// Ensure all images have proper size to fill the screen width/height
 		if (_topImage)
 		{
-			SetupImageSize(_topImage.rectTransform);
 			_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
-			_topImage.raycastTarget = false; // Don't block input
 		}
 
 		if (_centerImage)
 		{
-			SetupImageSize(_centerImage.rectTransform);
 			_centerImage.rectTransform.anchoredPosition = Vector2.zero;
-			_centerImage.raycastTarget = false; // Don't block input - let game UI handle it
 		}
 
 		if (_bottomImage)
 		{
-			SetupImageSize(_bottomImage.rectTransform);
 			_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
-			_bottomImage.raycastTarget = false; // Don't block input
 		}
-	}
-	
-	private void SetupImageSize(RectTransform rectTransform)
-	{
-		// Set anchors to center
-		rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-		rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-		
-		// Set size to match screen dimensions
-		rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
+
+		// Hide the loading indicator by default
+		if (_loadingIndicator)
+		{
+			_loadingIndicator.SetActive(false);
+		}
 	}
 
 	private void SetupInputHandlers()
 	{
+		// Subscribe to events from all handlers
 		foreach (var handler in _inputHandlers)
 		{
 			if (handler != null)
 			{
-				// Subscribe to all events - common API
 				handler.OnNextGameRequested += HandleNextGameRequest;
 				handler.OnPreviousGameRequested += HandlePreviousGameRequest;
 				handler.OnDragProgress += HandleSwipeProgress;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Enable or disable the swiper component
+	/// </summary>
+	public void SetEnabled(bool enabled)
+	{
+		gameObject.SetActive(enabled);
+		if (!enabled)
+		{
+			SetInputHandlersEnabled(false);
 		}
 	}
 
@@ -172,7 +183,7 @@ internal class GameSwiper : MonoBehaviour
 		{
 			_centerImage.texture = current;
 			_centerImage.enabled = current != null;
-			_centerImage.raycastTarget = false; // Don't block input - let game UI handle it
+			_centerImage.raycastTarget = false; // Don't block input - let the game UI handle it
 			// Update aspect ratio fitter when texture changes
 			if (_centerImageFitter != null)
 			{
@@ -193,6 +204,14 @@ internal class GameSwiper : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Reset transition request flag (call when transition fails or is cancelled)
+	/// </summary>
+	public void ResetTransitionRequest()
+	{
+		_isTransitionRequested = false;
+	}
+	
 	/// <summary>
 	/// Update navigation availability
 	/// </summary>
@@ -220,6 +239,87 @@ internal class GameSwiper : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Prepare textures for swipe up animation (to next game)
+	/// This rotates textures to match what the animation expects
+	/// </summary>
+	public void PrepareTexturesForNextAnimation(RenderTexture previous, RenderTexture current, RenderTexture next)
+	{
+		// For swipe up animation, the bottom image will move to center,
+		// So we need: top=previous, center=current, bottom=next,
+		// But after the game logic switch, we have new textures
+		// We want the bottom to show what will be the new current,
+		// So: top stays with old previous, center stays with old current, bottom gets new current
+
+		if (_topImage)
+		{
+			// Top will animate out of screen, can keep old previous or clear
+			_topImage.texture = null;
+			_topImage.enabled = false;
+		}
+
+		if (_centerImage)
+		{
+			// Center will move to top, should show the old current (which is new previous)
+			_centerImage.texture = previous;
+			_centerImage.enabled = previous != null;
+			if (_centerImageFitter != null)
+			{
+				_centerImageFitter.OnTextureChanged();
+			}
+		}
+
+		if (_bottomImage)
+		{
+			// Bottom will move to center, should show a new current
+			_bottomImage.texture = current;
+			_bottomImage.enabled = current != null;
+			if (_bottomImageFitter != null)
+			{
+				_bottomImageFitter.OnTextureChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Prepare textures for swipe down animation (to previous game)
+	/// This rotates textures to match what the animation expects
+	/// </summary>
+	public void PrepareTexturesForPreviousAnimation(RenderTexture previous, RenderTexture current, RenderTexture next)
+	{
+		// For swipe down animation, the top image will move to center,
+		// So we need the top to show what will be the new current
+
+		if (_topImage)
+		{
+			// Top will move to center, should show new current
+			_topImage.texture = current;
+			_topImage.enabled = current != null;
+			if (_topImageFitter != null)
+			{
+				_topImageFitter.OnTextureChanged();
+			}
+		}
+
+		if (_centerImage)
+		{
+			// Center will move to bottom, should show old current (which is new next)
+			_centerImage.texture = next;
+			_centerImage.enabled = next != null;
+			if (_centerImageFitter != null)
+			{
+				_centerImageFitter.OnTextureChanged();
+			}
+		}
+
+		if (_bottomImage)
+		{
+			// Bottom will animate out of screen, can keep old next or clear
+			_bottomImage.texture = null;
+			_bottomImage.enabled = false;
+		}
+	}
+
+	/// <summary>
 	/// Animate transition to next game (swipe up)
 	/// </summary>
 	public async Task AnimateToNext()
@@ -241,6 +341,7 @@ internal class GameSwiper : MonoBehaviour
 		finally
 		{
 			_isAnimating = false;
+			_isTransitionRequested = false; // Reset transition flag after animation completes
 			SetInputHandlersEnabled(true);
 		}
 	}
@@ -267,6 +368,7 @@ internal class GameSwiper : MonoBehaviour
 		finally
 		{
 			_isAnimating = false;
+			_isTransitionRequested = false; // Reset transition flag after animation completes
 			SetInputHandlersEnabled(true);
 		}
 	}
@@ -278,6 +380,7 @@ internal class GameSwiper : MonoBehaviour
 			return;
 		}
 
+		_isTransitionRequested = true;
 		OnNextGameRequested?.Invoke();
 	}
 
@@ -288,13 +391,14 @@ internal class GameSwiper : MonoBehaviour
 			return;
 		}
 
+		_isTransitionRequested = true;
 		OnPreviousGameRequested?.Invoke();
 	}
 
 	private void HandleSwipeProgress(float progress)
 	{
 		// Visual feedback during swipe
-		if (_isAnimating)
+		if (_isAnimating || _isTransitionRequested)
 		{
 			return;
 		}
@@ -318,7 +422,8 @@ internal class GameSwiper : MonoBehaviour
 		}
 
 		// If progress returns to 0 (drag ended), reset positions
-		if (Mathf.Approximately(progress, 0f))
+		// But not if a transition was already requested
+		if (Mathf.Approximately(progress, 0f) && !_isTransitionRequested)
 		{
 			ResetPositions();
 		}
@@ -355,8 +460,8 @@ internal class GameSwiper : MonoBehaviour
 
 		await sequence.AsyncWaitForCompletion();
 
-		// After animation, reset positions without rotating references
-		// The textures will be updated by UpdateTextures call from controller
+		// After animation, reset positions
+		// The controller will call UpdateTextures with the final textures
 		_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
 		_centerImage.rectTransform.anchoredPosition = Vector2.zero;
 		_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
@@ -378,8 +483,8 @@ internal class GameSwiper : MonoBehaviour
 
 		await sequence.AsyncWaitForCompletion();
 
-		// After animation, reset positions without rotating references
-		// The textures will be updated by UpdateTextures call from controller
+		// After animation, reset positions
+		// The controller will call UpdateTextures with the final textures
 		_topImage.rectTransform.anchoredPosition = new Vector2(0, ActualImageSpacing);
 		_centerImage.rectTransform.anchoredPosition = Vector2.zero;
 		_bottomImage.rectTransform.anchoredPosition = new Vector2(0, -ActualImageSpacing);
