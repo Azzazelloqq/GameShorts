@@ -16,6 +16,7 @@ using Code.Games;
 using Code.Games.AngryHumans;
 using Code.Games.TestGames;
 using Code.Generated.Addressables;
+using GameShorts.Gardener;
 using InGameLogger;
 using LightDI.Runtime;
 using ResourceLoader;
@@ -123,7 +124,7 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
-			{ typeof(GameGardneer), ResourceIdsContainer.GameGardneer.GardenerGame },
+			{ typeof(GardenerGame), ResourceIdsContainer.GameGardneer.GardenerGame },
 			{ typeof(AngryHumansShortGame), ResourceIdsContainer.GameAngryHumans.MainGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
@@ -137,7 +138,7 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
-			typeof(GameGardneer),
+			typeof(GardenerGame),
 			typeof(BoxTower),
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
