@@ -13,6 +13,7 @@ namespace Code.Core.ShortGamesCore.Game2
         private Axis axis;
         private float direction = 1f;
         private bool isMoving = false;
+        private bool isPaused = false;
         private Vector3 startPosition;
 
         public bool IsMoving => isMoving;
@@ -25,18 +26,38 @@ namespace Code.Core.ShortGamesCore.Game2
             limit = moveLimit;
             direction = 1f;
             isMoving = true;
+            isPaused = false;
             startPosition = transform.position;
         }
 
         public void StopMoving()
         {
             isMoving = false;
+            isPaused = false;
         }
 
         public BlockData GetBlockData()
         {
             var bounds = GetComponent<Renderer>().bounds;
             return new BlockData(transform.position, bounds.size, axis);
+        }
+
+        public void PauseMoving()
+        {
+            if (!isMoving)
+                return;
+
+            isPaused = true;
+            isMoving = false;
+        }
+
+        public void ResumeMoving()
+        {
+            if (!isPaused)
+                return;
+
+            isPaused = false;
+            isMoving = true;
         }
 
         private void Update()

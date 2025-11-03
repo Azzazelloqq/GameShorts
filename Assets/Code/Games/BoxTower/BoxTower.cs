@@ -42,7 +42,14 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 
 	public void StartGame()
 	{
-		CreateRoot();
+		if (_core == null)
+		{
+			CreateRoot();
+		}
+		else
+		{
+			_core.ResetForNewSession();
+		}
 	}
 
 	public void PauseGame()
@@ -59,7 +66,14 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 
 	public void RestartGame()
 	{
-		RecreateRoot();
+		if (_core == null)
+		{
+			CreateRoot();
+		}
+		else
+		{
+			_core.ResetForNewSession();
+		}
 	}
 
 	public void StopGame()
@@ -87,13 +101,6 @@ public class BoxTower : BaseMonoBehaviour, IShortGame2D
 		DisposeCore();
 
 		_isDisposed = true;
-	}
-
-	private void RecreateRoot()
-	{
-		DisposeCore();
-
-		CreateRoot();
 	}
 
 	private void DisposeCore()

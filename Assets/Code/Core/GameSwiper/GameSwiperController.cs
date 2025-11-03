@@ -187,21 +187,26 @@ public class GameSwiperController : IDisposable
 					_gameSwiper.SetLoadingState(true);
 				}
 
-				// Animate UI transition first
-				await _gameSwiper.AnimateToNext();
-
-				// Then switch game logic
+				// FIRST: Switch game logic and prepare all data
 				var success = await _shortGameServiceProvider.SwipeToNextGameAsync(cts.Token);
 				
 				if (!success)
 				{
 					_logger.LogError("Failed to switch to next game");
-					// Rollback animation
-					await _gameSwiper.AnimateToPrevious();
+					_gameSwiper.ResetTransitionRequest(); // Reset the transition flag if switch failed
 					return;
 				}
 
-				// Update UI with new textures
+				// SECOND: Prepare textures for animation
+				var previousRT = _shortGameServiceProvider.PreviousGameRenderTexture;
+				var currentRT = _shortGameServiceProvider.CurrentGameRenderTexture;
+				var nextRT = _shortGameServiceProvider.NextGameRenderTexture;
+				_gameSwiper.PrepareTexturesForNextAnimation(previousRT, currentRT, nextRT);
+
+				// THIRD: Animate UI transition with prepared textures
+				await _gameSwiper.AnimateToNext();
+				
+				// FOURTH: Update final state after animation
 				UpdateSwiperState();
 			}
 		}
@@ -216,6 +221,7 @@ public class GameSwiperController : IDisposable
 		finally
 		{
 			_gameSwiper.SetLoadingState(false);
+			_gameSwiper.ResetTransitionRequest(); // Ensure flag is reset even if exception occurred
 			_isTransitioning = false;
 		}
 	}
@@ -259,21 +265,26 @@ public class GameSwiperController : IDisposable
 					_gameSwiper.SetLoadingState(true);
 				}
 
-				// Animate UI transition first
-				await _gameSwiper.AnimateToPrevious();
-
-				// Then switch game logic
+				// FIRST: Switch game logic and prepare all data
 				var success = await _shortGameServiceProvider.SwipeToPreviousGameAsync(cts.Token);
 				
 				if (!success)
 				{
 					_logger.LogError("Failed to switch to previous game");
-					// Rollback animation
-					await _gameSwiper.AnimateToNext();
+					_gameSwiper.ResetTransitionRequest(); // Reset the transition flag if switch failed
 					return;
 				}
 
-				// Update UI with new textures
+				// SECOND: Prepare textures for animation
+				var previousRT = _shortGameServiceProvider.PreviousGameRenderTexture;
+				var currentRT = _shortGameServiceProvider.CurrentGameRenderTexture;
+				var nextRT = _shortGameServiceProvider.NextGameRenderTexture;
+				_gameSwiper.PrepareTexturesForPreviousAnimation(previousRT, currentRT, nextRT);
+
+				// THIRD: Animate UI transition with prepared textures
+				await _gameSwiper.AnimateToPrevious();
+				
+				// FOURTH: Update final state after animation
 				UpdateSwiperState();
 			}
 		}
@@ -288,6 +299,7 @@ public class GameSwiperController : IDisposable
 		finally
 		{
 			_gameSwiper.SetLoadingState(false);
+			_gameSwiper.ResetTransitionRequest(); // Ensure flag is reset even if exception occurred
 			_isTransitioning = false;
 		}
 	}

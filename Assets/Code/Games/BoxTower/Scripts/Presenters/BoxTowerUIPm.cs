@@ -27,6 +27,7 @@ namespace Code.Core.ShortGamesCore.Game2
             AddDispose(_ctx.gameModel.BestScore.Subscribe(OnBestScoreChanged));
             AddDispose(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
             AddDispose(_ctx.gameModel.IsFirstPlay.Subscribe(OnFirstPlayChanged));
+            AddDispose(_ctx.gameModel.IsPaused.Subscribe(OnPauseStateChanged));
             
             // Setup button listeners
             SetupButtonListeners();
@@ -73,6 +74,14 @@ namespace Code.Core.ShortGamesCore.Game2
                 case GameState.GameOver:
                     ShowGameOverState();
                     break;
+            }
+        }
+
+        private void OnPauseStateChanged(bool isPaused)
+        {
+            if (_ctx.sceneContextView.FullScreenTapButton != null)
+            {
+                _ctx.sceneContextView.FullScreenTapButton.interactable = !isPaused;
             }
         }
 
@@ -197,8 +206,7 @@ namespace Code.Core.ShortGamesCore.Game2
 
         private void OnPauseClicked()
         {
-            // Simple pause implementation
-            UnityEngine.Time.timeScale = UnityEngine.Time.timeScale == 0f ? 1f : 0f;
+            _ctx.gameModel.TogglePause();
         }
 
         protected override void OnDispose()

@@ -143,9 +143,7 @@ internal class QueueShortGamesLoader : IGamesLoader
 				return existingGame;
 			}
 
-			IShortGame game = null;
-
-			if (_preloadedGames.TryGetValue(gameType, out game))
+			if (_preloadedGames.TryGetValue(gameType, out var game))
 			{
 				_logger.Log($"Using preloaded game: {gameType.Name}");
 				_preloadedGames.Remove(gameType);

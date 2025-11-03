@@ -24,12 +24,22 @@ namespace Code.Core.ShortGamesCore.Game2
         private readonly Ctx _ctx;
         private IPoolManager _poolManager;
 
-        private List<GameObject> _placedBlocks = new List<GameObject>();
-        private List<GameObject> _activeChunks = new List<GameObject>();
-        private List<GameObject> _fallingBlocks = new List<GameObject>(); // Track falling blocks for cleanup
+        private readonly List<GameObject> _placedBlocks = new List<GameObject>();
+        private readonly HashSet<GameObject> _activeChunks = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> _fallingBlocks = new HashSet<GameObject>(); // Track falling blocks for cleanup
         private GameObject _currentMovingBlock;
         private BlockMover _currentMover;
         private readonly ITickHandler _tickHandler;
+        private bool _isPaused;
+
+        private readonly Dictionary<Rigidbody, RigidbodyState> _pausedRigidbodies = new Dictionary<Rigidbody, RigidbodyState>();
+
+        private struct RigidbodyState
+        {
+            public Vector3 linearVelocity;
+            public Vector3 angularVelocity;
+            public bool wasKinematic;
+        }
 
         public BoxTowerTowerPm(Ctx ctx,
             [Inject] IPoolManager poolManager,[Inject] ITickHandler tickHandler)
@@ -39,6 +49,7 @@ namespace Code.Core.ShortGamesCore.Game2
             _poolManager = poolManager;
             // Subscribe to model events
             AddDispose(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
+            AddDispose(_ctx.gameModel.IsPaused.Subscribe(SetPauseState));
             _ctx.towerModel.OnChunkCreated += CreateChunk;
             
             // Subscribe to scene updates
@@ -120,9 +131,8 @@ namespace Code.Core.ShortGamesCore.Game2
                 }
             }
 
-            // Also clean up any falling objects in the scene that might not be children of TowerRoot
-            ClearAllFallingObjects();
-            
+            _pausedRigidbodies.Clear();
+
             // Reset background color
             if (_ctx.sceneContextView.ColorManager != null)
             {
@@ -217,6 +227,9 @@ namespace Code.Core.ShortGamesCore.Game2
             if (_currentMovingBlock == null || _currentMover == null || !_currentMover.IsMoving)
                 return false;
 
+            if (_isPaused)
+                return false;
+
             // Stop the current block
             _currentMover.StopMoving();
             
@@ -307,10 +320,15 @@ namespace Code.Core.ShortGamesCore.Game2
             }
             
             // Track falling block for cleanup
-            _fallingBlocks.Add(_currentMovingBlock);
-            
-            // Return to pool after some time
             var fallingBlock = _currentMovingBlock;
+            _fallingBlocks.Add(fallingBlock);
+
+            if (_isPaused)
+            {
+                PauseDynamicObject(fallingBlock);
+            }
+
+            // Return to pool after some time
             AddDispose(Observable.Timer(TimeSpan.FromSeconds(3f)).Subscribe(_ => 
             {
                 ReturnFallingBlock(fallingBlock);
@@ -344,6 +362,11 @@ namespace Code.Core.ShortGamesCore.Game2
                 );
                 rb.AddForce(randomForce, ForceMode.Impulse);
 
+                if (_isPaused)
+                {
+                    PauseDynamicObject(chunk);
+                }
+
                 // Return chunk to pool after lifetime
                 AddDispose(Observable.Timer(TimeSpan.FromSeconds(1.5f)).Subscribe(_ => ReturnChunk(chunk)));
             }
@@ -359,6 +382,7 @@ namespace Code.Core.ShortGamesCore.Game2
             var rb = chunk.GetComponent<Rigidbody>();
             if (rb != null)
             {
+                RemovePausedRigidbody(rb);
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
             }
@@ -399,6 +423,15 @@ namespace Code.Core.ShortGamesCore.Game2
             if (fallingBlock == null || !_fallingBlocks.Contains(fallingBlock)) return;
 
             _fallingBlocks.Remove(fallingBlock);
+
+            var rb = fallingBlock.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                RemovePausedRigidbody(rb);
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
             _poolManager.Return(_ctx.sceneContextView.BlockPrefab, fallingBlock);
         }
 
@@ -407,45 +440,135 @@ namespace Code.Core.ShortGamesCore.Game2
             var blocksToReturn = new List<GameObject>(_fallingBlocks);
             foreach (var block in blocksToReturn)
             {
-                if (block != null)
-                {
-                    _poolManager.Return(_ctx.sceneContextView.BlockPrefab, block);
-                }
+                ReturnFallingBlock(block);
             }
+
             _fallingBlocks.Clear();
         }
 
-        private void ClearAllFallingObjects()
+        public void ResetForNewSession()
         {
-            // Find all objects with Rigidbody that are not kinematic (falling objects)
-            var allRigidbodies = UnityEngine.Object.FindObjectsOfType<Rigidbody>();
-            
-            foreach (var rb in allRigidbodies)
+            if (_isPaused)
             {
-                if (rb != null && !rb.isKinematic && rb.gameObject != null)
+                SetPauseState(false);
+            }
+
+            if (_currentMover != null)
+            {
+                _currentMover.StopMoving();
+            }
+
+            ClearTower();
+            _pausedRigidbodies.Clear();
+        }
+
+        private void SetPauseState(bool shouldPause)
+        {
+            if (_isPaused == shouldPause)
+                return;
+
+            _isPaused = shouldPause;
+
+            if (_isPaused)
+            {
+                PauseCurrentMover();
+                PauseDynamicCollection(_fallingBlocks);
+                PauseDynamicCollection(_activeChunks);
+            }
+            else
+            {
+                ResumeCurrentMover();
+                ResumePausedRigidbodies();
+            }
+        }
+
+        private void PauseCurrentMover()
+        {
+            if (_currentMover != null && _currentMover.IsMoving)
+            {
+                _currentMover.PauseMoving();
+            }
+        }
+
+        private void ResumeCurrentMover()
+        {
+            if (_currentMover != null)
+            {
+                _currentMover.ResumeMoving();
+            }
+        }
+
+        private void PauseDynamicCollection(IEnumerable<GameObject> objects)
+        {
+            foreach (var obj in objects)
+            {
+                PauseDynamicObject(obj);
+            }
+        }
+
+        private void PauseDynamicObject(GameObject obj)
+        {
+            if (obj == null)
+                return;
+
+            var rb = obj.GetComponent<Rigidbody>();
+            if (rb == null)
+                return;
+
+            if (_pausedRigidbodies.ContainsKey(rb))
+                return;
+
+            var state = new RigidbodyState
+            {
+                wasKinematic = rb.isKinematic,
+                linearVelocity = rb.isKinematic ? Vector3.zero : rb.linearVelocity,
+                angularVelocity = rb.isKinematic ? Vector3.zero : rb.angularVelocity
+            };
+
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+
+            _pausedRigidbodies.Add(rb, state);
+        }
+
+        private void ResumePausedRigidbodies()
+        {
+            if (_pausedRigidbodies.Count == 0)
+                return;
+
+            var rigidbodies = new List<Rigidbody>(_pausedRigidbodies.Keys);
+            foreach (var rb in rigidbodies)
+            {
+                if (rb == null)
+                    continue;
+
+                if (_pausedRigidbodies.TryGetValue(rb, out var state))
                 {
-                    // Check if it's a block or chunk object that should be returned to pool
-                    var gameObj = rb.gameObject;
-                    
-                    // Try to return as block prefab first
-                    if (_ctx.sceneContextView.BlockPrefab != null)
+                    rb.isKinematic = state.wasKinematic;
+                    if (!state.wasKinematic)
                     {
-                        _poolManager.Return(_ctx.sceneContextView.BlockPrefab, gameObj);
-                        continue;
-                    }
-                    
-                    // Try to return as chunk prefab
-                    if (_ctx.sceneContextView.ChunkPrefab != null)
-                    {
-                        _poolManager.Return(_ctx.sceneContextView.ChunkPrefab, gameObj);
-                        continue;
+                        rb.linearVelocity = state.linearVelocity;
+                        rb.angularVelocity = state.angularVelocity;
                     }
                 }
+
+                _pausedRigidbodies.Remove(rb);
             }
+        }
+
+        private void RemovePausedRigidbody(Rigidbody rb)
+        {
+            if (rb == null)
+                return;
+
+            _pausedRigidbodies.Remove(rb);
         }
 
         protected override void OnDispose()
         {
+            ResetForNewSession();
+
             // Unsubscribe from events
             _tickHandler.FrameUpdate -= OnSceneUpdate;
             if (_ctx.towerModel != null)
