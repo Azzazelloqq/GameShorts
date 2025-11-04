@@ -2195,7 +2195,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4910614050201453643
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2213,7 +2213,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 150}
+  m_AnchoredPosition: {x: 0, y: 200}
   m_SizeDelta: {x: -200, y: 300}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1755985568930651660
@@ -3712,6 +3712,8 @@ MonoBehaviour:
   _gameSettings: {fileID: 11400000, guid: 3989b62b43cabaf4da4c4113436ec984, type: 2}
   _availablePlants:
   - {fileID: 11400000, guid: 23df2cda53fc1fb47a3500fb0fd99922, type: 2}
+  - {fileID: 11400000, guid: 5ff6e134ca6223d4faf9fef43b05f095, type: 2}
+  - {fileID: 11400000, guid: 780cf403498c60749bab7f9120216434, type: 2}
 --- !u!1 &8826609970586087397
 GameObject:
   m_ObjectHideFlags: 0

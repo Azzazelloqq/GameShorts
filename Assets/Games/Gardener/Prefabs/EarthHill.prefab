@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6402861340961506140}
   - component: {fileID: 921315147879304953}
-  - component: {fileID: 1483118927884565409}
+  - component: {fileID: 3929513833531069750}
   m_Layer: 0
   m_Name: EarthHill
   m_TagString: Untagged
@@ -82,8 +82,8 @@ MonoBehaviour:
   _plantContainer: {fileID: 6402861340961506140}
   _emptyPlotModel: {fileID: 62285051511106902}
   _rottenPlantModel: {fileID: 8380911246964993177}
---- !u!65 &1483118927884565409
-BoxCollider:
+--- !u!135 &3929513833531069750
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -97,11 +97,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 0.3, z: 0.5}
+  m_Radius: 0.26
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8380911246964993177
 GameObject:

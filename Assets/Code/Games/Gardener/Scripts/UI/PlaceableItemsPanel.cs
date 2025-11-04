@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Code.Core.BaseDMDisposable.Scripts;
+using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.Gameplay.Modes;
 using GameShorts.Gardener.View;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace GameShorts.Gardener.UI
     /// Панель с элементами, которые можно разместить на сцене
     /// Отображается в определенных режимах (например, Harvey Mode)
     /// </summary>
-    public class PlaceableItemsPanel : BaseMonoBehaviour
+    internal class PlaceableItemsPanel : BaseMonoBehaviour
     {
         [SerializeField] private GameObject _rootPanel;
         [SerializeField] private Transform _itemsContainer;
@@ -25,14 +26,16 @@ namespace GameShorts.Gardener.UI
         private readonly List<PlaceableItemPm> _itemPresenters = new List<PlaceableItemPm>();
         private int _openAnimHash;
         private int _closeAnimHash;
+        private Func<Vector3, PlotPm> _findPlotAtPosition;
 
         /// <summary>
         /// Инициализирует панель
         /// </summary>
-        public void Initialize(Camera worldCamera, GardenBounds gardenBounds)
+        public void Initialize(Camera worldCamera, GardenBounds gardenBounds, Func<Vector3, PlotPm> findPlotAtPosition)
         {
             _worldCamera = worldCamera;
             _gardenBounds = gardenBounds;
+            _findPlotAtPosition = findPlotAtPosition;
             _gardenBounds.Init();
             _openAnimHash = Animator.StringToHash("Open");
             _closeAnimHash = Animator.StringToHash("Close");
@@ -67,7 +70,8 @@ namespace GameShorts.Gardener.UI
                     canvas = _canvas,
                     worldCamera = _worldCamera,
                     gardenBounds = _gardenBounds,
-                    onItemPlaced = OnItemPlaced
+                    onItemPlaced = OnItemPlaced,
+                    findPlotAtPosition = _findPlotAtPosition
                 });
                 
                 _itemPresenters.Add(itemPm);

@@ -2,6 +2,7 @@ using System;
 using Code.Core.BaseDMDisposable.Scripts;
 using GameShorts.Gardener.Gameplay.Modes;
 using LightDI.Runtime;
+using R3;
 using TickHandler;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,6 +20,7 @@ namespace GameShorts.Gardener.Gameplay
             public Camera mainCamera;
             public GardenerModeManager modeManager;
             public Func<Vector3, PlotPm> findPlotAtPosition;
+            public ReactiveProperty<bool> isPaused;
         }
         
         private readonly Ctx _ctx;
@@ -29,12 +31,22 @@ namespace GameShorts.Gardener.Gameplay
         private PlotPm _currentPlot;
         private Vector3 _holdWorldPosition;
         private Vector2 _holdScreenPosition; // Позиция курсора на экране
+        private bool _isInputEnabled = true;
         
         public GardenerInputHandler(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _tickHandler = tickHandler;
             _tickHandler.FrameUpdate += OnUpdate;
+            
+            // Подписываемся на паузу
+            if (_ctx.isPaused != null)
+            {
+                AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+                {
+                    _isInputEnabled = !isPaused;
+                }));
+            }
         }
         
         private void OnUpdate(float deltaTime)
@@ -45,6 +57,10 @@ namespace GameShorts.Gardener.Gameplay
         
         private void HandleInput(float deltaTime)
         {
+            // Если игра на паузе, не обрабатываем ввод
+            if (!_isInputEnabled)
+                return;
+            
             // Поддержка сенсорного ввода для мобильных устройств
             if (Input.touchCount > 0)
             {

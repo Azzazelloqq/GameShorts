@@ -49,7 +49,8 @@ namespace GameShorts.Gardener.Logic
                 OnBuyPlant = (plant) => _gameplayPm.BuyPlant(plant),
                 ModeManager = _gameplayPm.ModeManager,
                 MainCamera = _ctx.sceneContextView.MainCamera,
-                GardenBounds = _ctx.sceneContextView.GardenBounds
+                GardenBounds = _ctx.sceneContextView.GardenBounds,
+                FindPlotAtPosition = (pos) => _gameplayPm.FindPlotAtPosition(pos)
             };
             _uiPm = new GardenerUIPm(uiCtx);
         }

@@ -19,6 +19,7 @@ namespace GameShorts.Gardener.Gameplay
             public CancellationToken cancellationToken;
             public Action<int> onPlantHarvested;
             public float preparationTime;
+            public ReactiveProperty<bool> isPaused;
         }
 
         private readonly Ctx _ctx;
@@ -32,6 +33,7 @@ namespace GameShorts.Gardener.Gameplay
         private float _preparationTimer;
         private IDisposable _updateSubscription;
         private readonly ITickHandler _tickHandler;
+        private bool _isInputEnabled = true;
 
         public PlantState CurrentState => _currentState.Value;
         public float WaterLevel => _waterLevel.Value;
@@ -57,6 +59,15 @@ namespace GameShorts.Gardener.Gameplay
             // Подписываемся на изменения состояния растения
             AddDispose(_currentState.Subscribe(state => _ctx.plotView.UpdateState(state, _currentPlantSettings)));
             
+            // Подписываемся на паузу
+            if (_ctx.isPaused != null)
+            {
+                AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+                {
+                    _isInputEnabled = !isPaused;
+                }));
+            }
+            
             // Начинаем с неподготовленной грядки
             _isPreparationComplete.Value = false;
         }
@@ -72,6 +83,10 @@ namespace GameShorts.Gardener.Gameplay
 
         private void UpdatePlant(float deltaTime)
         {
+            // Если игра на паузе, не обновляем
+            if (!_isInputEnabled)
+                return;
+            
             // Обновляем подготовку грядки
             if (!_isPreparationComplete.Value)
             {

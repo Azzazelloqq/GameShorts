@@ -77,7 +77,8 @@ namespace GameShorts.Gardener.Gameplay
             {
                 mainCamera = _ctx.sceneContextView.MainCamera,
                 modeManager = _modeManager,
-                findPlotAtPosition = (pos) => FindPlotAtPosition(pos)
+                findPlotAtPosition = (pos) => FindPlotAtPosition(pos),
+                isPaused = _ctx.isPaused
             });
             AddDispose(_inputHandler);
 
@@ -183,7 +184,7 @@ namespace GameShorts.Gardener.Gameplay
             }
 
             // Проверяем, нет ли уже грядки в этой позиции
-            float minDistance = .5f; // Минимальное расстояние между грядками
+            float minDistance = .3f; // Минимальное расстояние между грядками
             if (IsPositionOccupied(worldPosition, minDistance))
             {
                 Debug.LogWarning($"Cannot place plot at {worldPosition} - position is too close to another plot!");
@@ -206,7 +207,8 @@ namespace GameShorts.Gardener.Gameplay
                 plotView = plotView,
                 cancellationToken = _ctx.cancellationToken,
                 onPlantHarvested = OnPlantHarvested,
-                preparationTime = _ctx.gameSettings.PlotPreparationTime
+                preparationTime = _ctx.gameSettings.PlotPreparationTime,
+                isPaused = _ctx.isPaused
             });
 
             _plots.Add(plotPm);

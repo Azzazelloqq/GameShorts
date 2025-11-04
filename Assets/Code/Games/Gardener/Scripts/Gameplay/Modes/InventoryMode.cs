@@ -146,12 +146,17 @@ namespace GameShorts.Gardener.Gameplay.Modes
                 if (plantSettings == null || count <= 0)
                     continue;
 
+                // Определяем префаб для превью (зрелое растение)
+                GameObject previewPrefab = plantSettings.HasFruits 
+                    ? plantSettings.FruitModel 
+                    : plantSettings.FloweringModel;
+                
                 // Создаем PlaceableItem для каждого типа семян
                 var item = new PlaceableItem
                 {
                     ItemName = plantSettings.PlantName,
                     Icon = GetSeedIcon(plantSettings),
-                    Prefab = null, // Не нужен префаб, т.к. мы сажаем на существующую грядку
+                    Prefab = previewPrefab, // Используем модель зрелого растения для превью
                     Count = count,
                     PlantSettings = plantSettings
                 };

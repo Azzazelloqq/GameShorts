@@ -4,6 +4,7 @@ using Code.Core.BaseDMDisposable.Scripts;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.UI;
 using GameShorts.Gardener.Core;
+using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.Gameplay.Modes;
 using GameShorts.Gardener.View;
 using R3;
@@ -25,6 +26,7 @@ namespace GameShorts.Gardener.Logic
             public GardenerModeManager ModeManager { get; set; }
             public Camera MainCamera { get; set; }
             public GardenBounds GardenBounds { get; set; }
+            public Func<Vector3, PlotPm> FindPlotAtPosition { get; set; }
         }
 
         private readonly Ctx _ctx;
@@ -70,7 +72,7 @@ namespace GameShorts.Gardener.Logic
             // Инициализируем панель placeable элементов
             if (_ctx.PlaceableItemsPanel != null)
             {
-                _ctx.PlaceableItemsPanel.Initialize(_ctx.MainCamera, _ctx.GardenBounds);
+                _ctx.PlaceableItemsPanel.Initialize(_ctx.MainCamera, _ctx.GardenBounds, _ctx.FindPlotAtPosition);
             }
             
             // Подписываемся на смену режима для обновления UI

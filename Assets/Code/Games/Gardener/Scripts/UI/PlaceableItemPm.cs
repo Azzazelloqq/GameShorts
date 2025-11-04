@@ -1,5 +1,6 @@
 using System;
 using Code.Core.BaseDMDisposable.Scripts;
+using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.Gameplay.Modes;
 using GameShorts.Gardener.View;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace GameShorts.Gardener.UI
             public Camera worldCamera;
             public GardenBounds gardenBounds;
             public Action<PlaceableItem, Vector3> onItemPlaced;
+            public Func<Vector3, PlotPm> findPlotAtPosition;
         }
 
         private readonly Ctx _ctx;
@@ -75,7 +77,23 @@ namespace GameShorts.Gardener.UI
             {
                 if (TryGetWorldPosition(eventData, out Vector3 worldPosition))
                 {
-                    _ctx.view.Update3DPreviewPosition(worldPosition);
+                    // Проверяем, есть ли грядка под курсором
+                    Vector3 targetPosition = worldPosition;
+                    
+                    // Прилипание к грядке работает только для семян (элементов с PlantSettings)
+                    // Грядки не должны прилипать к другим грядкам
+                    if (_ctx.item.PlantSettings != null && _ctx.findPlotAtPosition != null)
+                    {
+                        var plot = _ctx.findPlotAtPosition(worldPosition);
+                        
+                        // Если грядка найдена, прилепляем превью к центру грядки
+                        if (plot != null)
+                        {
+                            targetPosition = plot.WorldPosition;
+                        }
+                    }
+                    
+                    _ctx.view.Update3DPreviewPosition(targetPosition);
                 }
             }
             else
