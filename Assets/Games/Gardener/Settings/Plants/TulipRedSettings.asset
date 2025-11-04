@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2ad685ef02a0647b9e1c1c794f5087, type: 3}
+  m_Name: TulipRedSettings
+  m_EditorClassIdentifier: Gardener::GameShorts.Gardener.Data.PlantSettings
+  _plantName: Hydrangea
+  _growthTime: 20
+  _wateringInterval: 15
+  _hasFruits: 0
+  _seedPrice: 20
+  _harvestPrice: 70
+  _seedIcon: {fileID: 21300000, guid: 62b887e0e34bab44c9402a127b0c9b7e, type: 3}
+  _seedModel: {fileID: 464523929321355347, guid: d85bb8e9699f43042aa5ad0236622fcd, type: 3}
+  _sproutModel: {fileID: 329528859695212466, guid: 7c51d75c76cf44ae7a358c71c3de3837, type: 3}
+  _bushModel: {fileID: 2370834858386919805, guid: 584bc5d0de28148639f1528511323e7c, type: 3}
+  _floweringModel: {fileID: 2630349724537830605, guid: 96e2bc83624ab4ec0b4a9974caf7a9d1, type: 3}
+  _fruitModel: {fileID: 0}
