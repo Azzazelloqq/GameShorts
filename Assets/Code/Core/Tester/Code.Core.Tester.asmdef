@@ -18,7 +18,8 @@
         "ShortGame2048",
         "FlyHumans",
         "Lightseeker",
-        "Gardener"
+        "Gardener",
+        "CubeRunner"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

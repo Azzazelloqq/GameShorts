@@ -81,7 +81,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
                 playerDead = ShowFinishScreen,
                 cancellationToken = _ctx.cancellationToken
             };
-            _playerSpawnerPm = PlayerSpawnerPmFactory.CreatePlayerSpawnerPm(playerSpawnerCtx);
+            _playerSpawnerPm = new PlayerSpawnerPm(playerSpawnerCtx);
             AddDispose(_playerSpawnerPm);
 
             EnemyManagerPm.Ctx enemyManagerCtx = new EnemyManagerPm.Ctx

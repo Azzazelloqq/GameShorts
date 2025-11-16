@@ -11,6 +11,7 @@ namespace Code.Generated.Addressables
         public static readonly DefaultLocalGroup DefaultLocalGroup = new DefaultLocalGroup();
         public static readonly AssetsCommonCharactersLowpoly AssetsCommonCharactersLowpoly = new AssetsCommonCharactersLowpoly();
         public static readonly GameAngryHumans GameAngryHumans = new GameAngryHumans();
+        public static readonly GameCubeRunner GameCubeRunner = new GameCubeRunner();
         public static readonly GroupGame2048 GroupGame2048 = new GroupGame2048();
         public static readonly GameGardneer GameGardneer = new GameGardneer();
         public static readonly GameLightseeker GameLightseeker = new GameLightseeker();

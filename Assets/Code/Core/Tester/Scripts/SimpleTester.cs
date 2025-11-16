@@ -12,6 +12,7 @@ using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
 using Code.Games;
 using Code.Generated.Addressables;
+using GameShorts.CubeRunner;
 using GameShorts.FlyHumans;
 using GameShorts.Gardener;
 using InGameLogger;
@@ -131,6 +132,7 @@ namespace Code.Core.Tester
                 typeof(FlyHumansGame),
                 typeof(LightseekerGame),
                 typeof(GardenerGame),
+                typeof(CubeRunnerGame),
             };
 
             _gameTypes.AddRange(types);
@@ -149,6 +151,7 @@ namespace Code.Core.Tester
                 { typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain },
                 { typeof(LightseekerGame), ResourceIdsContainer.GameLightseeker.LightseekerMain },
                 { typeof(GardenerGame), ResourceIdsContainer.GameGardneer.GardenerGame },
+                { typeof(CubeRunnerGame), ResourceIdsContainer.GameCubeRunner.CubeRunnerGame },
             };
         }
 

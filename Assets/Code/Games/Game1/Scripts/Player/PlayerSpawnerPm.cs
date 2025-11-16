@@ -24,17 +24,14 @@ namespace Logic.Player
         }
 
         private readonly Ctx _ctx;
-        private readonly IPoolManager _poolManager;
         private PlayerModel _playerModel;
         private float _baseMaxSpeed;
         private float _baseAcceleration;
         private float _baseDeceleration;
 
-        public PlayerSpawnerPm(Ctx ctx, [Inject] IPoolManager poolManager)
+        public PlayerSpawnerPm(Ctx ctx)
         {
             _ctx = ctx;
-            _poolManager = poolManager;
-            
             var screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0);
             var startPos = _ctx.sceneContextView.Camera != null && _ctx.sceneContextView.Camera 
                 ? _ctx.sceneContextView.Camera.ScreenToWorldPoint(screenCenter) 

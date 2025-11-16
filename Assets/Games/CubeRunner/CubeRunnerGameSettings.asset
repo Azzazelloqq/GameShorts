@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 031bf99083cae41459a4d32d07218843, type: 3}
+  m_Name: CubeRunnerGameSettings
+  m_EditorClassIdentifier: CubeRunner::GameShorts.CubeRunner.Data.CubeRunnerGameSettings
+  _worldSpeed: 4
+  _tileSize: 1
+  _minZBoundary: -1
+  _maxZBoundary: 10
+  _laneCount: 3
+  _tilesAheadToGenerate: 24
+  _initialSafeTiles: 6
+  _sectionLength: 6
+  _difficultySteps: []
+  _cubePrefab: {fileID: 4595156241856067616, guid: 61e65ee46c622a64da59962a5b1adafd, type: 3}
+  _tilePrefab: {fileID: 1683995822252002517, guid: 935a170b6ccb4f04183e26498163a9b4, type: 3}
