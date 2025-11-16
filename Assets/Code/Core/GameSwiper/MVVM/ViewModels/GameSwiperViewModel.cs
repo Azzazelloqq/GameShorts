@@ -71,7 +71,7 @@ namespace Code.Core.GameSwiper.MVVM.ViewModels
             _navigationCts = new CancellationTokenSource();
             
             // Add to composite disposable
-            compositeDisposable.AddDisposable(GameViewModels);
+            compositeDisposable.AddDisposable((IDisposable)GameViewModels);
             compositeDisposable.AddDisposable(SwipeProgress);
             compositeDisposable.AddDisposable(IsEnabled);
             compositeDisposable.AddDisposable(LastSwipeDirection);
@@ -96,9 +96,9 @@ namespace Code.Core.GameSwiper.MVVM.ViewModels
             
             // Subscribe to model changes
             // For IReactiveList, we need to subscribe to collection change events
-            compositeDisposable.AddDisposable(model.Games.SubscribeOnAdded(OnGameAdded));
-            compositeDisposable.AddDisposable(model.Games.SubscribeOnRemoved(OnGameRemoved));
-            compositeDisposable.AddDisposable(model.Games.SubscribeOnCleared(OnGamesCleared));
+            compositeDisposable.AddDisposable(model.Games.SubscribeOnItemAdded(OnGameAdded));
+            compositeDisposable.AddDisposable(model.Games.SubscribeOnItemRemoved(OnGameRemoved));
+            // Note: IReactiveList doesn't have SubscribeOnCleared, so we handle clearing through adds/removes
             
             // Subscribe to properties
             compositeDisposable.AddDisposable(model.CurrentGameIndex.Subscribe(OnCurrentIndexChanged));
@@ -183,11 +183,6 @@ namespace Code.Core.GameSwiper.MVVM.ViewModels
         }
         
         private void OnGameRemoved(GameItemModel gameModel)
-        {
-            UpdateGameViewModels();
-        }
-        
-        private void OnGamesCleared()
         {
             UpdateGameViewModels();
         }
@@ -289,11 +284,11 @@ namespace Code.Core.GameSwiper.MVVM.ViewModels
             
             if (progress > swipeThreshold && CanGoToNext())
             {
-                _ = GoToNextCommand.Execute();
+                _ = GoToNextCommand.ExecuteAsync();
             }
             else if (progress < -swipeThreshold && CanGoToPrevious())
             {
-                _ = GoToPreviousCommand.Execute();
+                _ = GoToPreviousCommand.ExecuteAsync();
             }
         }
 

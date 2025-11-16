@@ -134,7 +134,7 @@ public class GameSwiperController : IDisposable
 		
 		// Initialize ViewModel async operations
 		await _viewModel.InitializeAsync(cancellationToken);
-		await _view.InitializeAsync(cancellationToken);
+		await _view.InitializeAsync(_viewModel, cancellationToken);
 		
 		// Subscribe to ViewModel events
 		_viewModel.OnNextGameStarted += OnMVVMNextGameStarted;

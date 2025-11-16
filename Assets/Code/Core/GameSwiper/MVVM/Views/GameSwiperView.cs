@@ -142,8 +142,7 @@ namespace Code.Core.GameSwiper.MVVM.Views
             
             // Bind game ViewModels - subscribe to collection changes
             compositeDisposable.AddDisposable(viewModel.GameViewModels.SubscribeOnItemAdded(_ => UpdateGameViews()));
-            compositeDisposable.AddDisposable(viewModel.GameViewModels.SubscribeOnRemoved(_ => UpdateGameViews()));
-            compositeDisposable.AddDisposable(viewModel.GameViewModels.SubscribeOnCleared(UpdateGameViews));
+            compositeDisposable.AddDisposable(viewModel.GameViewModels.SubscribeOnItemRemoved(_ => UpdateGameViews()));
             
             // Bind swipe progress
             compositeDisposable.AddDisposable(viewModel.SwipeProgress.Subscribe(OnSwipeProgressChanged));

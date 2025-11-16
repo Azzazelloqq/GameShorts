@@ -42,7 +42,7 @@
       "dependencies": {
         "com.azzazello.disposable": "https://github.com/Azzazelloqq/Disposable.git#v1.0.1"
       },
-      "hash": "de668738d1ce87cadcbb84cd9e1d3795c7a1a206"
+      "hash": "8fd7ea3f20cfa35fa3587713b061475a849d7079"
     },
     "com.azzazello.resourceloader": {
       "version": "https://github.com/Azzazelloqq/ResourceLoader.git",
