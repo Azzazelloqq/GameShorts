@@ -1,0 +1,19 @@
+{
+    "name": "Code.Core.SafeArea.Editor",
+    "rootNamespace": "Code.Core.SafeArea.Editor",
+    "references": [
+        "Code.Core.SafeArea"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+

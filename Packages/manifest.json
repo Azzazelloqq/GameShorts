@@ -1,9 +1,11 @@
 {
   "dependencies": {
     "com.azzazello.config": "https://github.com/Azzazelloqq/Config.git",
+    "com.azzazello.disposable": "https://github.com/Azzazelloqq/Disposable.git",
     "com.azzazello.lightdi": "https://github.com/Azzazelloqq/LightDI.git",
     "com.azzazello.localsavesystem": "https://github.com/Azzazelloqq/LocalSave.git",
     "com.azzazello.logger": "https://github.com/Azzazelloqq/InGameLogger.git",
+    "com.azzazello.mvvm": "https://github.com/Azzazelloqq/MVVM.git",
     "com.azzazello.resourceloader": "https://github.com/Azzazelloqq/ResourceLoader.git",
     "com.azzazello.tickhandler": "https://github.com/Azzazelloqq/TickHandler.git",
     "com.boxqkrtm.ide.cursor": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",

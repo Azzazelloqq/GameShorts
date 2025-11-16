@@ -143,6 +143,7 @@ public class GameEntryPoint : MonoBehaviour
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),
+			typeof(AngryHumansShortGame),
 			typeof(AsteroidsGame),
 		};
 	}

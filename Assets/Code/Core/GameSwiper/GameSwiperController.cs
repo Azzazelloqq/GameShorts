@@ -3,6 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.GamesLoader;
+using Code.Core.GameSwiper.MVVM.Models;
+using Code.Core.GameSwiper.MVVM.ViewModels;
+using Code.Core.GameSwiper.MVVM.Views;
 using Code.Generated.Addressables;
 using InGameLogger;
 using LightDI.Runtime;
@@ -13,8 +16,8 @@ using Object = UnityEngine.Object;
 namespace Code.Core.GameSwiper
 {
 /// <summary>
-/// Controller that connects GameSwiper UI with IGameProvider business logic
-/// Handles communication between visual component and game system
+/// Controller that manages the MVVM-based GameSwiper.
+/// Creates and initializes Model, ViewModel, and View components.
 /// </summary>
 public class GameSwiperController : IDisposable
 {
@@ -22,11 +25,20 @@ public class GameSwiperController : IDisposable
 	private readonly IInGameLogger _logger;
 	private readonly IResourceLoader _resourceLoader;
 	private readonly Transform _uiRoot;
-	private GameSwiper _gameSwiper;
+	
+	// MVVM components
+	private GameSwiperModel _model;
+	private GameSwiperViewModel _viewModel;
+	private GameSwiperView _view;
+	
+	// Legacy support (to be removed later)
+	private GameSwiper _legacySwiper;
+	private bool _useLegacy = false; // Can be toggled for migration
+	
 	private bool _isInitialized;
-	private bool _isTransitioning;
 	private CancellationTokenSource _cancellationTokenSource;
 	private bool _disposed;
+	private bool _isTransitioning;
 
 	public GameSwiperController(
 		Transform uiRoot,
@@ -42,7 +54,7 @@ public class GameSwiperController : IDisposable
 	}
 
 	/// <summary>
-	/// Load UI and setup connections
+	/// Load UI and setup MVVM connections
 	/// </summary>
 	public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
 	{
@@ -54,66 +66,16 @@ public class GameSwiperController : IDisposable
 
 		try
 		{
-			// Load the GameSwiper prefab
-			var prefab = await _resourceLoader.LoadResourceAsync<GameObject>(
-				ResourceIdsContainer.DefaultLocalGroup.GameSwiper,
-				cancellationToken);
-
-			if (prefab == null)
+			if (_useLegacy)
 			{
-				_logger.LogError("GameSwiper prefab not found");
-				return;
+				// Use legacy implementation
+				await InitializeLegacyAsync(cancellationToken);
 			}
-
-			// Instantiate and get component
-			var instance = Object.Instantiate(prefab, _uiRoot);
-			_gameSwiper = instance.GetComponent<GameSwiper>();
-
-			if (_gameSwiper == null)
+			else
 			{
-				_logger.LogError("GameSwiper component not found on prefab");
-				Object.Destroy(instance);
-				return;
+				// Use MVVM implementation
+				await InitializeSwiperView(cancellationToken);
 			}
-
-			_gameSwiper.OnNextGameRequested += HandleNextGameRequested;
-			_gameSwiper.OnPreviousGameRequested += HandlePreviousGameRequested;
-
-			// Wait for current game to be ready
-			if (!_shortGameServiceProvider.IsCurrentGameReady)
-			{
-				_logger.Log("Waiting for initial game to be ready...");
-				_gameSwiper.SetLoadingState(true);
-
-				int waitTime = 0;
-				const int maxWaitTime = 10000; // 10 seconds timeout
-				
-				while (!_shortGameServiceProvider.IsCurrentGameReady && waitTime < maxWaitTime)
-				{
-					await Task.Delay(100, cancellationToken);
-					waitTime += 100;
-				}
-				
-				if (waitTime >= maxWaitTime)
-				{
-					_logger.LogWarning("Timeout waiting for initial game to be ready");
-				}
-			}
-
-			// Force an initial update even if game is not ready
-			UpdateSwiperState();
-			
-			// Start the current game so it begins rendering
-			if (_shortGameServiceProvider.IsCurrentGameReady)
-			{
-				_shortGameServiceProvider.StartCurrentGame();
-				_logger.Log("Started current game");
-			}
-			
-			// Log the current state for debugging
-			_logger.Log($"Initial state - Current: {_shortGameServiceProvider.IsCurrentGameReady}, " +
-				$"Next: {_shortGameServiceProvider.IsNextGameReady}, " +
-				$"Previous: {_shortGameServiceProvider.IsPreviousGameReady}");
 
 			_isInitialized = true;
 		}
@@ -126,6 +88,126 @@ public class GameSwiperController : IDisposable
 			_logger.LogError($"Failed to initialize GameSwiperController: {ex.Message}");
 			throw;
 		}
+	}
+	
+	/// <summary>
+	/// Initialize MVVM-based GameSwiper
+	/// </summary>
+	private async ValueTask InitializeSwiperView(CancellationToken cancellationToken)
+	{
+		// Create Model
+		var settings = new SwiperSettings
+		{
+			AnimationDuration = 0.3f,
+			UseScreenHeight = true,
+			ImageSpacing = 1920f
+		};
+		_model = new GameSwiperModel(_shortGameServiceProvider, settings);
+		
+		// Create ViewModel
+		_viewModel = new GameSwiperViewModel(_model);
+		await _viewModel.InitializeAsync(cancellationToken);
+		
+		// Load and create View
+		var prefab = await _resourceLoader.LoadResourceAsync<GameObject>(
+			ResourceIdsContainer.DefaultLocalGroup.GameSwiper,
+			cancellationToken);
+		
+		if (prefab == null)
+		{
+			_logger.LogError("GameSwiper prefab not found");
+			return;
+		}
+		
+		// Instantiate and get MVVM view component
+		var instance = Object.Instantiate(prefab, _uiRoot);
+		_view = instance.GetComponent<GameSwiperView>();
+		
+		if (_view == null)
+		{
+			// If no MVVM view, try adding it
+			_view = instance.AddComponent<GameSwiperView>();
+		}
+		
+		// Initialize View with ViewModel
+		_view.Initialize(_viewModel);
+		
+		// Initialize ViewModel async operations
+		await _viewModel.InitializeAsync(cancellationToken);
+		await _view.InitializeAsync(cancellationToken);
+		
+		// Subscribe to ViewModel events
+		_viewModel.OnNextGameStarted += OnMVVMNextGameStarted;
+		_viewModel.OnPreviousGameStarted += OnMVVMPreviousGameStarted;
+		
+		_logger.Log("MVVM GameSwiper initialized successfully");
+	}
+	
+	/// <summary>
+	/// Initialize legacy GameSwiper (for backwards compatibility)
+	/// </summary>
+	private async ValueTask InitializeLegacyAsync(CancellationToken cancellationToken)
+	{
+		// Load the GameSwiper prefab
+		var prefab = await _resourceLoader.LoadResourceAsync<GameObject>(
+			ResourceIdsContainer.DefaultLocalGroup.GameSwiper,
+			cancellationToken);
+
+		if (prefab == null)
+		{
+			_logger.LogError("GameSwiper prefab not found");
+			return;
+		}
+
+		// Instantiate and get component
+		var instance = Object.Instantiate(prefab, _uiRoot);
+		_legacySwiper = instance.GetComponent<GameSwiper>();
+
+		if (_legacySwiper == null)
+		{
+			_logger.LogError("GameSwiper component not found on prefab");
+			Object.Destroy(instance);
+			return;
+		}
+
+		_legacySwiper.OnNextGameRequested += HandleNextGameRequested;
+		_legacySwiper.OnPreviousGameRequested += HandlePreviousGameRequested;
+
+		// Wait for current game to be ready
+		if (!_shortGameServiceProvider.IsCurrentGameReady)
+		{
+			_logger.Log("Waiting for initial game to be ready...");
+			_legacySwiper.SetLoadingState(true);
+
+			int waitTime = 0;
+			const int maxWaitTime = 10000; // 10 seconds timeout
+			
+			while (!_shortGameServiceProvider.IsCurrentGameReady && waitTime < maxWaitTime)
+			{
+				await Task.Delay(100, cancellationToken);
+				waitTime += 100;
+			}
+			
+			if (waitTime >= maxWaitTime)
+			{
+				_logger.LogWarning("Timeout waiting for initial game to be ready");
+			}
+		}
+
+		// Force an initial update even if game is not ready
+		UpdateLegacySwiperState();
+		
+		// Start the current game so it begins rendering
+		if (_shortGameServiceProvider.IsCurrentGameReady)
+		{
+			_shortGameServiceProvider.StartCurrentGame();
+			_logger.Log("Started current game");
+		}
+		
+		// Log the current state for debugging
+		_logger.Log($"Initial state - Current: {_shortGameServiceProvider.IsCurrentGameReady}, " +
+			$"Next: {_shortGameServiceProvider.IsNextGameReady}, " +
+			$"Previous: {_shortGameServiceProvider.IsPreviousGameReady}");
 	}
 	
 	public void Dispose()
@@ -141,15 +223,53 @@ public class GameSwiperController : IDisposable
 		_cancellationTokenSource?.Cancel();
 		_cancellationTokenSource?.Dispose();
 
-		if (_gameSwiper != null)
+		// Dispose MVVM components
+		if (_view != null)
 		{
-			_gameSwiper.OnNextGameRequested -= HandleNextGameRequested;
-			_gameSwiper.OnPreviousGameRequested -= HandlePreviousGameRequested;
+			_view.Dispose();
+			_view = null;
+		}
+		
+		if (_viewModel != null)
+		{
+			_viewModel.OnNextGameStarted -= OnMVVMNextGameStarted;
+			_viewModel.OnPreviousGameStarted -= OnMVVMPreviousGameStarted;
+			_viewModel.Dispose();
+			_viewModel = null;
+		}
+		
+		if (_model != null)
+		{
+			_model.Dispose();
+			_model = null;
+		}
+
+		// Dispose legacy components
+		if (_legacySwiper != null)
+		{
+			_legacySwiper.OnNextGameRequested -= HandleNextGameRequested;
+			_legacySwiper.OnPreviousGameRequested -= HandlePreviousGameRequested;
 		}
 	}
 
 	/// <summary>
-	/// Handle next game request from UI
+	/// Handle next game event from MVVM ViewModel
+	/// </summary>
+	private void OnMVVMNextGameStarted()
+	{
+		_logger.Log("Next game started via MVVM");
+	}
+	
+	/// <summary>
+	/// Handle previous game event from MVVM ViewModel
+	/// </summary>
+	private void OnMVVMPreviousGameStarted()
+	{
+		_logger.Log("Previous game started via MVVM");
+	}
+	
+	/// <summary>
+	/// Handle next game request from legacy UI
 	/// </summary>
 	private void HandleNextGameRequested()
 	{
@@ -184,7 +304,7 @@ public class GameSwiperController : IDisposable
 				// Show loading if game is not ready
 				if (!_shortGameServiceProvider.IsNextGameReady)
 				{
-					_gameSwiper.SetLoadingState(true);
+					_legacySwiper.SetLoadingState(true);
 				}
 
 				// FIRST: Switch game logic and prepare all data
@@ -193,7 +313,7 @@ public class GameSwiperController : IDisposable
 				if (!success)
 				{
 					_logger.LogError("Failed to switch to next game");
-					_gameSwiper.ResetTransitionRequest(); // Reset the transition flag if switch failed
+					_legacySwiper.ResetTransitionRequest(); // Reset the transition flag if switch failed
 					return;
 				}
 
@@ -201,13 +321,13 @@ public class GameSwiperController : IDisposable
 				var previousRT = _shortGameServiceProvider.PreviousGameRenderTexture;
 				var currentRT = _shortGameServiceProvider.CurrentGameRenderTexture;
 				var nextRT = _shortGameServiceProvider.NextGameRenderTexture;
-				_gameSwiper.PrepareTexturesForNextAnimation(previousRT, currentRT, nextRT);
+				_legacySwiper.PrepareTexturesForNextAnimation(previousRT, currentRT, nextRT);
 
 				// THIRD: Animate UI transition with prepared textures
-				await _gameSwiper.AnimateToNext();
+				await _legacySwiper.AnimateToNext();
 				
 				// FOURTH: Update final state after animation
-				UpdateSwiperState();
+				UpdateLegacySwiperState();
 			}
 		}
 		catch (OperationCanceledException)
@@ -220,9 +340,8 @@ public class GameSwiperController : IDisposable
 		}
 		finally
 		{
-			_gameSwiper.SetLoadingState(false);
-			_gameSwiper.ResetTransitionRequest(); // Ensure flag is reset even if exception occurred
-			_isTransitioning = false;
+			_legacySwiper.SetLoadingState(false);
+			_legacySwiper.ResetTransitionRequest(); // Ensure flag is reset even if exception occurred
 		}
 	}
 
@@ -262,7 +381,7 @@ public class GameSwiperController : IDisposable
 				// Show loading if game is not ready
 				if (!_shortGameServiceProvider.IsPreviousGameReady)
 				{
-					_gameSwiper.SetLoadingState(true);
+					_legacySwiper.SetLoadingState(true);
 				}
 
 				// FIRST: Switch game logic and prepare all data
@@ -271,7 +390,7 @@ public class GameSwiperController : IDisposable
 				if (!success)
 				{
 					_logger.LogError("Failed to switch to previous game");
-					_gameSwiper.ResetTransitionRequest(); // Reset the transition flag if switch failed
+					_legacySwiper.ResetTransitionRequest(); // Reset the transition flag if switch failed
 					return;
 				}
 
@@ -279,13 +398,13 @@ public class GameSwiperController : IDisposable
 				var previousRT = _shortGameServiceProvider.PreviousGameRenderTexture;
 				var currentRT = _shortGameServiceProvider.CurrentGameRenderTexture;
 				var nextRT = _shortGameServiceProvider.NextGameRenderTexture;
-				_gameSwiper.PrepareTexturesForPreviousAnimation(previousRT, currentRT, nextRT);
+				_legacySwiper.PrepareTexturesForPreviousAnimation(previousRT, currentRT, nextRT);
 
 				// THIRD: Animate UI transition with prepared textures
-				await _gameSwiper.AnimateToPrevious();
+				await _legacySwiper.AnimateToPrevious();
 				
 				// FOURTH: Update final state after animation
-				UpdateSwiperState();
+				UpdateLegacySwiperState();
 			}
 		}
 		catch (OperationCanceledException)
@@ -298,16 +417,15 @@ public class GameSwiperController : IDisposable
 		}
 		finally
 		{
-			_gameSwiper.SetLoadingState(false);
-			_gameSwiper.ResetTransitionRequest(); // Ensure flag is reset even if exception occurred
-			_isTransitioning = false;
+			_legacySwiper.SetLoadingState(false);
+			_legacySwiper.ResetTransitionRequest(); // Ensure flag is reset even if exception occurred
 		}
 	}
 
 	/// <summary>
-	/// Update swiper visual state from game provider
+	/// Update legacy swiper visual state from game provider
 	/// </summary>
-	private void UpdateSwiperState()
+	private void UpdateLegacySwiperState()
 	{
 		// Get render textures
 		var previousRT = _shortGameServiceProvider.PreviousGameRenderTexture;
@@ -321,17 +439,17 @@ public class GameSwiperController : IDisposable
 			$"Next={nextRT != null}");
 		
 		// Update textures
-		_gameSwiper.UpdateTextures(previousRT, currentRT, nextRT);
+		_legacySwiper.UpdateTextures(previousRT, currentRT, nextRT);
 
 		// Update navigation states for all input handlers
-		_gameSwiper.UpdateNavigationStates(
+		_legacySwiper.UpdateNavigationStates(
 			_shortGameServiceProvider.HasNextGame,
 			_shortGameServiceProvider.HasPreviousGame
 		);
 		
 		// Update loading state based on current game readiness
 		var showLoading = !_shortGameServiceProvider.IsCurrentGameReady;
-		_gameSwiper.SetLoadingState(showLoading);
+		_legacySwiper.SetLoadingState(showLoading);
 	}
 }
 }
