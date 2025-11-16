@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1;
 using Code.Core.GamesLoader;
 using Code.Core.GameSwiper;
+using Code.Core.GameStats;
 using Code.Core.ShortGamesCore.EscapeFromDark;
 using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Lawnmower;
@@ -48,6 +49,7 @@ public class GameEntryPoint : MonoBehaviour
 
 	private IShortGameServiceProvider _shortGameServiceProvider;
 	private GameSwiperController _gameSwiperController;
+	private IGameStatsService _gameStatsService;
 	private CancellationTokenSource _cancellationTokenSource;
 	private IDiContainer _globalGameDiContainer;
 	private UnityInGameLogger _logger;
@@ -107,11 +109,14 @@ public class GameEntryPoint : MonoBehaviour
 		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider(playableGames, factory);
 		await _shortGameServiceProvider.InitializeAsync(cancellationToken);
 
+		_gameStatsService = new LocalRandomGameStatsService(_logger);
+
 		_gameSwiperController = new GameSwiperController(
 			_uiParent,
 			_shortGameServiceProvider,
 			_logger,
-			_resourceLoader
+			_resourceLoader,
+			_gameStatsService
 		);
 
 		await _gameSwiperController.InitializeAsync(cancellationToken);
@@ -143,6 +148,7 @@ public class GameEntryPoint : MonoBehaviour
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),
+			typeof(AngryHumansShortGame),
 			typeof(AsteroidsGame),
 		};
 	}

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Swiper
+  m_EditorClassIdentifier: 
+  m_GroupName: Swiper
+  m_GUID: 12b07c8c636490c4f9eea1fbab29e3a4
+  m_SerializeEntries:
+  - m_GUID: 24ac034f5bb786b4791d47b25d13bd7b
+    m_Address: Assets/Content/Swiper/Materials/Round.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d0199c52cadef941898b51659770605
+    m_Address: Assets/Content/Swiper/Materials/GooeyEffect.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3fcd11e0359a66c46a6d65ac981f0296
+    m_Address: GameVotePanelView
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9121267f0c3094d43b15c521e6d333af
+    m_Address: GameItemView
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b44eedb105dc6a74d8779b9575af3915
+    m_Address: GameSwiperView
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: f2b5311b3ecbec34cb37af00119968d5, type: 2}
+    - {fileID: 11400000, guid: f066cf72f8858024783a4b68c1ee21cf, type: 2}

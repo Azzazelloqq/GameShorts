@@ -21,9 +21,13 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 	private readonly IGamesLoader _gamesLoader;
 	private bool _disposed;
 
-	public IShortGame CurrentGame => GetGameForType(_queueService?.CurrentGameType);
-	public IShortGame NextGame => GetGameForType(_queueService?.NextGameType);
-	public IShortGame PreviousGame => GetGameForType(_queueService?.PreviousGameType);
+		public IShortGame CurrentGame => GetGameForType(_queueService?.CurrentGameType);
+		public IShortGame NextGame => GetGameForType(_queueService?.NextGameType);
+		public IShortGame PreviousGame => GetGameForType(_queueService?.PreviousGameType);
+
+		public Type CurrentGameType => _queueService?.CurrentGameType;
+		public Type NextGameType => _queueService?.NextGameType;
+		public Type PreviousGameType => _queueService?.PreviousGameType;
 
 	public RenderTexture CurrentGameRenderTexture => CurrentGame?.GetRenderTexture();
 	public RenderTexture NextGameRenderTexture => NextGame?.GetRenderTexture();

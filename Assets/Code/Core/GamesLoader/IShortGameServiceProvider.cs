@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using UnityEngine;
 
@@ -16,15 +17,30 @@ public interface IShortGameServiceProvider : IDisposable
 	/// </summary>
 	IShortGame CurrentGame { get; }
 
+		/// <summary>
+		/// Gets the <see cref="Type"/> of the current game, even if it hasn't been instantiated yet.
+		/// </summary>
+		Type CurrentGameType { get; }
+
 	/// <summary>
 	/// Gets the next game (preloaded)
 	/// </summary>
 	IShortGame NextGame { get; }
 
+		/// <summary>
+		/// Gets the <see cref="Type"/> of the next game slot.
+		/// </summary>
+		Type NextGameType { get; }
+
 	/// <summary>
 	/// Gets the previous game (preloaded)
 	/// </summary>
 	IShortGame PreviousGame { get; }
+
+		/// <summary>
+		/// Gets the <see cref="Type"/> of the previous game slot.
+		/// </summary>
+		Type PreviousGameType { get; }
 
 	/// <summary>
 	/// Gets the render texture of the current game
