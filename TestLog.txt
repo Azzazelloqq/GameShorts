@@ -1,0 +1,26 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.2/staging' branch; Version is '6000.2.12f1 (e89d5df0e333) revision 15244637'; Using compiler version '194234433'; Build Type 'Release'
+OS: 'Windows 11  (10.0.26200) 64bit Core' Language: 'en' Physical Memory: 32603 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+Date: 2025-11-26T12:15:48Z
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-succe" at "2025-11-26T12:15:48.8681095Z"
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.2.12f1\Editor\Unity.exe
+-batchmode
+-nographics
+-silent-crashes
+-projectPath
+D:\PROJECTS\GameShorts
+-runTests
+-testPlatform
+EditMode
+-testFilter
+Code.Core.ShotGamesCore.Tests
+-testResults
+TestResults.xml
+-logFile
+TestLog.txt
+Successfully changed project path to: D:\PROJECTS\GameShorts
+D:/PROJECTS/GameShorts
+Exiting without the bug reporter. Application will terminate with return code 1

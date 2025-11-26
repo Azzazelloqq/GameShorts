@@ -18,11 +18,9 @@ namespace GameShorts.CubeRunner.Core
         }
 
         private readonly CubeRunnerScenePm _scene;
-        private readonly IPoolManager _poolManager;
 
-        public CubeRunnerCorePm(Ctx ctx, IPoolManager poolManager)
+        public CubeRunnerCorePm(Ctx ctx)
         {
-            _poolManager = poolManager;
             CubeRunnerScenePm.Ctx sceneCtx = new CubeRunnerScenePm.Ctx
             {
                 sceneContextView = ctx.sceneContextView,
@@ -31,7 +29,7 @@ namespace GameShorts.CubeRunner.Core
                 isPaused = ctx.isPaused
             };
 
-            _scene = new CubeRunnerScenePm(sceneCtx, _poolManager);
+            _scene = new CubeRunnerScenePm(sceneCtx);
             AddDispose(_scene);
         }
     }

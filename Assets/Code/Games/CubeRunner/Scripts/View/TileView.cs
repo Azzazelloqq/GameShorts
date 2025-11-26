@@ -8,21 +8,38 @@ namespace GameShorts.CubeRunner.View
         [SerializeField]
         private MeshRenderer _meshRenderer;
 
-        public Vector3 WorldPosition
-        {
-            get => transform.position;
-            set => transform.position = value;
-        }
+        public MeshRenderer MeshRenderer => _meshRenderer;
+        private bool _isPlayerEnter;
+        private bool _isExitTile;
 
-        public Vector3 LocalPosition
+        public bool IsExitTile
         {
-            get => transform.localPosition;
-            set => transform.localPosition = value;
+            get => _isExitTile;
+            set
+            {
+                if (value)
+                {
+                    var color = value ? Color.red : Color.white;
+                    color.a = value ? 0.5f : 1f;
+                    SetColor(color);
+                    
+                }
+                _isExitTile = value;
+            }
         }
-
-        public void SetActive(bool isActive)
+        public bool IsPlayerEnter
         {
-            gameObject.SetActive(isActive);
+            get => _isPlayerEnter;
+            private set
+            {
+                if (_isExitTile)
+                {
+                    var color = value ? Color.lawnGreen : Color.red;
+                    color.a = 0.5f;
+                    SetColor(color);
+                }
+                _isPlayerEnter = value;
+            }
         }
 
         public void SetColor(Color color)
@@ -31,6 +48,21 @@ namespace GameShorts.CubeRunner.View
             {
                 _meshRenderer.material.color = color;
             }
+        }
+        
+        private void OnCollisionEnter(Collision collision)
+        {
+            IsPlayerEnter = collision.transform.CompareTag("Player");
+        }
+        
+        private void OnCollisionExit(Collision collision)
+        {
+            IsPlayerEnter = false;
+        }
+
+        public void ResetView()
+        {
+            SetColor(Color.white);
         }
     }
 }

@@ -31,7 +31,6 @@ namespace GameShorts.CubeRunner
         private bool _isDisposed;
         private RenderTexture _renderTexture;
         private readonly ReactiveProperty<bool> _isPaused = new ReactiveProperty<bool>();
-        private IPoolManager _poolManager;
 
         public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
@@ -119,17 +118,12 @@ namespace GameShorts.CubeRunner
 
             _core?.Dispose();
             _core = null;
-
-            _poolManager?.Dispose();
-            _poolManager = null;
         }
 
         private void CreateRoot()
         {
             _isPaused.Value = false;
             _cancellationTokenSource = new CancellationTokenSource();
-            _poolManager?.Dispose();
-            _poolManager = new PoolManager();
             var rootCtx = new CubeRunnerCorePm.Ctx
             {
                 sceneContextView = _sceneContextView,
@@ -137,7 +131,7 @@ namespace GameShorts.CubeRunner
                 restartGame = RestartGame,
                 isPaused = _isPaused
             };
-            _core = new CubeRunnerCorePm(rootCtx, _poolManager);
+            _core = new CubeRunnerCorePm(rootCtx);
         }
     }
 }

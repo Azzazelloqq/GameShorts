@@ -9,7 +9,8 @@
         "TickHandler",
         "Tools",
         "Unity.TextMeshPro",
-        "R3.Unity"
+        "R3.Unity",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -21,4 +22,3 @@
     "versionDefines": [],
     "noEngineReferences": false
 }
-

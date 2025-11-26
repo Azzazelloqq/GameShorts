@@ -1,6 +1,8 @@
 using System;
 using Code.Core.BaseDMDisposable.Scripts;
+using LightDI.Runtime;
 using R3;
+using TickHandler;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -11,26 +13,25 @@ namespace GameShorts.CubeRunner.Gameplay
         internal struct Ctx
         {
             public ReactiveProperty<bool> isPaused;
-            public float swipeThreshold;
         }
 
         private readonly Ctx _ctx;
-        private readonly Subject<CubeRunnerSwipeDirection> _swipeStream = new Subject<CubeRunnerSwipeDirection>();
-        private readonly IDisposable _updateSubscription;
+        private readonly Subject<Vector2Int> _swipeStream = new Subject<Vector2Int>();
+        private readonly float _swipeThresholdPixels = 50f;
 
         private bool _isInputEnabled = true;
         private bool _isPointerDown;
         private Vector2 _pointerDownPosition;
         private Vector2 _pointerUpPosition;
+        private readonly ITickHandler _tickHandler;
 
-        public Subject<CubeRunnerSwipeDirection> Swipes => _swipeStream;
+        public Subject<Vector2Int> Swipes => _swipeStream;
 
-        public CubeRunnerInputHandler(Ctx ctx)
+        public CubeRunnerInputHandler(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
-            _updateSubscription = Observable.EveryUpdate()
-                .Subscribe(_ => OnUpdate());
-            AddDispose(_updateSubscription);
+            _tickHandler = tickHandler;
+            _tickHandler.FrameUpdate += OnUpdate;
 
             if (_ctx.isPaused != null)
             {
@@ -42,7 +43,7 @@ namespace GameShorts.CubeRunner.Gameplay
             }
         }
 
-        private void OnUpdate()
+        private void OnUpdate(float _)
         {
             if (!_isInputEnabled)
             {
@@ -50,7 +51,9 @@ namespace GameShorts.CubeRunner.Gameplay
             }
 
             HandleTouchInput();
+#if UNITY_EDITOR
             HandleMouseInput();
+#endif
         }
 
         private void HandleTouchInput()
@@ -122,7 +125,7 @@ namespace GameShorts.CubeRunner.Gameplay
             Vector2 delta = _pointerUpPosition - _pointerDownPosition;
             float distance = delta.magnitude;
 
-            float threshold = Mathf.Max(10f, _ctx.swipeThreshold);
+            float threshold = Mathf.Max(10f, _swipeThresholdPixels);
             if (distance < threshold)
             {
                 return;
@@ -130,11 +133,11 @@ namespace GameShorts.CubeRunner.Gameplay
 
             if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             {
-                _swipeStream.OnNext(delta.x > 0f ? CubeRunnerSwipeDirection.Right : CubeRunnerSwipeDirection.Left);
+                _swipeStream.OnNext(delta.x > 0f ? Vector2Int.right : Vector2Int.left);
             }
             else
             {
-                _swipeStream.OnNext(delta.y > 0f ? CubeRunnerSwipeDirection.Up : CubeRunnerSwipeDirection.Down);
+                _swipeStream.OnNext(delta.y > 0f ? Vector2Int.up : Vector2Int.down);
             }
         }
 
@@ -162,6 +165,7 @@ namespace GameShorts.CubeRunner.Gameplay
 
         protected override void OnDispose()
         {
+            _tickHandler.FrameUpdate -= OnUpdate;
             _swipeStream.OnCompleted();
             _swipeStream.Dispose();
             ResetPointerState();

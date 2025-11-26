@@ -12,14 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 031bf99083cae41459a4d32d07218843, type: 3}
   m_Name: CubeRunnerGameSettings
   m_EditorClassIdentifier: CubeRunner::GameShorts.CubeRunner.Data.CubeRunnerGameSettings
-  _worldSpeed: 4
   _tileSize: 1
-  _minZBoundary: -1
-  _maxZBoundary: 10
-  _laneCount: 3
-  _tilesAheadToGenerate: 24
-  _initialSafeTiles: 6
-  _sectionLength: 6
-  _difficultySteps: []
-  _cubePrefab: {fileID: 4595156241856067616, guid: 61e65ee46c622a64da59962a5b1adafd, type: 3}
-  _tilePrefab: {fileID: 1683995822252002517, guid: 935a170b6ccb4f04183e26498163a9b4, type: 3}
+  _spawnHeight: 10
+  _cubeDimensions: {x: 1, y: 1, z: 1}
+  _cubePrefab: {fileID: 2294736519771721843, guid: 61e65ee46c622a64da59962a5b1adafd, type: 3}
+  _tilePrefab: {fileID: 1335092213641119363, guid: 935a170b6ccb4f04183e26498163a9b4, type: 3}
+  _borderPrefab: {fileID: 1335092213641119363, guid: 362e4a2225e140447a89db6870eb3ce7, type: 3}

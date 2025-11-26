@@ -1,36 +1,82 @@
+using System.Collections;
 using Code.Core.BaseDMDisposable.Scripts;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 
 namespace GameShorts.CubeRunner.View
 {
-    public class CubeView : BaseMonoBehaviour
+    internal class CubeView : BaseMonoBehaviour
     {
+        public struct Ctx
+        {
+            public Vector3 scale;
+        }
+        
         [SerializeField]
         private Transform _visualRoot;
+        
+        [SerializeField]
+        private BoxCollider _boxCollider;
+        
+        [SerializeField]
+        private Rigidbody _rigidbody;
+        
+        private Ctx _ctx;
+        private Vector3 _logicalLocalPosition;
+        private Vector3 _cubeDimensions;
+        private bool _isGrounded;
 
-        public Transform VisualRoot => _visualRoot != null ? _visualRoot : transform;
+        public bool IsGrounded => _isGrounded;
 
-        public Vector3 WorldPosition
+        public Transform VisualRoot =>  transform;
+        
+        public BoxCollider Collider => _boxCollider;
+        
+        public Bounds ColliderBounds => _boxCollider != null
+            ? _boxCollider.bounds
+            : new Bounds(transform.position, Vector3.zero);
+
+        public Rigidbody Rigidbody => _rigidbody;
+
+        public void SetCtx(Ctx ctx)
         {
-            get => transform.position;
-            set => transform.position = value;
+            _ctx = ctx;
         }
 
-        public Vector3 LocalPosition
+        public void SetCubeDimensions(Vector3 cubeDimensions)
         {
-            get => transform.localPosition;
-            set => transform.localPosition = value;
+            UpdateCubeDimensions(cubeDimensions);
         }
 
-        public void SetRotation(Quaternion rotation)
+        public void SetActiveControl(bool isActive)
         {
-            transform.rotation = rotation;
+            _rigidbody.freezeRotation = !isActive;
+            IsCollisionTrigger(!isActive);
         }
 
-        public void SetScale(Vector3 scale)
+        public void IsCollisionTrigger(bool isTrigger)
         {
-            VisualRoot.localScale = scale;
+            _boxCollider.isTrigger = isTrigger;
         }
+
+        void OnCollisionEnter(Collision theCollision)
+        {
+            var tileView = theCollision.gameObject.GetComponent<TileView>();
+            _isGrounded = tileView != null;
+           // _rigidbody.freezeRotation = !_isGrounded;
+        }
+
+        private void UpdateCubeDimensions(Vector3 dimensions)
+        {
+            _cubeDimensions = new Vector3(
+                Mathf.Max(0.01f, dimensions.x),
+                Mathf.Max(0.01f, dimensions.y),
+                Mathf.Max(0.01f, dimensions.z));
+                
+            VisualRoot.localScale = _cubeDimensions;
+        }
+
     }
 }
 
