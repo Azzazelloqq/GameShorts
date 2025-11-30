@@ -134,8 +134,8 @@ public class GameEntryPoint : MonoBehaviour
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
-			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main},
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
+			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main },
+			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame }
 		};
 	}
 
@@ -149,14 +149,14 @@ public class GameEntryPoint : MonoBehaviour
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),
 			typeof(AngryHumansShortGame),
-			typeof(AsteroidsGame),
+			typeof(AsteroidsGame)
 		};
 	}
 
 	private void OnDestroy()
 	{
 		_logger?.Log("GameEntryPoint OnDestroy - starting cleanup");
-		
+
 		_cancellationTokenSource?.Cancel();
 
 		// Dispose in correct order to prevent errors
@@ -164,7 +164,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_gameSwiperController?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing GameSwiperController: {ex.Message}");
 		}
@@ -173,7 +173,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_shortGameServiceProvider?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing ShortGameServiceProvider: {ex.Message}");
 		}
@@ -182,7 +182,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_resourceLoader?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing ResourceLoader: {ex.Message}");
 		}
@@ -191,7 +191,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_cancellationTokenSource?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing CancellationTokenSource: {ex.Message}");
 		}
@@ -200,7 +200,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_poolObjects?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing PoolObjects: {ex.Message}");
 		}
@@ -209,7 +209,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_globalGameDiContainer?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing GlobalGameDiContainer: {ex.Message}");
 		}
