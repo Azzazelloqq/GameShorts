@@ -7,6 +7,7 @@ namespace Code.Generated.Addressables
     {
         public static readonly GameEscapeFromDark GameEscapeFromDark = new GameEscapeFromDark();
         public static readonly GameFlyHumans GameFlyHumans = new GameFlyHumans();
+        public static readonly Swiper Swiper = new Swiper();
         public static readonly GameAsteroids GameAsteroids = new GameAsteroids();
         public static readonly DefaultLocalGroup DefaultLocalGroup = new DefaultLocalGroup();
         public static readonly AssetsCommonCharactersLowpoly AssetsCommonCharactersLowpoly = new AssetsCommonCharactersLowpoly();

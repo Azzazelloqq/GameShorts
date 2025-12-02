@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1;
 using Code.Core.GamesLoader;
 using Code.Core.GameSwiper;
+using Code.Core.GameStats;
 using Code.Core.ShortGamesCore.EscapeFromDark;
 using Code.Core.ShortGamesCore.Game2;
 using Code.Core.ShortGamesCore.Lawnmower;
@@ -48,6 +49,7 @@ public class GameEntryPoint : MonoBehaviour
 
 	private IShortGameServiceProvider _shortGameServiceProvider;
 	private GameSwiperController _gameSwiperController;
+	private IGameStatsService _gameStatsService;
 	private CancellationTokenSource _cancellationTokenSource;
 	private IDiContainer _globalGameDiContainer;
 	private UnityInGameLogger _logger;
@@ -107,11 +109,14 @@ public class GameEntryPoint : MonoBehaviour
 		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider(playableGames, factory);
 		await _shortGameServiceProvider.InitializeAsync(cancellationToken);
 
+		_gameStatsService = new LocalRandomGameStatsService(_logger);
+
 		_gameSwiperController = new GameSwiperController(
 			_uiParent,
 			_shortGameServiceProvider,
 			_logger,
-			_resourceLoader
+			_resourceLoader,
+			_gameStatsService
 		);
 
 		await _gameSwiperController.InitializeAsync(cancellationToken);
@@ -129,8 +134,8 @@ public class GameEntryPoint : MonoBehaviour
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
-			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main},
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
+			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main },
+			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame }
 		};
 	}
 
@@ -143,14 +148,15 @@ public class GameEntryPoint : MonoBehaviour
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),
-			typeof(AsteroidsGame),
+			typeof(AngryHumansShortGame),
+			typeof(AsteroidsGame)
 		};
 	}
 
 	private void OnDestroy()
 	{
 		_logger?.Log("GameEntryPoint OnDestroy - starting cleanup");
-		
+
 		_cancellationTokenSource?.Cancel();
 
 		// Dispose in correct order to prevent errors
@@ -158,7 +164,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_gameSwiperController?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing GameSwiperController: {ex.Message}");
 		}
@@ -167,7 +173,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_shortGameServiceProvider?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing ShortGameServiceProvider: {ex.Message}");
 		}
@@ -176,7 +182,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_resourceLoader?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing ResourceLoader: {ex.Message}");
 		}
@@ -185,7 +191,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_cancellationTokenSource?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing CancellationTokenSource: {ex.Message}");
 		}
@@ -194,7 +200,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_poolObjects?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing PoolObjects: {ex.Message}");
 		}
@@ -203,7 +209,7 @@ public class GameEntryPoint : MonoBehaviour
 		{
 			_globalGameDiContainer?.Dispose();
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing GlobalGameDiContainer: {ex.Message}");
 		}

@@ -1,0 +1,16 @@
+{
+    "name": "Code.Core.SafeArea",
+    "rootNamespace": "Code.Core.SafeArea",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+
+

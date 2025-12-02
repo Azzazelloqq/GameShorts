@@ -92,7 +92,7 @@ namespace Logic.Player.LaserWeapon
             _view.Laser.SetPosition(2, endPosition);    // End point
 
             // Perform raycast for collision detection in both directions
-            var collisions1 = Physics2D.Raycast(_view.transform.position, directionVector, ContactFilter2D.noFilter, _hits, halfLength);
+            var collisions1 = Physics2D.Raycast(_view.transform.position, directionVector, default, _hits, halfLength);
             
             // Process collisions in positive direction
             for (int i = 0; i < collisions1; i++)
@@ -108,7 +108,7 @@ namespace Logic.Player.LaserWeapon
             }
             
             // Raycast in opposite direction
-            var collisions2 = Physics2D.Raycast(_view.transform.position, oppositeDirection, ContactFilter2D.noFilter, _hits, halfLength);
+            var collisions2 = Physics2D.Raycast(_view.transform.position, oppositeDirection, default, _hits, halfLength);
             
             // Process collisions in negative direction
             for (int i = 0; i < collisions2; i++)
