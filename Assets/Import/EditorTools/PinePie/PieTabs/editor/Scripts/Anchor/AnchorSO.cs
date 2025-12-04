@@ -6,6 +6,9 @@
 #if UNITY_EDITOR
 using UnityEngine;
 
-public class AnchorSO : ScriptableObject { }
+namespace PinePie.PieTabs
+{
+    public class AnchorSO : ScriptableObject { }
+}
 
 #endif

@@ -2,6 +2,7 @@
 
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -128,6 +129,61 @@ namespace PinePie.PieTabs
             }
         }
 
+        public static List<string> CleanEntries(List<string> items)
+        {
+            // HashSet for fast lookup
+            HashSet<string> set = new HashSet<string>(items);
+
+            List<string> output = new List<string>();
+
+            foreach (var item in items)
+            {
+                bool isParent = items.Any(child =>
+                    child != item &&
+                    child.StartsWith(item + "/")
+                );
+
+                if (!isParent)
+                    output.Add(item);
+            }
+
+            return output;
+        }
+
+
+        public static void OnCreateMenuEntrySelected(Object obj, string fullEntry)
+        {
+            string iconName = EditorGUIUtility.ObjectContent(obj, obj.GetType()).image.name;
+
+            CreatorButton buttonAtSamePath = creatorButtons.buttons
+                .FirstOrDefault(b => b.buttonProp.iconName == iconName)?.buttonProp;
+
+            CreatorButton button = new(fullEntry, obj);
+
+            if (buttonAtSamePath != null)
+            {
+                button.isMinimal = buttonAtSamePath.isMinimal;
+                button.color = buttonAtSamePath.color;
+            }
+
+            if (placeHolderIndex != -1)
+                creatorButtons.InsertAt(placeHolderIndex, button, UI.creatorButtonAsset);
+
+            if (buttonAtSamePath != null)
+                creatorButtons.RemoveButton(buttonAtSamePath);
+
+            placeHolderIndex = -1;
+            FillCreatorButtons();
+        }
+
+        public static void OnEditMenuEntry(CreatorButton btnProp, string newEntry)
+        {
+            btnProp.menuEntry = newEntry;
+
+            FillCreatorButtons();
+        }
+
+
 
         // placeholder helper
         public static int PlaceholderNeedleAtPos(VisualElement area, float mouseX)
@@ -161,6 +217,39 @@ namespace PinePie.PieTabs
             return dropIndex;
         }
 
+
+        // asset create menu items fetcher
+        public static List<string> GetAssetCreateMenuEntries()
+        {
+            var list = new List<string>();
+
+            var menuType = typeof(UnityEditor.Editor).Assembly.GetType("UnityEditor.Menu");
+            if (menuType == null) return list;
+
+            var method = menuType.GetMethod(
+                "GetMenuItems",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(string), typeof(bool), typeof(bool) },
+                null
+            );
+
+            if (method == null) return list;
+            var raw = method.Invoke(null, new object[] { "Assets/Create/", true, false });
+            if (raw == null) return list;
+
+            foreach (var item in (Array)raw)
+            {
+                string path = item.GetType().GetProperty("path")?.GetValue(item) as string;
+
+                if (!string.IsNullOrEmpty(path))
+                    list.Add(path);
+            }
+
+            return list;
+        }
+
+
         // loader
         private static VisualTreeAsset LoadUXML(string relativePath) =>
             AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{PathUtility.GetPieTabsPath()}/PinePie/PieTabs/editor/Core/UI/{relativePath}");
@@ -183,7 +272,7 @@ namespace PinePie.PieTabs
             });
         }
 
-        public static void SetupButtonProperties(bool isCreator, VisualElement button, bool isMinimal, string Label, string color)
+        public static void SetupButtonProperties(VisualElement button, bool isMinimal, string Label, string color)
         {
             // color and tooltip
             Color col = HexToColor(color);
@@ -195,8 +284,7 @@ namespace PinePie.PieTabs
             var labelElement = button.Q<Label>("buttonLabel");
             if (labelElement != null)
             {
-                string lbl = isCreator ? "" : null;
-                labelElement.text = isMinimal ? lbl : Label;
+                labelElement.text = isMinimal ? "" : Label;
 
                 labelElement.style.color = IsColorDark(col)
                 ? HexToColor("#f7f7f7")

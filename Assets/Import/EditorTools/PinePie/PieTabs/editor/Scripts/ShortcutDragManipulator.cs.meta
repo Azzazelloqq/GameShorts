@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 320557
   packageName: PieTabs
-  packageVersion: 1.0.3
-  assetPath: Assets/PinePie/PieTabs/editor/Scripts/ShortcutDragManipulator.cs
-  uploadId: 789650
+  packageVersion: 1.0.5
+  assetPath: Assets/Import/EditorTools/PinePie/PieTabs/editor/Scripts/ShortcutDragManipulator.cs
+  uploadId: 824780

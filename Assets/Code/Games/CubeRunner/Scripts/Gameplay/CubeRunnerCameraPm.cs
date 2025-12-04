@@ -41,7 +41,7 @@ namespace GameShorts.CubeRunner.Gameplay
                 return;
             }
 
-            _initialHeight = _cameraTransform.position.y;
+            _initialHeight = _cameraTransform.localPosition.y;
             _tickHandler.FrameLateUpdate += OnLateUpdate;
         }
 
@@ -54,7 +54,7 @@ namespace GameShorts.CubeRunner.Gameplay
             if (cubeView == null)
                 return;
 
-            Vector3 cubePosition = cubeView.VisualRoot.position;
+            Vector3 cubePosition = cubeView.VisualRoot.localPosition;
             EnsureOffsetInitialized(cubePosition);
 
             Vector3 desiredPosition = new Vector3(
@@ -62,7 +62,7 @@ namespace GameShorts.CubeRunner.Gameplay
                 _initialHeight,
                 cubePosition.z + _offsetXZ.z);
 
-            _cameraTransform.position = desiredPosition;
+            _cameraTransform.localPosition = desiredPosition;
             _cameraTransform.LookAt(cubePosition);
         }
 
@@ -71,7 +71,7 @@ namespace GameShorts.CubeRunner.Gameplay
             if (_offsetInitialized || _cameraTransform == null)
                 return;
 
-            Vector3 offset = _cameraTransform.position - cubePosition;
+            Vector3 offset = _cameraTransform.localPosition - cubePosition;
             offset.y = 0f;
 
             if (offset.sqrMagnitude <= Mathf.Epsilon)
@@ -109,4 +109,6 @@ namespace GameShorts.CubeRunner.Gameplay
         }
     }
 }
+
+
 

@@ -17,6 +17,7 @@ using Code.Games;
 using Code.Games.AngryHumans;
 using Code.Games.TestGames;
 using Code.Generated.Addressables;
+using GameShorts.CubeRunner;
 using GameShorts.Gardener;
 using InGameLogger;
 using LightDI.Runtime;
@@ -135,7 +136,8 @@ public class GameEntryPoint : MonoBehaviour
 			{ typeof(LawnmowerGame), ResourceIdsContainer.GameLawnmover.GameLawnmower },
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
 			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main },
-			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame }
+			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
+			{ typeof(CubeRunnerGame), ResourceIdsContainer.GameCuberunner.GameCubeRunner },
 		};
 	}
 
@@ -143,13 +145,14 @@ public class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
+			typeof(CubeRunnerGame),
 			typeof(GardenerGame),
 			typeof(BoxTower),
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),
 			typeof(AngryHumansShortGame),
-			typeof(AsteroidsGame)
+			typeof(AsteroidsGame),
 		};
 	}
 

@@ -3,7 +3,6 @@
     <ui:Template name="shortcutButton" src="project://database/Assets/PinePie/PieTabs/editor/Core/UI/shortcutButton.uxml?fileID=9197481963319205126&amp;guid=85c5988639717a442bd4981eb13f5d93&amp;type=3#shortcutButton" />
     <ui:Template name="creatorButton" src="project://database/Assets/PinePie/PieTabs/editor/Core/UI/creatorButton.uxml?fileID=9197481963319205126&amp;guid=928c7816d698d104089e4639c75c1711&amp;type=3#creatorButton" />
     <ui:Template name="copiedText" src="project://database/Assets/PinePie/PieTabs/editor/Core/UI/copiedText.uxml?fileID=9197481963319205126&amp;guid=e92c464ae8c33a4449498b93ff3a2b1d&amp;type=3#copiedText" />
-    <ui:Template name="NewFileNameField" src="project://database/Assets/PinePie/PieTabs/editor/Core/UI/NewFileNameField.uxml?fileID=9197481963319205126&amp;guid=563f07022e5cf7e4c80a32babce457e3&amp;type=3#NewFileNameField" />
     <ui:Template name="colorPopup" src="project://database/Assets/PinePie/PieTabs/editor/Core/UI/colorPopup.uxml?fileID=9197481963319205126&amp;guid=6845dda8e683b34428e976e9d45786c8&amp;type=3#colorPopup" />
     <Style src="project://database/Assets/PinePie/PieTabs/editor/Core/UI/PieDeskStyling.uss?fileID=7433441132597879392&amp;guid=575cf5165b849494da86da44afc43d62&amp;type=3#PieDeskStyling" />
     <ui:VisualElement name="PieDeskUI" picking-mode="Ignore" style="flex-grow: 1; flex-direction: column; height: 19px; flex-shrink: 1; width: 100%; overflow: hidden; flex-wrap: nowrap;">
@@ -22,7 +21,6 @@
         </ui:VisualElement>
         <ui:VisualElement name="bottomAddressBar" style="flex-grow: 0; width: auto; height: 20px; flex-shrink: 0; margin-right: 80px; margin-top: auto; margin-left: 91px;" />
         <ui:Instance template="copiedText" name="copiedText" style="position: absolute; bottom: 50px; left: 244px; display: none;" />
-        <ui:Instance template="NewFileNameField" name="NewFileNameField" style="position: absolute; top: 23px; left: 228px; display: none;" />
         <ui:Instance template="colorPopup" name="colorPopup" style="position: absolute; left: 48px; display: none;" />
     </ui:VisualElement>
 </ui:UXML>

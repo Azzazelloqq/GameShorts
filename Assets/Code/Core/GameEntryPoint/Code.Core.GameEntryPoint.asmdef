@@ -19,7 +19,8 @@
     "Lawnmower",
     "ShortGame2048",
     "AngryHumans",
-    "Gardener"
+    "Gardener",
+    "CubeRunner"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

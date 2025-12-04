@@ -110,7 +110,7 @@ namespace PinePie.PieTabs
             var button = template.Instantiate().Q<VisualElement>("customButton");
             if (button == null) return null;
 
-            Navigator.SetupButtonProperties(false, button, isMinimal, Label, color);
+            Navigator.SetupButtonProperties(button, isMinimal, Label, color);
 
             // icon
             UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(Path);
@@ -140,13 +140,13 @@ namespace PinePie.PieTabs
     {
         public string menuEntry;
         public string iconName;
-        public bool isMinimal = false;
+        public bool isMinimal = true;
         public string color = "#3E3E3E";
 
         public string Label => string.IsNullOrEmpty(menuEntry) ? "" : menuEntry[(menuEntry.LastIndexOf('/') + 1)..];
 
 
-        public CreatorButton(string entry, UnityEngine.Object obj, bool isMinimal = false, string color = "#3E3E3E")
+        public CreatorButton(string entry, UnityEngine.Object obj, bool isMinimal = true, string color = "#3E3E3E")
         {
             menuEntry = entry;
             iconName = EditorGUIUtility.ObjectContent(obj, obj.GetType()).image.name;
@@ -159,7 +159,7 @@ namespace PinePie.PieTabs
             var button = template.Instantiate().Q<VisualElement>("customButton");
             if (button == null) return null;
 
-            Navigator.SetupButtonProperties(true, button, isMinimal, Label, color);
+            Navigator.SetupButtonProperties(button, isMinimal, Label, color);
 
             // icon
             Texture2D iconTexture = EditorGUIUtility.IconContent(iconName).image as Texture2D;
@@ -178,13 +178,6 @@ namespace PinePie.PieTabs
         public override void SaveToJson() => ButtonCache<CreatorButton>.Save(buttons.Select(b => b.buttonProp).ToList());
         protected override List<CreatorButton> LoadButtonData() => ButtonCache<CreatorButton>.Load();
     }
-
-    public class ClickState
-    {
-        public bool leftClicked;
-        public bool rightClicked;
-    }
-
 
 }
 

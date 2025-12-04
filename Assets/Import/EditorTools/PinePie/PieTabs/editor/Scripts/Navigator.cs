@@ -2,11 +2,13 @@
 
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace PinePie.PieTabs
 {
@@ -61,11 +63,18 @@ namespace PinePie.PieTabs
         public static CreatorButtonBundle creatorButtons = new();
 
         private const string SplitterKey = "PieTabs_LastSplitterSpacing";
+        private const string SearchBarOpenKey = "PieTabs_SearchBarOpen";
 
         private static float LastSplitterSpacing
         {
             get => EditorPrefs.GetFloat(SplitterKey, 300f);
             set => EditorPrefs.SetFloat(SplitterKey, value);
+        }
+
+        private static bool IsSearchBarOpen
+        {
+            get => EditorPrefs.GetBool(SearchBarOpenKey, false);
+            set => EditorPrefs.SetBool(SearchBarOpenKey, value);
         }
 
         private static int placeHolderIndex;
@@ -82,9 +91,6 @@ namespace PinePie.PieTabs
             UI.placeholderNeedle = LoadUXML("placeholderLine.uxml").Instantiate().Q<VisualElement>("line");
 
             UI.copiedText = UI.mainUI.Q<VisualElement>("copiedText");
-
-            UI.menuEntryFieldBox = UI.mainUI.Q<VisualElement>("NewFileNameField");
-            UI.menuEntryField = UI.menuEntryFieldBox.Q<TextField>("entry");
 
             UI.colorPopup = UI.mainUI.Q<VisualElement>("colorPopup").Q<VisualElement>("colorPopup");
 
@@ -114,7 +120,7 @@ namespace PinePie.PieTabs
 
                 // asset creator button 
                 creatorButtons.LoadFromJson(UI.creatorButtonAsset);
-                SetupDragNDropForCreatorArea(UI.creatorButtonArea, creatorButtons);
+                SetupDragNDropForCreatorArea();
                 FillCreatorButtons();
             }
 
@@ -129,54 +135,44 @@ namespace PinePie.PieTabs
             SetupDragNDropForShortcutArea(UI.shortcutButtonArea, navButtons);
             FillShortcutButtons();
 
-
             UI.projectBrowserUI.Add(UI.mainUI);
         }
 
 
         // click callbacks
         public static void OnShortcutButtonClicked(
-            VisualElement button,
+            VisualElement UIbutton,
             Action<VisualElement> depSelection,
             ShortcutButton buttonProp)
         {
             // callbacks
-            var state = new ClickState();
-            button.userData = state;
+            Object obj = AssetDatabase.LoadAssetAtPath<Object>(buttonProp.Path);
+            UIbutton.AddManipulator(new ShortcutDragManipulator(obj));
 
-            UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(buttonProp.Path);
-            button.AddManipulator(new ShortcutDragManipulator(obj));
-
-            button.RegisterCallback<PointerDownEvent>(evt =>
+            UIbutton.RegisterCallback<PointerDownEvent>(evt =>
             {
-                var s = (ClickState)button.userData;
-
                 if (evt.button == 0)
                 {
-                    s.leftClicked = true;
-                    button.Q<VisualElement>("shade").style.backgroundColor = new Color(255, 255, 255, 0.15f);
+                    UIbutton.Q<VisualElement>("shade").style.backgroundColor = new Color(255, 255, 255, 0.15f);
 
                     evt.StopPropagation();
                 }
                 else if (evt.button == 1)
                 {
-                    s.rightClicked = true;
-
                     evt.StopPropagation();
                 }
             });
-            button.RegisterCallback<PointerUpEvent>(evt =>
-            {
-                var s = (ClickState)button.userData;
 
+            UIbutton.RegisterCallback<PointerUpEvent>(evt =>
+            {
                 // single click
-                if (s.leftClicked)
+                if (evt.button == 0)
                 {
                     if (obj == null) return;
 
                     if (evt.ctrlKey)
                     {
-                        depSelection?.Invoke(button);
+                        depSelection?.Invoke(UIbutton);
 
                         if (AssetDatabase.IsValidFolder(buttonProp.Path))
                             OpenFolder(buttonProp.Path);
@@ -189,10 +185,10 @@ namespace PinePie.PieTabs
                     else if (evt.shiftKey)
                     {
                         buttonProp.isMinimal = !buttonProp.isMinimal;
-                        button.Q<Label>("buttonLabel").text = buttonProp.isMinimal ? "" : buttonProp.Label;
-                        button.tooltip = buttonProp.isMinimal ? buttonProp.Label : null;
+                        UIbutton.Q<Label>("buttonLabel").text = buttonProp.isMinimal ? "" : buttonProp.Label;
+                        UIbutton.tooltip = buttonProp.isMinimal ? buttonProp.Label : null;
 
-                        var buttonShade = button.Q<VisualElement>("shade");
+                        var buttonShade = UIbutton.Q<VisualElement>("shade");
                         buttonShade.Q<Label>("buttonLabel").text = buttonProp.isMinimal ? "" : buttonProp.Label;
 
                         navButtons.SaveToJson();
@@ -207,13 +203,13 @@ namespace PinePie.PieTabs
                         ColorPopup.popupIsOpen = true;
 
                         ColorPopup.activeNavButton = buttonProp;
-                        ColorPopup.activeVisualItem = button;
+                        ColorPopup.activeVisualItem = UIbutton;
 
                         evt.StopPropagation();
                     }
                     else
                     {
-                        depSelection?.Invoke(button);
+                        depSelection?.Invoke(UIbutton);
 
                         // uncomment line below to open folder even in single click
 
@@ -225,62 +221,62 @@ namespace PinePie.PieTabs
                         evt.StopPropagation();
                     }
                 }
-                else if (s.rightClicked)
+                else if (evt.button == 1)
                 {
                     RemoveButton(buttonProp);
 
                     evt.StopPropagation();
                 }
 
-                button.Q<VisualElement>("shade").style.backgroundColor = new Color(255, 255, 255, 0.12f);
-                s.leftClicked = false;
-                s.rightClicked = false;
+                UIbutton.Q<VisualElement>("shade").style.backgroundColor = new Color(255, 255, 255, 0.12f);
             });
 
         }
 
         public static void OnAssetCreatorButtonClicked(
-            VisualElement button,
+            VisualElement UIbutton,
             Action<VisualElement> depSelection,
             CreatorButton buttonProp)
         {
             // callbacks
-            var state = new ClickState();
-            button.userData = state;
-
-            button.RegisterCallback<PointerDownEvent>(evt =>
+            UIbutton.RegisterCallback<PointerDownEvent>(evt =>
             {
-                var s = (ClickState)button.userData;
-
                 if (evt.button == 0)
                 {
-                    s.leftClicked = true;
-                    button.Q<VisualElement>("shade").style.backgroundColor = new Color(255, 255, 255, 0.15f);
+                    UIbutton.Q<VisualElement>("shade").style.backgroundColor = new Color(255, 255, 255, 0.15f);
 
                     evt.StopPropagation();
                 }
                 else if (evt.button == 1)
                 {
-                    s.rightClicked = true;
-
                     evt.StopPropagation();
                 }
             });
 
-            button.RegisterCallback<PointerUpEvent>(evt =>
+            UIbutton.RegisterCallback<PointerUpEvent>(evt =>
             {
-                var s = (ClickState)button.userData;
-
                 // single click
-                if (s.leftClicked)
+                if (evt.button == 0)
                 {
                     if (evt.ctrlKey)
                     {
-                        ShowBoxAtPos(UI.menuEntryFieldBox, evt.position.x);
-                        UI.menuEntryField.SetValueWithoutNotify(buttonProp.Label);
-                        UI.menuEntryField.Focus();
+                        List<string> items = GetAssetCreateMenuEntries();
 
-                        FinalizeMenuEntry(buttonProp);
+                        var menu = new GenericMenu();
+                        foreach (var item in CleanEntries(items))
+                        {
+                            var trimmedItem = item;
+                            const string prefix = "Assets/Create/";
+
+                            if (item.StartsWith(prefix))
+                                trimmedItem = item.Substring(prefix.Length);
+
+                            menu.AddItem(new GUIContent(trimmedItem), false, () =>
+                            {
+                                OnEditMenuEntry(buttonProp, item);
+                            });
+                        }
+                        menu.DropDown(new Rect(evt.position, Vector2.zero));
 
                         evt.StopPropagation();
                     }
@@ -288,10 +284,10 @@ namespace PinePie.PieTabs
                     else if (evt.shiftKey)
                     {
                         buttonProp.isMinimal = !buttonProp.isMinimal;
-                        button.Q<Label>("buttonLabel").text = buttonProp.isMinimal ? "" : buttonProp.Label;
-                        button.tooltip = buttonProp.isMinimal ? buttonProp.Label : null;
+                        UIbutton.Q<Label>("buttonLabel").text = buttonProp.isMinimal ? "" : buttonProp.Label;
+                        UIbutton.tooltip = buttonProp.isMinimal ? buttonProp.Label : null;
 
-                        var buttonShade = button.Q<VisualElement>("shade");
+                        var buttonShade = UIbutton.Q<VisualElement>("shade");
                         buttonShade.Q<Label>("buttonLabel").text = buttonProp.isMinimal ? "" : buttonProp.Label;
 
                         creatorButtons.SaveToJson();
@@ -307,264 +303,28 @@ namespace PinePie.PieTabs
                         ColorPopup.popupIsOpen = true;
 
                         ColorPopup.activeCreatorButton = buttonProp;
-                        ColorPopup.activeVisualItem = button;
+                        ColorPopup.activeVisualItem = UIbutton;
 
                         evt.StopPropagation();
                     }
                     else
                     {
-                        depSelection?.Invoke(button);
+                        depSelection?.Invoke(UIbutton);
                         AssetDatabase.Refresh();
                         EditorApplication.ExecuteMenuItem(buttonProp.menuEntry);
 
                         evt.StopPropagation();
                     }
                 }
-                else if (s.rightClicked)
+                else if (evt.button == 1)
                 {
                     RemoveButton(buttonProp);
 
                     evt.StopPropagation();
                 }
-
-                s.leftClicked = false;
-                s.rightClicked = false;
             });
 
         }
-
-
-        // UI Setup
-
-        // split bars
-        public static void SetupDragAreaStyling()
-        {
-            foreach (var view in new VisualElement[] { UI.shortcutButtonArea, UI.creatorButtonArea })
-            {
-                view.contentContainer.style.flexDirection = FlexDirection.RowReverse;
-                view.contentContainer.style.justifyContent = Justify.FlexStart;
-            }
-        }
-
-        public static void SetupSplitter()
-        {
-            VisualElement splitter = UI.mainUI.Q<VisualElement>("splitter");
-            bool isDragging = false;
-            int pointerId = -1;
-            float distFromMouse = 0;
-
-
-
-            splitter.RegisterCallback<PointerDownEvent>(evt =>
-            {
-                isDragging = true;
-                pointerId = evt.pointerId;
-
-                float mousePosFromRight = UI.mainUI.resolvedStyle.width - evt.position.x;
-                distFromMouse = UI.creatorButtonArea.resolvedStyle.width - mousePosFromRight;
-
-                splitter.CapturePointer(pointerId);
-
-                evt.StopPropagation();
-            });
-
-            splitter.RegisterCallback<PointerMoveEvent>(evt =>
-            {
-                if (!isDragging || evt.pointerId != pointerId) return;
-
-                float mousePos = UI.mainUI.resolvedStyle.width - evt.position.x;
-                UI.creatorButtonArea.style.width = mousePos + distFromMouse;
-
-                evt.StopPropagation();
-            });
-
-            splitter.RegisterCallback<PointerUpEvent>(evt =>
-            {
-                if (evt.pointerId != pointerId) return;
-
-                LastSplitterSpacing = UI.creatorButtonArea.resolvedStyle.width;
-                isDragging = false;
-
-                splitter.ReleasePointer(pointerId);
-                evt.StopPropagation();
-            });
-        }
-
-        public static void SetupSearchBarControls()
-        {
-            VisualElement splitter = UI.mainUI.Q<VisualElement>("splitter");
-            VisualElement spacer = UI.mainUI.Q<VisualElement>("itemSpacer");
-            VisualElement creatorButtonPopupAdder = UI.mainUI.Q<VisualElement>("createAssetButton");
-
-            Button openSearchButton = UI.mainUI.Q<Button>("searchToggle");
-            Button closeSearchButton = UI.mainUI.Q<Button>("closeSearchBar");
-
-            ScrollView AssetCreatorButtonArea = UI.mainUI.Q<ScrollView>("CreationMenuDragArea");
-
-            openSearchButton.clicked += () =>
-            {
-                closeSearchButton.style.display = DisplayStyle.Flex;
-                closeSearchButton.style.marginRight = 465;
-
-                splitter.style.display = DisplayStyle.None;
-                spacer.style.display = DisplayStyle.None;
-
-                AssetCreatorButtonArea.style.width = 0;
-                openSearchButton.style.display = DisplayStyle.None;
-            };
-
-            closeSearchButton.clicked += () =>
-            {
-                closeSearchButton.style.display = DisplayStyle.None;
-                closeSearchButton.style.marginRight = 0f;
-
-                spacer.style.display = DisplayStyle.Flex;
-                if (IsTwoColumnMode())
-                {
-                    splitter.style.display = DisplayStyle.Flex;
-                }
-
-                AssetCreatorButtonArea.style.width = LastSplitterSpacing;
-                openSearchButton.style.display = DisplayStyle.Flex;
-            };
-        }
-
-
-        // address copy from bottom bar
-        public static void SetupBottomBarMargin()
-        {
-            VisualElement bottomAddressBar = UI.mainUI.Q<VisualElement>("bottomAddressBar");
-
-            bottomAddressBar.style.marginLeft = GetSideRectWidth(GetWin());
-        }
-
-        public static void RegisterAddressCopyCallbacks()
-        {
-            VisualElement bottomAddressBar = UI.mainUI.Q<VisualElement>("bottomAddressBar");
-            bottomAddressBar.RegisterCallback<MouseDownEvent>((evt) =>
-            {
-                if (IsTwoColumnMode()) bottomAddressBar.style.marginLeft = GetSideRectWidth(GetWin());
-
-                string copyingStr = "";
-
-                if (evt.button == 0)
-                {
-                    copyingStr = !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(Selection.activeObject))
-                        ? AssetDatabase.GetAssetPath(Selection.activeObject)
-                        : GetActiveFolderPath();
-                }
-                else if (evt.button == 1)
-                {
-                    string assetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
-                    copyingStr = !string.IsNullOrEmpty(assetPath)
-                        ? Path.GetFileName(assetPath)
-                        : "";
-                }
-
-                EditorGUIUtility.systemCopyBuffer = copyingStr;
-
-                ShowCopiedNotification(evt.mousePosition, UI.mainUI);
-            });
-
-            if (IsTwoColumnMode())
-                Selection.selectionChanged += () =>
-                {
-                    SetupBottomBarMargin();
-                };
-        }
-
-        public static void ShowCopiedNotification(Vector2 position, VisualElement root)
-        {
-            UI.copiedText.style.left = position.x - 20;
-
-            UI.copiedText.style.display = DisplayStyle.Flex;
-
-            root.schedule.Execute(() =>
-            {
-                UI.copiedText.style.display = DisplayStyle.None;
-            }).ExecuteLater(1000);
-        }
-
-
-        // icon popup
-        public static void ShowBoxAtPos(VisualElement box, float posX)
-        {
-            UI.mainUI.pickingMode = PickingMode.Position;
-
-            float rightOffset = UI.mainUI.resolvedStyle.width - 200;
-
-            box.style.left = Mathf.Clamp(posX, 0, rightOffset);
-
-            box.style.display = DisplayStyle.Flex;
-        }
-
-        public static void CallbacksForPopupBoxes()
-        {
-            UI.mainUI.RegisterCallback<MouseDownEvent>((evt) =>
-            {
-                UI.menuEntryFieldBox.style.display = DisplayStyle.None;
-                UI.colorPopup.style.display = DisplayStyle.None;
-
-                ColorPopup.popupIsOpen = false;
-
-                UI.mainUI.pickingMode = PickingMode.Ignore;
-            });
-        }
-
-        public static void CallbacksForColorPopup()
-        {
-            foreach (Button child in UI.colorPopup.Query<Button>("icon").ToList())
-            {
-                child.clicked += () =>
-                {
-                    if (ColorPopup.popupIsOpen)
-                    {
-                        if (ColorPopup.isForCreator)
-                        {
-                            ColorPopup.activeCreatorButton.color = ColorToHex(child.resolvedStyle.backgroundColor);
-                            creatorButtons.SaveToJson();
-                        }
-                        else
-                        {
-                            ColorPopup.activeNavButton.color = ColorToHex(child.resolvedStyle.backgroundColor);
-                            navButtons.SaveToJson();
-                        }
-
-                        ColorPopup.activeVisualItem.style.backgroundColor = HexToColor(ColorPopup.isForCreator
-                            ? ColorPopup.activeCreatorButton.color
-                            : ColorPopup.activeNavButton.color);
-                    }
-                };
-            }
-
-            UI.colorPopup.RegisterCallback<MouseDownEvent>((evt) => evt.StopPropagation());
-        }
-
-        public static void FinalizeMenuEntry(CreatorButton button)
-        {
-            var capturedButtons = button;
-
-            void OnKey(KeyDownEvent evt)
-            {
-                if ((evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter) && UI.menuEntryFieldBox.style.display == DisplayStyle.Flex)
-                {
-                    capturedButtons.menuEntry = "Assets/Create/" + UI.menuEntryField.value;
-
-                    UI.menuEntryFieldBox.style.display = DisplayStyle.None;
-                    UI.mainUI.pickingMode = PickingMode.Ignore;
-
-                    FillCreatorButtons();
-                    creatorButtons.SaveToJson();
-
-                    evt.StopPropagation();
-                    UI.menuEntryField.UnregisterCallback<KeyDownEvent>(OnKey);
-                }
-            }
-
-            UI.menuEntryFieldBox.RegisterCallback<MouseDownEvent>((evt) => evt.StopPropagation());
-            UI.menuEntryField.RegisterCallback<KeyDownEvent>(OnKey);
-        }
-
 
 
         // filling and removing
@@ -653,50 +413,53 @@ namespace PinePie.PieTabs
             });
         }
 
-        public static void SetupDragNDropForCreatorArea(VisualElement area, CreatorButtonBundle creatorButtonsList)
+        public static void SetupDragNDropForCreatorArea()
         {
-            area.RegisterCallback<DragUpdatedEvent>(evt =>
+            UI.creatorButtonArea.RegisterCallback<DragUpdatedEvent>(evt =>
             {
                 DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
 
-                PlaceholderNeedleAtPos(area, evt.localMousePosition.x);
+                PlaceholderNeedleAtPos(UI.creatorButtonArea, evt.localMousePosition.x);
 
                 evt.StopPropagation();
             });
 
-            area.RegisterCallback<DragPerformEvent>(evt =>
+
+            UI.creatorButtonArea.RegisterCallback<DragPerformEvent>(evt =>
             {
                 DragAndDrop.AcceptDrag();
                 UI.placeholderNeedle.RemoveFromHierarchy();
 
-                foreach (var obj in DragAndDrop.objectReferences)
+                Object[] objectReferences = DragAndDrop.objectReferences;
+                if (objectReferences.Count() > 1)
                 {
-                    string iconName = EditorGUIUtility.ObjectContent(obj, obj.GetType()).image.name;
-
-                    var foundButton = creatorButtonsList.buttons.FirstOrDefault(b => b.buttonProp.iconName == iconName);
-                    CreatorButton buttonAtSamePath = foundButton?.buttonProp;
-
-                    CreatorButton button = new("", obj);
-                    if (buttonAtSamePath != null) button = new CreatorButton("", obj, buttonAtSamePath.isMinimal, buttonAtSamePath.color);
-
-                    if (placeHolderIndex != -1) creatorButtonsList.InsertAt(placeHolderIndex, button, UI.creatorButtonAsset);
-
-                    if (buttonAtSamePath != null) creatorButtonsList.RemoveButton(buttonAtSamePath);
-
-                    ShowBoxAtPos(UI.menuEntryFieldBox, evt.mousePosition.x);
-                    UI.menuEntryField.SetValueWithoutNotify("");
-                    UI.menuEntryField.Focus();
-
-                    FinalizeMenuEntry(button);
+                    Debug.Log("[PieTabs]_Drag one item at a time");
+                    return;
                 }
 
-                placeHolderIndex = -1;
-                FillCreatorButtons();
+                List<string> items = GetAssetCreateMenuEntries();
+
+                var menu = new GenericMenu();
+                foreach (var item in CleanEntries(items))
+                {
+                    var trimmedItem = item;
+                    const string prefix = "Assets/Create/";
+
+                    if (item.StartsWith(prefix))
+                        trimmedItem = item.Substring(prefix.Length);
+
+                    menu.AddItem(new GUIContent(trimmedItem), false, () =>
+                    {
+                        Object obj = DragAndDrop.objectReferences[0];
+                        OnCreateMenuEntrySelected(obj, item);
+                    });
+                }
+                menu.DropDown(new Rect(evt.mousePosition, Vector2.zero));
 
                 evt.StopPropagation();
             });
 
-            area.RegisterCallback<MouseLeaveEvent>(evt =>
+            UI.creatorButtonArea.RegisterCallback<MouseLeaveEvent>(evt =>
             {
                 if (DragAndDrop.objectReferences.Length > 0)
                 {
@@ -717,10 +480,6 @@ namespace PinePie.PieTabs
 
         public static VisualElement placeholderNeedle;
         public static VisualElement copiedText;
-
-
-        public static TextField menuEntryField;
-        public static VisualElement menuEntryFieldBox;
 
         public static VisualElement colorPopup;
 

@@ -99,7 +99,6 @@ namespace GameShorts.CubeRunner
         private void RecreateRoot()
         {
             DisposeCore();
-            _isDisposed = false;
             CreateRoot();
         }
 
@@ -122,6 +121,7 @@ namespace GameShorts.CubeRunner
 
         private void CreateRoot()
         {
+            _isDisposed = false;
             _isPaused.Value = false;
             _cancellationTokenSource = new CancellationTokenSource();
             var rootCtx = new CubeRunnerCorePm.Ctx

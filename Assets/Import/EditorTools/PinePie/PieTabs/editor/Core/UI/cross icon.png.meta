@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 892f099dfa3da02489248b8fda9cd19c
+guid: 0f99cf9e69912cc49b4d4e68ba9a0e06
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -130,5 +130,5 @@ AssetOrigin:
   productId: 320557
   packageName: PieTabs
   packageVersion: 1.0.5
-  assetPath: Assets/Import/EditorTools/PinePie/PieTabs/editor/Core/UI/plus 1.png
+  assetPath: Assets/Import/EditorTools/PinePie/PieTabs/editor/Core/UI/cross icon.png
   uploadId: 824780
