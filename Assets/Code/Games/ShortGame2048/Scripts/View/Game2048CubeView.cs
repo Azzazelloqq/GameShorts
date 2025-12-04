@@ -117,6 +117,7 @@ namespace Code.Games
         public void SetTargetX(float targetX)
         {
             _targetX = targetX;
+            Debug.Log($"Set TargetX({targetX})");
         }
         
         /// <summary>

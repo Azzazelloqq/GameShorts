@@ -151,7 +151,7 @@ namespace Code.Core.Tester
                 { typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain },
                 { typeof(LightseekerGame), ResourceIdsContainer.GameLightseeker.LightseekerMain },
                 { typeof(GardenerGame), ResourceIdsContainer.GameGardneer.GardenerGame },
-                { typeof(CubeRunnerGame), ResourceIdsContainer.GameCubeRunner.CubeRunnerGame },
+                { typeof(CubeRunnerGame), ResourceIdsContainer.GameCuberunner.GameCubeRunner },
             };
         }
 

@@ -115,7 +115,7 @@ namespace Code.Games
             _targetX = _cubeStartX + deltaWorldX;
             
             // Ограничиваем целевую позицию
-            _targetX = Mathf.Clamp(_targetX, _ctx.minX, _ctx.maxX);
+            _targetX = Mathf.Clamp(_targetX, _ctx.minX+_cubeStartX, _ctx.maxX+_cubeStartX);
             
             // Передаем целевую позицию в View для плавного движения
             _currentCube.View.SetTargetX(_targetX);

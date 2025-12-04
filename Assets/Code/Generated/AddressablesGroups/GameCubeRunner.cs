@@ -2,8 +2,8 @@
 
 namespace Code.Generated.Addressables
 {
-    public class GameCubeRunner
+    public class GameCuberunner
     {
-        public string CubeRunnerGame = "CubeRunnerGame";
+        public string GameCubeRunner = "GameCubeRunner";
     }
 }
