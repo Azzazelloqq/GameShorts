@@ -42,7 +42,8 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             
             _mockFactory = new AddressableShortGameFactory(_parent, resourceMapping, resourceLoader, _logger);
             _queueService = new GameQueueService(_logger);
-            _loader = new QueueShortGamesLoader(_mockFactory, _queueService, _logger);
+            var settings = new ShortGameLoaderSettings();
+            _loader = new QueueShortGamesLoader(_mockFactory, _queueService, _logger, settings);
         }
         
         [TearDown]
@@ -337,6 +338,67 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             
             // Act & Assert
             Assert.IsTrue(_loader.IsGameLoaded(typeof(MockShortGame)));
+        }
+
+        [Test]
+        public async Task ActivateNextGameAsync_WhenNotPreloaded_LoadsViaFallback()
+        {
+            // Arrange
+            var settings = new ShortGameLoaderSettings(
+                readinessTimeout: TimeSpan.FromMilliseconds(50),
+                preloadRadius: 0,
+                maxLoadedGames: 2,
+                fallbackLoadAttempts: 2);
+
+            _loader.Dispose();
+            _loader = new QueueShortGamesLoader(_mockFactory, _queueService, _logger, settings);
+
+            var gameTypes = new[]
+            {
+                typeof(MockShortGame),
+                typeof(MockPoolableShortGame)
+            };
+            _queueService.Initialize(gameTypes);
+
+            Assert.IsTrue(await _loader.ActivateNextGameAsync(), "Should activate first game");
+
+            // Act
+            var activatedNext = await _loader.ActivateNextGameAsync();
+
+            // Assert
+            Assert.IsTrue(activatedNext, "Fallback should load next game");
+            Assert.AreEqual(typeof(MockPoolableShortGame), _loader.ActiveGameType);
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockPoolableShortGame)));
+        }
+
+        [Test]
+        public async Task ActivateNextGameAsync_RespectsMaxLoadedGames()
+        {
+            // Arrange
+            var settings = new ShortGameLoaderSettings(
+                readinessTimeout: TimeSpan.FromMilliseconds(50),
+                preloadRadius: 0,
+                maxLoadedGames: 1,
+                fallbackLoadAttempts: 1);
+
+            _loader.Dispose();
+            _loader = new QueueShortGamesLoader(_mockFactory, _queueService, _logger, settings);
+
+            var gameTypes = new[]
+            {
+                typeof(MockShortGame),
+                typeof(MockPoolableShortGame)
+            };
+            _queueService.Initialize(gameTypes);
+
+            Assert.IsTrue(await _loader.ActivateNextGameAsync(), "Should activate first game");
+
+            // Act
+            Assert.IsTrue(await _loader.ActivateNextGameAsync(), "Should activate next game");
+
+            // Assert
+            Assert.IsFalse(_loader.IsGameLoaded(typeof(MockShortGame)), "Previous game should be unloaded");
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockPoolableShortGame)), "Active game should stay loaded");
         }
         
         [Test]

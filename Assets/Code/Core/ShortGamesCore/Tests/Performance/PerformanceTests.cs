@@ -52,7 +52,9 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
             // Setup new architecture components
             _registry = new GameRegistry(_logger);
             _queueService = new GameQueueService(_logger);
-            _loader = new QueueShortGamesLoader(_factory, _queueService, _logger);
+            var settings = new ShortGameLoaderSettings();
+            
+            _loader = new QueueShortGamesLoader(_factory, _queueService, _logger, settings);
         }
         
         [TearDown]

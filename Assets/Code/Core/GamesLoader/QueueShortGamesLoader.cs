@@ -13,15 +13,19 @@ namespace Code.Core.GamesLoader
 /// <summary>
 /// Queue-based game loader that loads games sequentially from a queue
 /// </summary>
-internal class QueueShortGamesLoader : IGamesLoader
+public class QueueShortGamesLoader : IGamesLoader
 {
 	private readonly IShortGameFactory _gameFactory;
 	private readonly IGameQueueService _queueService;
 	private readonly IInGameLogger _logger;
+	private static readonly TimeSpan PreloadPollDelay = TimeSpan.FromMilliseconds(50);
 
 	private readonly Dictionary<Type, IShortGame> _loadedGames = new();
 	private readonly Dictionary<Type, IShortGame> _preloadedGames = new();
 	private readonly SemaphoreSlim _loadingSemaphore = new(1, 1);
+	private readonly SemaphoreSlim _activationSemaphore = new(1, 1);
+	private readonly ShortGameLoaderSettings _settings;
+	private Type _activeGameType;
 
 	private bool _isLoading;
 	private bool _disposed;
@@ -36,6 +40,10 @@ internal class QueueShortGamesLoader : IGamesLoader
 
 	// Properties
 	public bool IsLoading => _isLoading;
+	public Type ActiveGameType => _activeGameType;
+	public IShortGame ActiveGame => _activeGameType != null && _loadedGames.TryGetValue(_activeGameType, out var active)
+		? active
+		: null;
 	public IReadOnlyDictionary<Type, IShortGame> LoadedGames => _loadedGames;
 	public IReadOnlyDictionary<Type, IShortGame> PreloadedGames => _preloadedGames;
 
@@ -49,11 +57,13 @@ internal class QueueShortGamesLoader : IGamesLoader
 	public QueueShortGamesLoader(
 		[Inject] IShortGameFactory gameFactory,
 		[Inject] IGameQueueService queueService,
-		[Inject] IInGameLogger logger)
+		[Inject] IInGameLogger logger,
+		ShortGameLoaderSettings settings)
 	{
-		_gameFactory = gameFactory ?? throw new ArgumentNullException(nameof(gameFactory));
-		_queueService = queueService ?? throw new ArgumentNullException(nameof(queueService));
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		_gameFactory = gameFactory;
+		_queueService = queueService;
+		_logger = logger;
+		_settings = settings;
 	}
 
 
@@ -292,18 +302,49 @@ internal class QueueShortGamesLoader : IGamesLoader
 		return preloadedGames;
 	}
 
+	public async ValueTask PreloadWindowAsync(CancellationToken cancellationToken = default)
+	{
+		if (_disposed)
+		{
+			_logger.LogWarning("Skipping preload window - loader already disposed");
+			return;
+		}
+
+		var windowTypes = _queueService.GetGamesToPreload(_settings.PreloadRadius)
+			.Where(type => type != null)
+			.Distinct()
+			.ToList();
+
+		if (windowTypes.Count == 0)
+		{
+			_logger.Log("Preload window requested but queue is empty");
+			return;
+		}
+
+		var toPreload = windowTypes
+			.Where(type => !IsGameLoaded(type))
+			.ToList();
+
+		if (toPreload.Count > 0)
+		{
+			_logger.Log($"Preloading window around index {_queueService.CurrentIndex}: {string.Join(", ", toPreload.Select(t => t.Name))}");
+			await PreloadGamesAsync(toPreload, cancellationToken);
+		}
+
+		TrimPreloadedGames(windowTypes);
+	}
+
 	public bool StartPreloadedGame(Type gameType)
 	{
 		ValidateGameType(gameType);
 
-		if (!_preloadedGames.TryGetValue(gameType, out var game))
+		if (!_preloadedGames.Remove(gameType, out var game))
 		{
 			_logger.LogError($"Game {gameType.Name} is not preloaded");
 			return false;
 		}
 
 		// Move from preloaded to loaded
-		_preloadedGames.Remove(gameType);
 		_loadedGames[gameType] = game;
 
 		// Start the game
@@ -313,6 +354,85 @@ internal class QueueShortGamesLoader : IGamesLoader
 		OnGameLoadingCompleted?.Invoke(gameType, game);
 
 		return true;
+	}
+
+	public async Task<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default)
+	{
+		await _activationSemaphore.WaitAsync(cancellationToken);
+		try
+		{
+			var activated = await ActivateCurrentSlotAsync("current", cancellationToken);
+			if (activated)
+			{
+				await PreloadWindowAsync(cancellationToken);
+			}
+
+			return activated;
+		}
+		finally
+		{
+			_activationSemaphore.Release();
+		}
+	}
+
+	public async Task<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default)
+	{
+		await _activationSemaphore.WaitAsync(cancellationToken);
+		try
+		{
+			if (!_queueService.HasNext)
+			{
+				_logger.LogWarning("Cannot activate next game - end of queue reached");
+				return false;
+			}
+
+			if (!_queueService.MoveNext())
+			{
+				return false;
+			}
+
+			var activated = await ActivateCurrentSlotAsync("next", cancellationToken);
+			if (activated)
+			{
+				await PreloadWindowAsync(cancellationToken);
+			}
+
+			return activated;
+		}
+		finally
+		{
+			_activationSemaphore.Release();
+		}
+	}
+
+	public async Task<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default)
+	{
+		await _activationSemaphore.WaitAsync(cancellationToken);
+		try
+		{
+			if (!_queueService.HasPrevious)
+			{
+				_logger.LogWarning("Cannot activate previous game - start of queue reached");
+				return false;
+			}
+
+			if (!_queueService.MovePrevious())
+			{
+				return false;
+			}
+
+			var activated = await ActivateCurrentSlotAsync("previous", cancellationToken);
+			if (activated)
+			{
+				await PreloadWindowAsync(cancellationToken);
+			}
+
+			return activated;
+		}
+		finally
+		{
+			_activationSemaphore.Release();
+		}
 	}
 
 	public void UnloadGame(Type gameType)
@@ -338,6 +458,11 @@ internal class QueueShortGamesLoader : IGamesLoader
 			preloadedGame.Dispose();
 			_preloadedGames.Remove(gameType);
 		}
+
+	if (_activeGameType == gameType)
+	{
+		_activeGameType = null;
+	}
 	}
 
 	public void UnloadAllGames()
@@ -374,6 +499,7 @@ internal class QueueShortGamesLoader : IGamesLoader
 		}
 
 		_preloadedGames.Clear();
+	_activeGameType = null;
 	}
 
 	public IShortGame GetGame(Type gameType)
@@ -430,7 +556,8 @@ internal class QueueShortGamesLoader : IGamesLoader
 		UnloadAllGames();
 
 		_queueService?.Clear();
-		_loadingSemaphore?.Dispose();
+	_loadingSemaphore?.Dispose();
+	_activationSemaphore?.Dispose();
 	}
 
 	private async ValueTask<IShortGame> LoadCurrentGameAsync(CancellationToken cancellationToken)
@@ -487,6 +614,194 @@ internal class QueueShortGamesLoader : IGamesLoader
 		if (!typeof(IShortGame).IsAssignableFrom(gameType))
 		{
 			throw new ArgumentException($"Type {gameType.Name} does not implement IShortGame", nameof(gameType));
+		}
+	}
+
+	private async Task<bool> ActivateCurrentSlotAsync(string direction, CancellationToken cancellationToken)
+	{
+		var currentType = _queueService.CurrentGameType;
+		if (currentType == null)
+		{
+			_logger.LogError($"Cannot activate {direction} game - queue returned null for current slot.");
+			return false;
+		}
+
+		_logger.Log($"Activating {direction} game {currentType.Name} at index {_queueService.CurrentIndex}");
+
+		var game = await EnsureGameReadyAsync(currentType, cancellationToken);
+		if (game == null)
+		{
+			_logger.LogError($"Failed to activate {currentType.Name} - game could not be prepared.");
+			return false;
+		}
+
+		var previousActive = _activeGameType;
+		_activeGameType = currentType;
+
+		if (!_loadedGames.ContainsKey(currentType))
+		{
+			_loadedGames[currentType] = game;
+		}
+
+		if (previousActive != null && previousActive != currentType)
+		{
+			StopGameIfPossible(previousActive);
+		}
+
+		TrimLoadedGames();
+		return true;
+	}
+
+	private async Task<IShortGame> EnsureGameReadyAsync(Type gameType, CancellationToken cancellationToken)
+	{
+		if (_loadedGames.TryGetValue(gameType, out var activeGame))
+		{
+			return activeGame;
+		}
+
+		if (_preloadedGames.ContainsKey(gameType))
+		{
+			return StartPreloadedAndGet(gameType);
+		}
+
+		var deadline = DateTime.UtcNow + _settings.ReadinessTimeout;
+		while (DateTime.UtcNow < deadline)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			if (_preloadedGames.ContainsKey(gameType))
+			{
+				return StartPreloadedAndGet(gameType);
+			}
+
+			await Task.Delay(PreloadPollDelay, cancellationToken);
+		}
+
+		for (var attempt = 1; attempt <= _settings.FallbackLoadAttempts; attempt++)
+		{
+			_logger.LogWarning($"Game {gameType.Name} was not preloaded in time. Fallback load attempt {attempt}/{_settings.FallbackLoadAttempts}.");
+			var loaded = await LoadGameAsync(gameType, cancellationToken);
+			if (loaded != null)
+			{
+				return loaded;
+			}
+		}
+
+		return null;
+	}
+
+	private IShortGame StartPreloadedAndGet(Type gameType)
+	{
+		if (!StartPreloadedGame(gameType))
+		{
+			return null;
+		}
+
+		return _loadedGames.TryGetValue(gameType, out var game) ? game : null;
+	}
+
+	private void TrimLoadedGames()
+	{
+		if (_settings.MaxLoadedGames <= 0)
+		{
+			return;
+		}
+
+		while (_loadedGames.Count > _settings.MaxLoadedGames)
+		{
+			var candidate = _loadedGames.Keys
+				.Where(type => type != _activeGameType)
+				.Select(type => new
+				{
+					Type = type,
+					Distance = CalculateDistanceFromCursor(type)
+				})
+				.OrderByDescending(entry => entry.Distance)
+				.ThenBy(entry => entry.Type.Name)
+				.FirstOrDefault();
+
+			if (candidate == null)
+			{
+				break;
+			}
+
+			_logger.Log($"Unloading {candidate.Type.Name} to satisfy MaxLoadedGames limit {_settings.MaxLoadedGames}");
+			UnloadGame(candidate.Type);
+		}
+	}
+
+	private void TrimPreloadedGames(ICollection<Type> windowTypes)
+	{
+		var allowed = new HashSet<Type>(windowTypes);
+		if (_activeGameType != null)
+		{
+			allowed.Add(_activeGameType);
+		}
+
+		var toRemove = _preloadedGames.Keys
+			.Where(type => !allowed.Contains(type))
+			.ToList();
+
+		foreach (var type in toRemove)
+		{
+			if (_preloadedGames.TryGetValue(type, out var game))
+			{
+				try
+				{
+					_logger.Log($"Evicting preloaded game outside window: {type.Name}");
+					game.Dispose();
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Failed to dispose preloaded game {type.Name}: {ex.Message}");
+				}
+			}
+
+			_preloadedGames.Remove(type);
+		}
+	}
+
+	private int CalculateDistanceFromCursor(Type type)
+	{
+		var cursor = _queueService.CurrentIndex;
+		var targetIndex = GetIndexOfGameType(type);
+
+		if (cursor < 0 || targetIndex < 0)
+		{
+			return int.MaxValue;
+		}
+
+		return Math.Abs(cursor - targetIndex);
+	}
+
+	private int GetIndexOfGameType(Type type)
+	{
+		for (var i = 0; i < _queueService.TotalGamesCount; i++)
+		{
+			if (_queueService.GetGameTypeAtIndex(i) == type)
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	private void StopGameIfPossible(Type gameType)
+	{
+		if (!_loadedGames.TryGetValue(gameType, out var game))
+		{
+			return;
+		}
+
+		try
+		{
+			_logger.Log($"Stopping previously active game {gameType.Name}");
+			game.StopGame();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to stop game {gameType.Name}: {ex.Message}");
 		}
 	}
 }

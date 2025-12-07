@@ -6,7 +6,7 @@ namespace Code.Core.GamesLoader
 /// <summary>
 /// Registry of all available games in the system
 /// </summary>
-internal interface IGameRegistry : IDisposable
+public interface IGameRegistry : IDisposable
 {
 	/// <summary>
 	/// Event fired when a new game is registered

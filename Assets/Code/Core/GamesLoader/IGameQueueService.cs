@@ -6,12 +6,12 @@ namespace Code.Core.GamesLoader
 /// <summary>
 /// Service responsible for managing the queue of games
 /// </summary>
-internal interface IGameQueueService : IDisposable
+public interface IGameQueueService : IDisposable
 {
 	/// <summary>
-	/// Event fired when the game queue is updated
+	/// Event fired when the game queue is updated together with a snapshot and reason.
 	/// </summary>
-	event Action OnQueueUpdated;
+	event Action<IReadOnlyList<Type>, int, QueueChangeReason> OnQueueUpdated;
 
 	/// <summary>
 	/// Gets the current game type
@@ -81,10 +81,37 @@ internal interface IGameQueueService : IDisposable
 	Type GetGameTypeAtIndex(int index);
 
 	/// <summary>
-	/// Gets all game types that should be preloaded (current, next, previous)
+	/// Gets all game types that should be preloaded around the cursor (current ± radius).
 	/// </summary>
+	/// <param name="radius">How many neighbours on each side to include.</param>
 	/// <returns>Collection of game types to preload</returns>
-	IEnumerable<Type> GetGamesToPreload();
+	IEnumerable<Type> GetGamesToPreload(int radius = 1);
+
+	/// <summary>
+	/// Inserts a new game type into the queue while keeping the current cursor stable.
+	/// </summary>
+	/// <param name="index">Target index.</param>
+	/// <param name="gameType">Type to insert.</param>
+	void InsertAt(int index, Type gameType);
+
+	/// <summary>
+	/// Removes a game type at the provided index.
+	/// </summary>
+	/// <param name="index">Index to remove.</param>
+	/// <returns>True when removal happened.</returns>
+	bool RemoveAt(int index);
+
+	/// <summary>
+	/// Removes the first occurrence of a specific game type.
+	/// </summary>
+	/// <param name="gameType">Type to remove.</param>
+	/// <returns>True when removal happened.</returns>
+	bool Remove(Type gameType);
+
+	/// <summary>
+	/// Replaces the entire queue contents with the supplied collection.
+	/// </summary>
+	void ReplaceAll(IEnumerable<Type> gameTypes);
 
 	/// <summary>
 	/// Resets the queue to the beginning

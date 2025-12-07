@@ -39,3 +39,4 @@ internal class GameVotePanelModel : ModelBase
 	}
 }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ namespace Code.Core.GamesLoader
 /// <summary>
 /// Interface for loading and preloading games
 /// </summary>
-internal interface IGamesLoader : IDisposable
+public interface IGamesLoader : IDisposable
 {
 	/// <summary>
 	/// Event fired when a game starts loading
@@ -45,6 +45,16 @@ internal interface IGamesLoader : IDisposable
 	/// Gets whether the loader is currently loading a game
 	/// </summary>
 	bool IsLoading { get; }
+
+	/// <summary>
+	/// Gets the active (running) game type maintained by the loader.
+	/// </summary>
+	Type ActiveGameType { get; }
+
+	/// <summary>
+	/// Gets the active (running) game instance maintained by the loader.
+	/// </summary>
+	IShortGame ActiveGame { get; }
 
 	/// <summary>
 	/// Gets the currently loaded games (game type to instance mapping)
@@ -83,6 +93,11 @@ internal interface IGamesLoader : IDisposable
 		CancellationToken cancellationToken = default);
 
 	/// <summary>
+	/// Ensures the configured preload window is populated around the current queue cursor.
+	/// </summary>
+	ValueTask PreloadWindowAsync(CancellationToken cancellationToken = default);
+
+	/// <summary>
 	/// Starts a preloaded game
 	/// </summary>
 	/// <param name="gameType">Type of the preloaded game to start</param>
@@ -113,5 +128,20 @@ internal interface IGamesLoader : IDisposable
 	/// <param name="gameType">Type of the game</param>
 	/// <returns>True if the game is loaded or preloaded</returns>
 	bool IsGameLoaded(Type gameType);
+
+	/// <summary>
+	/// Activates (starts) the current queue entry without moving the cursor.
+	/// </summary>
+	Task<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Moves the cursor forward and activates the new current game.
+	/// </summary>
+	Task<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Moves the cursor backward and activates the new current game.
+	/// </summary>
+	Task<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default);
 }
 }
