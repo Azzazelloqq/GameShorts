@@ -296,11 +296,23 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             var gameTypes = new List<Type> { typeof(MockShortGame), typeof(MockPoolableShortGame) };
             _queueService.Initialize(gameTypes);
             int eventCount = 0;
-            _queueService.OnQueueUpdated += () => eventCount++;
+            QueueChangeReason? lastReason = null;
+            int lastIndex = -1;
+            IReadOnlyList<Type> lastSnapshot = null;
+            _queueService.OnQueueUpdated += (snapshot, index, reason) =>
+            {
+                eventCount++;
+                lastReason = reason;
+                lastIndex = index;
+                lastSnapshot = snapshot;
+            };
             
             // Act & Assert each action
             _queueService.MoveNext(); // Move to index 0 - should fire event
             Assert.AreEqual(1, eventCount, "Event should fire after MoveNext");
+            Assert.AreEqual(QueueChangeReason.Moved, lastReason);
+            Assert.AreEqual(0, lastIndex);
+            Assert.AreEqual(gameTypes.Count, lastSnapshot?.Count);
             
             // MovePrevious from index 0 won't work (no previous), so no event
             bool movedBack = _queueService.MovePrevious();
@@ -312,9 +324,14 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             
             _queueService.Reset(); // Reset to -1 - should fire event
             Assert.AreEqual(3, eventCount, "Event should fire after Reset");
+            Assert.AreEqual(QueueChangeReason.Reset, lastReason);
+            Assert.AreEqual(-1, lastIndex);
             
             _queueService.Clear(); // Clear queue - should fire event
             Assert.AreEqual(4, eventCount, "Event should fire after Clear");
+            Assert.AreEqual(QueueChangeReason.Cleared, lastReason);
+            Assert.AreEqual(-1, lastIndex);
+            Assert.AreEqual(0, lastSnapshot?.Count);
         }
     }
 }

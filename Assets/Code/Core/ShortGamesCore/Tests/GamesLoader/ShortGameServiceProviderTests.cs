@@ -41,6 +41,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             
             // Setup queue service
             _queueService = new GameQueueService(_logger);
+            _queueService.Initialize(_registry.RegisteredGames);
             
             // Setup loader
             var resourceMapping = new Dictionary<Type, string>
@@ -54,10 +55,11 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             SetupMockResources(resourceLoader);
             
             var factory = new AddressableShortGameFactory(_parent, resourceMapping, resourceLoader, _logger);
-            _loader = new QueueShortGamesLoader(factory, _queueService, _logger);
+            var settings = new ShortGameLoaderSettings();
+            _loader = new QueueShortGamesLoader(factory, _queueService, _logger, settings);
             
             // Create and initialize provider
-            _serviceProvider = new TestableShortGameServiceProvider(_logger, factory);
+            _serviceProvider = new TestableShortGameServiceProvider(_logger, _registry, _queueService, _loader);
             await _serviceProvider.InitializeAsync();
         }
         
@@ -124,7 +126,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         {
             // Assert
             Assert.AreEqual(3, _queueService.TotalGamesCount);
-            Assert.That(_logger.LoggedMessages, Has.Some.Contains("Initializing queue with 3 registered games"));
+            Assert.That(_logger.LoggedMessages, Has.Some.Contains("Initializing GameQueueService with 3 games"));
         }
         
         [Test]
@@ -321,12 +323,12 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         [Test]
         public async Task HasGame_Properties_ReturnCorrectValues()
         {
-            // Arrange - No games loaded initially
-            Assert.IsFalse(_serviceProvider.HasCurrentGame);
-            Assert.IsFalse(_serviceProvider.HasNextGame);
-            Assert.IsFalse(_serviceProvider.HasPreviousGame);
+            // After initialization only the current game should be loaded
+            Assert.IsTrue(_serviceProvider.HasCurrentGame, "Current game should be active after init");
+            Assert.IsFalse(_serviceProvider.HasNextGame, "Next game should not be ready before preloading");
+            Assert.IsFalse(_serviceProvider.HasPreviousGame, "Previous game should not be ready at start");
             
-            // Act - Load games
+            // Act - Load surrounding games
             _queueService.MoveToIndex(1);
             await _serviceProvider.UpdatePreloadedGamesAsync();
             
@@ -378,42 +380,43 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async Task InitializeAsync_NullRegistry_ThrowsException()
+        public void Constructor_NullRegistry_ThrowsException()
         {
-            // Arrange
-            // Need factory to create provider
-            var mockFactory = new MockShortGameFactory();
-            var newProvider = new TestableShortGameServiceProvider(_logger, mockFactory);
-            
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await newProvider.InitializeAsync());
+            var queueService = new GameQueueService(_logger);
+            var factory = new MockShortGameFactory();
+            var settings = new ShortGameLoaderSettings();
+                
+            var loader = new QueueShortGamesLoader(factory, queueService, _logger, settings);
+
+            Assert.Throws<ArgumentNullException>(() =>
+                new TestableShortGameServiceProvider(_logger, null, queueService, loader));
         }
         
         [Test]
-        public async Task InitializeAsync_NullQueueService_ThrowsException()
+        public void Constructor_NullQueueService_ThrowsException()
         {
-            // Arrange
-            // Need factory to create provider
-            var mockFactory = new MockShortGameFactory();
-            var newProvider = new TestableShortGameServiceProvider(_logger, mockFactory);
+            var registry = new GameRegistry(_logger);
+            registry.RegisterGame(typeof(MockShortGame));
+            var factory = new MockShortGameFactory();
+            var queueService = new GameQueueService(_logger);
+            var settings = new ShortGameLoaderSettings();
             
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await newProvider.InitializeAsync());
+            var loader = new QueueShortGamesLoader(factory, queueService, _logger, settings);
+
+            Assert.Throws<ArgumentNullException>(() =>
+                new TestableShortGameServiceProvider(_logger, registry, null, loader));
         }
         
         [Test]
-        public async Task InitializeAsync_NullLoader_ThrowsException()
+        public void Constructor_NullLoader_ThrowsException()
         {
-            // Arrange
-            // Need factory to create provider
-            var mockFactory = new MockShortGameFactory();
-            var newProvider = new TestableShortGameServiceProvider(_logger, mockFactory);
-            
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await newProvider.InitializeAsync());
+            var registry = new GameRegistry(_logger);
+            registry.RegisterGame(typeof(MockShortGame));
+            var queueService = new GameQueueService(_logger);
+            queueService.Initialize(registry.RegisteredGames);
+
+            Assert.Throws<ArgumentNullException>(() =>
+                new TestableShortGameServiceProvider(_logger, registry, queueService, null));
         }
         
         [Test]
@@ -423,28 +426,21 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             
             // Verify queue was initialized by GameProvider
             Assert.AreEqual(3, _queueService.TotalGamesCount, "Queue should have 3 games");
-            Assert.AreEqual(-1, _queueService.CurrentIndex, "Initial index should be -1");
-            
-            // Arrange & Act
-            var moveResult = _queueService.MoveNext(); // Move to index 0
-            Assert.IsTrue(moveResult, "MoveNext should return true");
-            Assert.AreEqual(0, _queueService.CurrentIndex, "Index should be 0 after MoveNext");
+            Assert.AreEqual(0, _queueService.CurrentIndex, "Provider should activate first game on init");
             
             var gameType = _queueService.CurrentGameType;
-            Assert.IsNotNull(gameType, "CurrentGameType should not be null after MoveNext");
+            Assert.IsNotNull(gameType, "CurrentGameType should not be null after initialization");
             Assert.AreEqual(typeof(MockShortGame), gameType);
             
-            // Try to load the game directly
-            var game = await _loader.LoadGameAsync(gameType);
-            
-            // Assert
-            Assert.IsNotNull(game, "Game should be loaded successfully");
-            Assert.IsInstanceOf<MockShortGame>(game);
+            // Active game should already be running
+            var activeGame = _loader.ActiveGame;
+            Assert.IsNotNull(activeGame, "Loader should expose active game");
+            Assert.IsInstanceOf<MockShortGame>(activeGame);
             
             // Check if we can get it back
             var retrievedGame = _loader.GetGame(gameType);
             Assert.IsNotNull(retrievedGame, "Should be able to retrieve loaded game");
-            Assert.AreEqual(game, retrievedGame);
+            Assert.AreEqual(activeGame, retrievedGame);
         }
         
         [Test]

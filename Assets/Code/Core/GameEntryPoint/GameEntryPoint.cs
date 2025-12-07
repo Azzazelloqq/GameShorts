@@ -106,8 +106,24 @@ public class GameEntryPoint : MonoBehaviour
 				_gamePositioningConfig);
 		_globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
 
-		var playableGames = GetPlayableGames();
-		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider(playableGames, factory);
+		var gameLoaderSettings = new ShortGameLoaderSettings();
+		_globalGameDiContainer.RegisterAsSingleton(gameLoaderSettings);
+		var games = GetPlayableGames();
+		var registry = GameRegistryFactory.CreateGameRegistry();
+		_globalGameDiContainer.RegisterAsSingleton<IGameRegistry>(registry);
+		
+		registry.RegisterGames(games);
+
+		var queueService = GameQueueServiceFactory.CreateGameQueueService();
+		queueService.Initialize(registry.RegisteredGames);
+		_globalGameDiContainer.RegisterAsSingleton<IGameQueueService>(queueService);
+		
+		var settings = new ShortGameLoaderSettings();
+		
+		var loader = QueueShortGamesLoaderFactory.CreateQueueShortGamesLoader(settings);
+		_globalGameDiContainer.RegisterAsSingleton<IGamesLoader>(loader);
+		
+		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider();
 		await _shortGameServiceProvider.InitializeAsync(cancellationToken);
 
 		_gameStatsService = new LocalRandomGameStatsService(_logger);
@@ -170,42 +186,6 @@ public class GameEntryPoint : MonoBehaviour
 		catch (Exception ex)
 		{
 			_logger?.LogError($"Error disposing GameSwiperController: {ex.Message}");
-		}
-
-		try
-		{
-			_shortGameServiceProvider?.Dispose();
-		}
-		catch (Exception ex)
-		{
-			_logger?.LogError($"Error disposing ShortGameServiceProvider: {ex.Message}");
-		}
-
-		try
-		{
-			_resourceLoader?.Dispose();
-		}
-		catch (Exception ex)
-		{
-			_logger?.LogError($"Error disposing ResourceLoader: {ex.Message}");
-		}
-
-		try
-		{
-			_cancellationTokenSource?.Dispose();
-		}
-		catch (Exception ex)
-		{
-			_logger?.LogError($"Error disposing CancellationTokenSource: {ex.Message}");
-		}
-
-		try
-		{
-			_poolObjects?.Dispose();
-		}
-		catch (Exception ex)
-		{
-			_logger?.LogError($"Error disposing PoolObjects: {ex.Message}");
 		}
 
 		try

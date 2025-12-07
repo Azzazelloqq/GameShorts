@@ -125,7 +125,8 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 var queueService = new GameQueueService(logger);
                 queueService.Initialize(new[] { typeof(MockShortGame) });
                 
-                var loader = new QueueShortGamesLoader(factory, queueService, logger);
+                var settings = new ShortGameLoaderSettings();
+                var loader = new QueueShortGamesLoader(factory, queueService, logger, settings);
                 
                 // Act
                 var game = await loader.LoadGameAsync(typeof(MockShortGame));

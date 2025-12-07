@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using InGameLogger;
 using LightDI.Runtime;
@@ -15,19 +13,13 @@ namespace Code.Core.GamesLoader
 /// </summary>
 public class ShortGameServiceProvider : IShortGameServiceProvider
 {
-	private readonly IInGameLogger _logger;
-	private readonly IGameRegistry _gameRegistry;
-	private readonly IGameQueueService _queueService;
-	private readonly IGamesLoader _gamesLoader;
-	private bool _disposed;
+	public IShortGame CurrentGame => GetGameForType(_queueService?.CurrentGameType);
+	public IShortGame NextGame => GetGameForType(_queueService?.NextGameType);
+	public IShortGame PreviousGame => GetGameForType(_queueService?.PreviousGameType);
 
-		public IShortGame CurrentGame => GetGameForType(_queueService?.CurrentGameType);
-		public IShortGame NextGame => GetGameForType(_queueService?.NextGameType);
-		public IShortGame PreviousGame => GetGameForType(_queueService?.PreviousGameType);
-
-		public Type CurrentGameType => _queueService?.CurrentGameType;
-		public Type NextGameType => _queueService?.NextGameType;
-		public Type PreviousGameType => _queueService?.PreviousGameType;
+	public Type CurrentGameType => _queueService?.CurrentGameType;
+	public Type NextGameType => _queueService?.NextGameType;
+	public Type PreviousGameType => _queueService?.PreviousGameType;
 
 	public RenderTexture CurrentGameRenderTexture => CurrentGame?.GetRenderTexture();
 	public RenderTexture NextGameRenderTexture => NextGame?.GetRenderTexture();
@@ -41,43 +33,62 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 	public bool IsNextGameReady => NextGame?.IsPreloaded ?? false;
 	public bool IsPreviousGameReady => PreviousGame?.IsPreloaded ?? false;
 
-	public ShortGameServiceProvider(
+	private readonly IInGameLogger _logger;
+	private readonly IGameRegistry _gameRegistry;
+	private readonly IGameQueueService _queueService;
+	private readonly IGamesLoader _gamesLoader;
+	private readonly ShortGameLoaderSettings _settings;
+	private bool _initialized;
+	private bool _disposed;
+	
+	internal ShortGameServiceProvider(
 		[Inject] IInGameLogger logger,
-		IEnumerable<Type> games,
-		IShortGameFactory gameFactory)
+		[Inject] IGameRegistry gameRegistry,
+		[Inject] IGameQueueService queueService,
+		[Inject] IGamesLoader gamesLoader,
+		[Inject] ShortGameLoaderSettings settings)
 	{
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		
-		_logger.Log("Initializing GameProvider");
+		_logger = logger;
+		_gameRegistry = gameRegistry;
+		_queueService = queueService;
+		_gamesLoader = gamesLoader;
+		_settings = settings;
 
-		_gameRegistry = new GameRegistry(logger);
-		_gameRegistry.RegisterGames(games);
-		
-		_queueService = new GameQueueService(logger);
-		_gamesLoader = new QueueShortGamesLoader(gameFactory, _queueService, logger);
-
-		_queueService.Initialize(_gameRegistry.RegisteredGames);
-		
-		// Move to the first game in the queue
-		if (_queueService.TotalGamesCount > 0)
-		{
-			_queueService.MoveNext();
-			_logger.Log($"Moved to first game: {_queueService.CurrentGameType?.Name}");
-		}
+		_logger.Log("ShortGameServiceProvider constructed with external dependencies");
 	}
 
 	public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
 	{
-		await UpdatePreloadedGamesAsync(cancellationToken);
-		
-		// Start the current game so it begins rendering
-		if (IsCurrentGameReady && CurrentGame != null)
+		if (_disposed)
 		{
-			_logger.Log("Starting current game after initialization");
-			CurrentGame.StartGame();
+			throw new ObjectDisposedException(nameof(ShortGameServiceProvider));
 		}
+
+		if (_initialized)
+		{
+			return;
+		}
+
+		if (_queueService.TotalGamesCount == 0)
+		{
+			_logger.LogWarning("ShortGameServiceProvider.InitializeAsync called with empty registry.");
+			return;
+		}
+
+		_logger.Log(
+			$"Preloading short games window (radius={_settings.PreloadRadius}, timeout={_settings.ReadinessTimeout.TotalSeconds:0.#}s)");
+		await _gamesLoader.PreloadWindowAsync(cancellationToken);
+
+		if (_gamesLoader.ActiveGameType == null)
+		{
+			_logger.Log("No active game found, activating the first entry in the queue.");
+			await _gamesLoader.ActivateNextGameAsync(cancellationToken);
+		}
+
+		FocusCurrentGameInput();
+		_initialized = true;
 	}
-	
+
 	public void Dispose()
 	{
 		if (_disposed)
@@ -90,41 +101,25 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 
 		StopAllGames();
 
-		_gameRegistry.Dispose(); 
+		_gameRegistry.Dispose();
 		_queueService.Dispose();
 		_gamesLoader.Dispose();
 	}
 
 	public void StartCurrentGame()
 	{
-		if (CurrentGame != null)
-		{
-			_logger.Log("Starting current game");
-			CurrentGame.StartGame();
-			
-			// Enable input only for current game, disable for others
-			EnableCurrentGameInput();
-			DisableNextGameInput();
-			DisablePreviousGameInput();
-		}
+		StartGameForType(_queueService?.CurrentGameType, "current");
+		FocusCurrentGameInput();
 	}
 
 	public void StartNextGame()
 	{
-		if (NextGame != null)
-		{
-			_logger.Log("Starting next game");
-			NextGame.StartGame();
-		}
+		StartGameForType(_queueService?.NextGameType, "next");
 	}
 
 	public void StartPreviousGame()
 	{
-		if (PreviousGame != null)
-		{
-			_logger.Log("Starting previous game");
-			PreviousGame.StartGame();
-		}
+		StartGameForType(_queueService?.PreviousGameType, "previous");
 	}
 
 	public void PauseCurrentGame()
@@ -309,60 +304,31 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 			return;
 		}
 
-		_logger.Log("Updating preloaded games");
-
-		var gamesToPreload = _queueService.GetGamesToPreload();
-		await _gamesLoader.PreloadGamesAsync(gamesToPreload, cancellationToken);
+		_logger.Log("Updating preloaded games window");
+		await _gamesLoader.PreloadWindowAsync(cancellationToken);
 	}
 
 	public async Task<bool> SwipeToNextGameAsync(CancellationToken cancellationToken = default)
 	{
 		try
 		{
-			// Check if can switch
 			if (!HasNextGame)
 			{
 				_logger.LogWarning("No next game available");
 				return false;
 			}
 
-			// Wait for next game to be ready
-			if (!IsNextGameReady)
-			{
-				_logger.Log("Waiting for next game to be ready");
-				var timeout = TimeSpan.FromSeconds(10);
-				var startTime = DateTime.UtcNow;
-				
-				while (!IsNextGameReady && DateTime.UtcNow - startTime < timeout)
-				{
-					cancellationToken.ThrowIfCancellationRequested();
-					await Task.Delay(100, cancellationToken);
-				}
+			DisableAllGamesInput();
 
-				if (!IsNextGameReady)
-				{
-					_logger.LogError("Next game failed to be ready in time");
-					return false;
-				}
+			var result = await _gamesLoader.ActivateNextGameAsync(cancellationToken);
+			if (!result)
+			{
+				_logger.LogError("Failed to activate next game through loader");
+				EnableCurrentGameInput();
+				return false;
 			}
 
-			// Disable input for all games during transition
-			DisableAllGamesInput();
-			
-			// Pause current game
-			PauseCurrentGame();
-
-			// Move queue to next
-			_queueService.MoveNext();
-
-			// Stop old game
-			StopPreviousGame();
-
-			// Start new current game (this will automatically enable input for current game)
-			StartCurrentGame();
-
-			// Update preloaded games for new position
-			await UpdatePreloadedGamesAsync(cancellationToken);
+			FocusCurrentGameInput();
 
 			_logger.Log("Successfully switched to next game");
 			return true;
@@ -383,50 +349,23 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 	{
 		try
 		{
-			// Check if can switch
 			if (!HasPreviousGame)
 			{
 				_logger.LogWarning("No previous game available");
 				return false;
 			}
 
-			// Wait for previous game to be ready
-			if (!IsPreviousGameReady)
-			{
-				_logger.Log("Waiting for previous game to be ready");
-				var timeout = TimeSpan.FromSeconds(10);
-				var startTime = DateTime.UtcNow;
-				
-				while (!IsPreviousGameReady && DateTime.UtcNow - startTime < timeout)
-				{
-					cancellationToken.ThrowIfCancellationRequested();
-					await Task.Delay(100, cancellationToken);
-				}
+			DisableAllGamesInput();
 
-				if (!IsPreviousGameReady)
-				{
-					_logger.LogError("Previous game failed to be ready in time");
-					return false;
-				}
+			var result = await _gamesLoader.ActivatePreviousGameAsync(cancellationToken);
+			if (!result)
+			{
+				_logger.LogError("Failed to activate previous game through loader");
+				EnableCurrentGameInput();
+				return false;
 			}
 
-			// Disable input for all games during transition
-			DisableAllGamesInput();
-			
-			// Pause current game
-			PauseCurrentGame();
-
-			// Move queue to previous
-			_queueService.MovePrevious();
-
-			// Stop old game
-			StopNextGame();
-
-			// Start new current game (this will automatically enable input for current game)
-			StartCurrentGame();
-
-			// Update preloaded games for new position
-			await UpdatePreloadedGamesAsync(cancellationToken);
+			FocusCurrentGameInput();
 
 			_logger.Log("Successfully switched to previous game");
 			return true;
@@ -456,6 +395,28 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		}
 
 		return _gamesLoader.GetGame(gameType);
+	}
+
+	private void StartGameForType(Type gameType, string slot)
+	{
+		if (gameType == null)
+		{
+			return;
+		}
+
+		_logger.Log($"Starting {slot} game via loader");
+
+		if (!_gamesLoader.StartPreloadedGame(gameType))
+		{
+			GetGameForType(gameType)?.StartGame();
+		}
+	}
+
+	private void FocusCurrentGameInput()
+	{
+		EnableCurrentGameInput();
+		DisableNextGameInput();
+		DisablePreviousGameInput();
 	}
 }
 }

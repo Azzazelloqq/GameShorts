@@ -31,6 +31,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 
                 // Create queue service
                 var queueService = new GameQueueService(logger);
+                queueService.Initialize(registry.RegisteredGames);
                 
                 // Create prefabs
                 var prefab = new GameObject("MockPrefab");
@@ -47,11 +48,13 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 };
                 var factory = new AddressableShortGameFactory(parent.transform, resourceMapping, resourceLoader, logger);
                 
+                var settings = new ShortGameLoaderSettings();
+
                 // Create loader
-                var loader = new QueueShortGamesLoader(factory, queueService, logger);
+                var loader = new QueueShortGamesLoader(factory, queueService, logger, settings);
                 
                 // Create provider
-                var provider = new TestableShortGameServiceProvider(logger, factory);
+                var provider = new TestableShortGameServiceProvider(logger, registry, queueService, loader);
                 
                 // Act
                 await provider.InitializeAsync();
@@ -108,6 +111,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 
                 // Create queue service
                 var queueService = new GameQueueService(logger);
+                queueService.Initialize(registry.RegisteredGames);
                 
                 // Create prefabs
                 var prefab1 = new GameObject("MockPrefab1");
@@ -137,11 +141,13 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
                 };
                 var factory = new AddressableShortGameFactory(parent.transform, resourceMapping, resourceLoader, logger);
                 
+                var settings = new ShortGameLoaderSettings();
+
                 // Create loader
-                var loader = new QueueShortGamesLoader(factory, queueService, logger);
+                var loader = new QueueShortGamesLoader(factory, queueService, logger, settings);
                 
                 // Create provider
-                var provider = new TestableShortGameServiceProvider(logger, factory);
+                var provider = new TestableShortGameServiceProvider(logger, registry, queueService, loader);
                 
                 // Act
                 await provider.InitializeAsync();

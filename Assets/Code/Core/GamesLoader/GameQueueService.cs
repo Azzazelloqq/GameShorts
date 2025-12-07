@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using InGameLogger;
+using LightDI.Runtime;
 
 namespace Code.Core.GamesLoader
 {
 /// <summary>
 /// Implementation of game queue management service
 /// </summary>
-internal class GameQueueService : IGameQueueService
+public class GameQueueService : IGameQueueService
 {
 	private readonly IInGameLogger _logger;
 	private readonly List<Type> _gameQueue = new();
 	private int _currentIndex = -1;
 
-	public event Action OnQueueUpdated;
+	public event Action<IReadOnlyList<Type>, int, QueueChangeReason> OnQueueUpdated;
 
 	public Type CurrentGameType => GetGameTypeAtIndex(_currentIndex);
 
@@ -30,9 +31,9 @@ internal class GameQueueService : IGameQueueService
 
 	public bool HasPrevious => _currentIndex > 0;
 
-	public GameQueueService(IInGameLogger logger)
+	public GameQueueService([Inject]IInGameLogger logger)
 	{
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		_logger = logger;
 	}
 
 	public void Initialize(IReadOnlyList<Type> gameTypes)
@@ -53,7 +54,7 @@ internal class GameQueueService : IGameQueueService
 		_gameQueue.AddRange(gameTypes);
 		_currentIndex = -1;
 
-		OnQueueUpdated?.Invoke();
+		NotifyQueueUpdated(QueueChangeReason.Initialized);
 	}
 	
 	public void Dispose()
@@ -74,7 +75,7 @@ internal class GameQueueService : IGameQueueService
 		_currentIndex++;
 		_logger.Log($"Moved to next game at index {_currentIndex}: {CurrentGameType?.Name}");
 
-		OnQueueUpdated?.Invoke();
+		NotifyQueueUpdated(QueueChangeReason.Moved);
 		return true;
 	}
 
@@ -89,7 +90,7 @@ internal class GameQueueService : IGameQueueService
 		_currentIndex--;
 		_logger.Log($"Moved to previous game at index {_currentIndex}: {CurrentGameType?.Name}");
 
-		OnQueueUpdated?.Invoke();
+		NotifyQueueUpdated(QueueChangeReason.Moved);
 		return true;
 	}
 
@@ -104,7 +105,7 @@ internal class GameQueueService : IGameQueueService
 		_currentIndex = index;
 		_logger.Log($"Moved to game at index {_currentIndex}: {CurrentGameType?.Name}");
 
-		OnQueueUpdated?.Invoke();
+		NotifyQueueUpdated(QueueChangeReason.Moved);
 		return true;
 	}
 
@@ -118,36 +119,32 @@ internal class GameQueueService : IGameQueueService
 		return _gameQueue[index];
 	}
 
-	public IEnumerable<Type> GetGamesToPreload()
+	public IEnumerable<Type> GetGamesToPreload(int radius = 1)
 	{
-		var gamesToPreload = new List<Type>();
-
-		// Add current game if valid
-		if (CurrentGameType != null)
+		if (_gameQueue.Count == 0)
 		{
-			gamesToPreload.Add(CurrentGameType);
+			return Array.Empty<Type>();
 		}
 
-		// Add next game if exists
-		if (NextGameType != null)
+		var safeRadius = Math.Max(0, radius);
+		var cursor = _currentIndex < 0 ? 0 : _currentIndex;
+		var startIndex = Math.Max(0, cursor - safeRadius);
+		var endIndex = Math.Min(_gameQueue.Count - 1, cursor + safeRadius);
+
+		var slice = new List<Type>();
+		for (var i = startIndex; i <= endIndex; i++)
 		{
-			gamesToPreload.Add(NextGameType);
+			slice.Add(_gameQueue[i]);
 		}
 
-		// Add previous game if exists
-		if (PreviousGameType != null)
-		{
-			gamesToPreload.Add(PreviousGameType);
-		}
-
-		return gamesToPreload.Distinct();
+		return slice.Distinct();
 	}
 
 	public void Reset()
 	{
 		_logger.Log("Resetting game queue to the beginning");
 		_currentIndex = -1;
-		OnQueueUpdated?.Invoke();
+		NotifyQueueUpdated(QueueChangeReason.Reset);
 	}
 
 	public void Clear()
@@ -155,7 +152,106 @@ internal class GameQueueService : IGameQueueService
 		_logger.Log("Clearing game queue");
 		_gameQueue.Clear();
 		_currentIndex = -1;
-		OnQueueUpdated?.Invoke();
+		NotifyQueueUpdated(QueueChangeReason.Cleared);
+	}
+
+	public void InsertAt(int index, Type gameType)
+	{
+		if (gameType == null)
+		{
+			throw new ArgumentNullException(nameof(gameType));
+		}
+
+		if (index < 0 || index > _gameQueue.Count)
+		{
+			throw new ArgumentOutOfRangeException(nameof(index), $"Index {index} is outside of queue bounds.");
+		}
+
+		_gameQueue.Insert(index, gameType);
+
+		if (index <= _currentIndex)
+		{
+			_currentIndex++;
+		}
+
+		NotifyQueueUpdated(QueueChangeReason.Inserted);
+	}
+
+	public bool RemoveAt(int index)
+	{
+		if (index < 0 || index >= _gameQueue.Count)
+		{
+			return false;
+		}
+
+		_gameQueue.RemoveAt(index);
+
+		if (_gameQueue.Count == 0)
+		{
+			_currentIndex = -1;
+		}
+		else if (_currentIndex >= _gameQueue.Count)
+		{
+			_currentIndex = _gameQueue.Count - 1;
+		}
+		else if (index <= _currentIndex)
+		{
+			_currentIndex = Math.Max(-1, _currentIndex - 1);
+		}
+
+		NotifyQueueUpdated(QueueChangeReason.Removed);
+		return true;
+	}
+
+	public bool Remove(Type gameType)
+	{
+		if (gameType == null)
+		{
+			return false;
+		}
+
+		var index = _gameQueue.IndexOf(gameType);
+		if (index < 0)
+		{
+			return false;
+		}
+
+		return RemoveAt(index);
+	}
+
+	public void ReplaceAll(IEnumerable<Type> gameTypes)
+	{
+		if (gameTypes == null)
+		{
+			throw new ArgumentNullException(nameof(gameTypes));
+		}
+
+		_gameQueue.Clear();
+		_gameQueue.AddRange(gameTypes);
+
+		if (_gameQueue.Count == 0)
+		{
+			_currentIndex = -1;
+		}
+		else
+		{
+			if (_currentIndex >= _gameQueue.Count)
+			{
+				_currentIndex = _gameQueue.Count - 1;
+			}
+
+			if (_currentIndex < -1)
+			{
+				_currentIndex = -1;
+			}
+		}
+
+		NotifyQueueUpdated(QueueChangeReason.Replaced);
+	}
+
+	private void NotifyQueueUpdated(QueueChangeReason reason)
+	{
+		OnQueueUpdated?.Invoke(_gameQueue.AsReadOnly(), _currentIndex, reason);
 	}
 }
 }

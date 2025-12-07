@@ -9,7 +9,7 @@ namespace Code.Core.GamesLoader
 /// <summary>
 /// Implementation of game registry that manages all available games
 /// </summary>
-internal class GameRegistry : IGameRegistry
+public class GameRegistry : IGameRegistry
 {
 	private readonly IInGameLogger _logger;
 	private readonly List<Type> _registeredGames = new();
