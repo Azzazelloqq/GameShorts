@@ -32,7 +32,7 @@ namespace Code.Core.GameEntryPoint
 /// <summary>
 /// Simple entry point for game system initialization
 /// </summary>
-public class GameEntryPoint : MonoBehaviour
+public sealed class GameEntryPoint : MonoBehaviour
 {
 	[Header("Settings")]
 	[SerializeField]
@@ -139,7 +139,7 @@ public class GameEntryPoint : MonoBehaviour
 	/// <summary>
 	/// Override this method to provide resource mapping for your games
 	/// </summary>
-	protected virtual Dictionary<Type, string> GetResourceMapping()
+	private Dictionary<Type, string> GetResourceMapping()
 	{
 		return new Dictionary<Type, string>
 		{

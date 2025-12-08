@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a475fc5620a176408cafe1516294bf5, type: 3}
   m_Name: GamePositioningConfig
   m_EditorClassIdentifier: Core.ShortGame::Code.Core.ShortGamesCore.Source.GameCore.GamePositioningConfig
-  _distance3DGames: 100
+  _distance3DGames: 1000
   _base3DPosition: {x: 0, y: 0, z: 0}
   _positioning3DAxis: {x: 1, y: 0, z: 0}
   _distance2DGames: 50
