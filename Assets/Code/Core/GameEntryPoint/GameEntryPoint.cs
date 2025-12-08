@@ -107,7 +107,6 @@ public class GameEntryPoint : MonoBehaviour
 		_globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
 
 		var gameLoaderSettings = new ShortGameLoaderSettings();
-		_globalGameDiContainer.RegisterAsSingleton(gameLoaderSettings);
 		var games = GetPlayableGames();
 		var registry = GameRegistryFactory.CreateGameRegistry();
 		_globalGameDiContainer.RegisterAsSingleton<IGameRegistry>(registry);
@@ -118,9 +117,7 @@ public class GameEntryPoint : MonoBehaviour
 		queueService.Initialize(registry.RegisteredGames);
 		_globalGameDiContainer.RegisterAsSingleton<IGameQueueService>(queueService);
 		
-		var settings = new ShortGameLoaderSettings();
-		
-		var loader = QueueShortGamesLoaderFactory.CreateQueueShortGamesLoader(settings);
+		var loader = QueueShortGamesLoaderFactory.CreateQueueShortGamesLoader(gameLoaderSettings);
 		_globalGameDiContainer.RegisterAsSingleton<IGamesLoader>(loader);
 		
 		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider();

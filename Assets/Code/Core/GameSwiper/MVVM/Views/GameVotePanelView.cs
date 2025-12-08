@@ -556,3 +556,4 @@ internal class GameVotePanelView : ViewMonoBehavior<GameVotePanelViewModel>
 }
 }
 
+
