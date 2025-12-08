@@ -120,7 +120,7 @@ public class GameEntryPoint : MonoBehaviour
 		var loader = QueueShortGamesLoaderFactory.CreateQueueShortGamesLoader(gameLoaderSettings);
 		_globalGameDiContainer.RegisterAsSingleton<IGamesLoader>(loader);
 		
-		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider();
+		_shortGameServiceProvider = ShortGameServiceProviderFactory.CreateShortGameServiceProvider(gameLoaderSettings);
 		await _shortGameServiceProvider.InitializeAsync(cancellationToken);
 
 		_gameStatsService = new LocalRandomGameStatsService(_logger);
