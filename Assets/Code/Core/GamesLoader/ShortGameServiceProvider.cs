@@ -46,7 +46,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		[Inject] IGameRegistry gameRegistry,
 		[Inject] IGameQueueService queueService,
 		[Inject] IGamesLoader gamesLoader,
-		[Inject] ShortGameLoaderSettings settings)
+		ShortGameLoaderSettings settings)
 	{
 		_logger = logger;
 		_gameRegistry = gameRegistry;
