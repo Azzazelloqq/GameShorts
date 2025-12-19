@@ -137,7 +137,7 @@ public class GameEntryPoint : MonoBehaviour
 			{ typeof(EscapeFromDarkGame), ResourceIdsContainer.GameEscapeFromDark.EscapeFromDarkMain },
 			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main },
 			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
-			{ typeof(CubeRunnerGame), ResourceIdsContainer.GameCuberunner.GameCubeRunner },
+			{ typeof(CubeRunnerGame), ResourceIdsContainer.GameCubeRunner.CubeRunnerGame },
 		};
 	}
 

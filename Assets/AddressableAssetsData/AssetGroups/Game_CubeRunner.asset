@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Game_Cuberunner
+  m_Name: Game_CubeRunner
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: Game_Cuberunner
-  m_GUID: e9a084cc1fc702442b55b4e48962d793
+  m_GroupName: Game_CubeRunner
+  m_GUID: 06c14422ba868a448afb97e05928c514
   m_SerializeEntries:
   - m_GUID: 51a44e8effbb93e46b87e0553ef4e74f
-    m_Address: GameCubeRunner
+    m_Address: CubeRunnerGame
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Game
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
   m_SchemaSet:
-    m_Schemas: []
+    m_Schemas:
+    - {fileID: 11400000, guid: fa918ed324b349c4d8c543f670c0d91c, type: 2}
+    - {fileID: 11400000, guid: 2b3688d9f7d3af24d8e90aa617e90858, type: 2}
