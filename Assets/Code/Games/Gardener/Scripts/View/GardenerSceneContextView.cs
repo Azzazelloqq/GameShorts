@@ -1,11 +1,11 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.UI;
 using UnityEngine;
 
 namespace GameShorts.Gardener.View
 {
-    internal class GardenerSceneContextView : BaseMonoBehaviour
+    internal class GardenerSceneContextView : MonoBehaviourDisposable
     {
         [Header("Garden")]
         [SerializeField] private Transform _basePlatform; 

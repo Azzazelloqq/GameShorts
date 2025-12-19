@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BoxTowerGameScenePm : BaseDisposable
+    public class BoxTowerGameScenePm : DisposableBase
     {
         public struct Ctx
         {
@@ -55,7 +55,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 cancellationToken = _ctx.cancellationToken
             };
             _towerPresenter =  BoxTowerTowerPmFactory.CreateBoxTowerTowerPm(towerCtx);
-            AddDispose(_towerPresenter);
+            AddDisposable(_towerPresenter);
         }
 
         private void CreateUIPresenter()
@@ -68,7 +68,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 cancellationToken = _ctx.cancellationToken
             };
             _uiPresenter = new BoxTowerUIPm(uiCtx);
-            AddDispose(_uiPresenter);
+            AddDisposable(_uiPresenter);
         }
 
         private void CreateCameraPresenter()
@@ -80,7 +80,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 cancellationToken = _ctx.cancellationToken
             };
             _cameraPresenter =  BoxTowerCameraPmFactory.CreateBoxTowerCameraPm(cameraCtx);
-            AddDispose(_cameraPresenter);
+            AddDisposable(_cameraPresenter);
         }
 
         private void CreateInputPresenter()
@@ -96,7 +96,7 @@ namespace Code.Core.ShortGamesCore.Game2
             // Set tower presenter reference for input handling
             _inputPresenter.SetTowerPresenter(_towerPresenter);
             
-            AddDispose(_inputPresenter);
+            AddDisposable(_inputPresenter);
         }
 
         private void SetupModelSubscriptions()

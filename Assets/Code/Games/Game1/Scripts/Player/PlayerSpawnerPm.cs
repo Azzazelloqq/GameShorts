@@ -3,7 +3,7 @@ using System.Threading;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Logic.Player
 {
-    internal class PlayerSpawnerPm : BaseDisposable
+    internal class PlayerSpawnerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -58,7 +58,7 @@ namespace Logic.Player
             };
 
             // Подписываемся на изменения множителя скорости игрока
-            AddDispose(_playerModel.DifficultyScaler.PlayerSpeedMultiplier.Subscribe(OnPlayerSpeedMultiplierChanged));
+            AddDisposable(_playerModel.DifficultyScaler.PlayerSpeedMultiplier.Subscribe(OnPlayerSpeedMultiplierChanged));
             PlayerPm.Ctx playerCtx = new PlayerPm.Ctx
             {
                 playerModel = _playerModel,

@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Core;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.View;
@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace GameShorts.Gardener.Gameplay
 {
-    internal class PlotPm : BaseDisposable
+    internal class PlotPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -57,12 +57,12 @@ namespace GameShorts.Gardener.Gameplay
             _tickHandler.FrameUpdate += UpdatePlant;
                 
             // Подписываемся на изменения состояния растения
-            AddDispose(_currentState.Subscribe(state => _ctx.plotView.UpdateState(state, _currentPlantSettings)));
+            AddDisposable(_currentState.Subscribe(state => _ctx.plotView.UpdateState(state, _currentPlantSettings)));
             
             // Подписываемся на паузу
             if (_ctx.isPaused != null)
             {
-                AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+                AddDisposable(_ctx.isPaused.Subscribe(isPaused =>
                 {
                     _isInputEnabled = !isPaused;
                 }));

@@ -1,10 +1,10 @@
 ﻿using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 
 namespace GameShorts.CubeRunner.View
 {
-    public class BorderView: BaseMonoBehaviour
+    public class BorderView: MonoBehaviourDisposable
     {
         public Action PlayerDetected;
         

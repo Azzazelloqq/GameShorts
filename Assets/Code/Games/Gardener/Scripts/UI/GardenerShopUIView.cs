@@ -1,12 +1,12 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace GameShorts.Gardener.UI
 {
-    internal class GardenerShopUIView : BaseMonoBehaviour
+    internal class GardenerShopUIView : MonoBehaviourDisposable
     {
         [SerializeField] private Button _closeButton;
         [SerializeField] private GameObject _rootPanel;

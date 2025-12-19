@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.Gameplay.Modes;
 using GameShorts.Gardener.View;
@@ -12,7 +12,7 @@ namespace GameShorts.Gardener.UI
     /// Панель с элементами, которые можно разместить на сцене
     /// Отображается в определенных режимах (например, Harvey Mode)
     /// </summary>
-    internal class PlaceableItemsPanel : BaseMonoBehaviour
+    internal class PlaceableItemsPanel : MonoBehaviourDisposable
     {
         [SerializeField] private GameObject _rootPanel;
         [SerializeField] private Transform _itemsContainer;

@@ -1,10 +1,10 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace GameShorts.FlyHumans.UI
 {
-    internal class FlyHumansMainUIView : BaseMonoBehaviour
+    internal class FlyHumansMainUIView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.Tools.Pool;
@@ -9,7 +9,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
 {
-    internal class EscapeFromDarkCorePm : BaseDisposable
+    internal class EscapeFromDarkCorePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -27,7 +27,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
         {
             _ctx = ctx;
             _diContainer = DiContainerFactory.CreateContainer();
-            AddDispose(_diContainer);
+            AddDisposable(_diContainer);
             _inputManager = new InputManager.InputManager();
             _diContainer.RegisterAsSingleton<IInputManager>(_inputManager);
             _inputManager?.SetJoystickOptions(AxisOptions.None);
@@ -39,7 +39,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
                 restartGame = _ctx.restartGame
             };
             _scene = new EscapeFromDarkScenePm(sceneCtx);
-            AddDispose(_scene);
+            AddDisposable(_scene);
         }
 
         protected override void OnDispose()

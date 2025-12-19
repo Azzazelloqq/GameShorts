@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 {
-    internal class EscapeFromDarkLevelPm : BaseDisposable
+    internal class EscapeFromDarkLevelPm : DisposableBase
     {
         internal struct Ctx
         {

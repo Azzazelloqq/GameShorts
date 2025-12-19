@@ -2,24 +2,24 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azzazelloqq.MVVM.Core;
-using Azzazelloqq.MVVM.ReactiveLibrary;
 using Code.Core.GameStats;
 using Code.Core.GameSwiper.MVVM.Models;
 using InGameLogger;
+using R3;
 using UnityEngine;
 
 namespace Code.Core.GameSwiper.MVVM.ViewModels
 {
 internal class GameItemViewModel : ViewModelBase<GameItemModel>
 {
-	public IReadOnlyReactiveProperty<RenderTexture> RenderTexture => model.RenderTexture;
-	public IReadOnlyReactiveProperty<bool> IsLoading => model.IsLoading;
-	public IReadOnlyReactiveProperty<bool> IsActive => model.IsActive;
-	public IReadOnlyReactiveProperty<GamePresentationData?> Presentation => model.PresentationData;
+	public ReadOnlyReactiveProperty<RenderTexture> RenderTexture => model.RenderTexture;
+	public ReadOnlyReactiveProperty<bool> IsLoading => model.IsLoading;
+	public ReadOnlyReactiveProperty<bool> IsActive => model.IsActive;
+	public ReadOnlyReactiveProperty<GamePresentationData?> Presentation => model.PresentationData;
 
-	public IReactiveProperty<bool> IsUIVisible { get; }
-	public IReactiveProperty<float> UIOpacity { get; }
-	public IReactiveProperty<bool> ShouldShowLoadingIndicator { get; }
+	public ReadOnlyReactiveProperty<bool> IsUIVisible => _isUIVisible;
+	public ReadOnlyReactiveProperty<float> UIOpacity => _uIOpacity;
+	public ReadOnlyReactiveProperty<bool> ShouldShowLoadingIndicator => _shouldShowLoadingIndicator;
 
 	public int GameIndex => model.Index;
 	public GameVotePanelViewModel VotePanelViewModel { get; }
@@ -27,12 +27,15 @@ internal class GameItemViewModel : ViewModelBase<GameItemModel>
 	private const float LoadingIndicatorDelaySeconds = 0.1f;
 	private CancellationTokenSource _loadingIndicatorCts;
 	private bool _isVotePanelInitialized;
+	private readonly ReactiveProperty<bool> _isUIVisible;
+	private readonly ReactiveProperty<float> _uIOpacity;
+	private readonly ReactiveProperty<bool> _shouldShowLoadingIndicator;
 
 	public GameItemViewModel(GameItemModel model, IGameStatsService gameStatsService, IInGameLogger logger) : base(model)
 	{
-		IsUIVisible = new ReactiveProperty<bool>(true);
-		UIOpacity = new ReactiveProperty<float>(1f);
-		ShouldShowLoadingIndicator = new ReactiveProperty<bool>(false);
+		_isUIVisible = AddDisposable(new ReactiveProperty<bool>(true));
+		_uIOpacity = AddDisposable(new ReactiveProperty<float>(1f));
+		_shouldShowLoadingIndicator = AddDisposable(new ReactiveProperty<bool>(false));
 
 		compositeDisposable.AddDisposable(IsUIVisible);
 		compositeDisposable.AddDisposable(UIOpacity);
@@ -76,8 +79,8 @@ internal class GameItemViewModel : ViewModelBase<GameItemModel>
 
 	public void UpdateUIVisibility(bool isVisible, float opacity = 1f)
 	{
-		IsUIVisible.SetValue(isVisible);
-		UIOpacity.SetValue(opacity);
+		_isUIVisible.Value = isVisible;
+		_uIOpacity.Value = opacity;
 	}
 
 	private void OnLoadingStateChanged(bool isLoading)
@@ -90,11 +93,11 @@ internal class GameItemViewModel : ViewModelBase<GameItemModel>
 	{
 		if (isLoading)
 		{
-			UIOpacity.SetValue(0.5f);
+			_uIOpacity.Value = 0.5f;
 		}
-		else if (IsActive.Value)
+		else if (IsActive.CurrentValue)
 		{
-			UIOpacity.SetValue(1f);
+			_uIOpacity.Value = 1f;
 		}
 	}
 
@@ -106,11 +109,11 @@ internal class GameItemViewModel : ViewModelBase<GameItemModel>
 
 		if (!isLoading)
 		{
-			ShouldShowLoadingIndicator.SetValue(false);
+			_shouldShowLoadingIndicator.Value = false;
 			return;
 		}
 
-		ShouldShowLoadingIndicator.SetValue(false);
+		_shouldShowLoadingIndicator.Value = false;
 
 		_loadingIndicatorCts = new CancellationTokenSource();
 		_ = ShowLoadingIndicatorWithDelayAsync(_loadingIndicatorCts.Token);
@@ -127,9 +130,9 @@ internal class GameItemViewModel : ViewModelBase<GameItemModel>
 			return;
 		}
 
-		if (!token.IsCancellationRequested && model.IsLoading.Value)
+		if (!token.IsCancellationRequested && model.IsLoading.CurrentValue)
 		{
-			ShouldShowLoadingIndicator.SetValue(true);
+			_shouldShowLoadingIndicator.Value = true;
 		}
 	}
 

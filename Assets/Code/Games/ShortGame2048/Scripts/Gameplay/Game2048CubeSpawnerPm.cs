@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using R3;
+using CompositeDisposable = R3.CompositeDisposable;
 
 namespace Code.Games
 {
-    internal class Game2048CubeSpawnerPm : BaseDisposable
+    internal class Game2048CubeSpawnerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -33,7 +34,7 @@ namespace Code.Games
         {
             _ctx = ctx;
             _onCubeCollision = ctx.onCubeCollision;
-            AddDispose(_compositeDisposable);
+            AddDisposable(_compositeDisposable);
         }
 
         public CubePm CreateCube()

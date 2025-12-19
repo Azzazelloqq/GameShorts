@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using LightDI.Runtime;
 using UnityEngine;
 using R3;
 using TickHandler;
+using CompositeDisposable = R3.CompositeDisposable;
 
 namespace Code.Games
 {
-    internal class Game2048GameplayPm : BaseDisposable
+    internal class Game2048GameplayPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -53,7 +54,7 @@ namespace Code.Games
             SubscribeToPause();
             StartGameCycle();
             
-            AddDispose(_compositeDisposable);
+            AddDisposable(_compositeDisposable);
             _tickHandler.FrameUpdate += TrySpawnNewCube;
         }
 
@@ -77,7 +78,7 @@ namespace Code.Games
 
         private void SubscribeToPause()
         {
-            AddDispose(_ctx.isPaused
+            AddDisposable(_ctx.isPaused
                 .Subscribe(isPaused =>
                 {
                     if (isPaused)
@@ -103,7 +104,7 @@ namespace Code.Games
             };
             
             _cubeSpawner = new Game2048CubeSpawnerPm(spawnerCtx);
-            AddDispose(_cubeSpawner);
+            AddDisposable(_cubeSpawner);
         }
 
         private void UpdateScore(CubePm cube)
@@ -129,7 +130,7 @@ namespace Code.Games
             };
 
             _mergeManager = new Game2048CubeMergeManagerPm(mergeCtx);
-            AddDispose(_mergeManager);
+            AddDisposable(_mergeManager);
 
             // Устанавливаем обработчик коллизий в спавнер
             _cubeSpawner.SetCollisionHandler( (cubeId1,cubeId2) =>
@@ -157,7 +158,7 @@ namespace Code.Games
             };
 
             _cubeController = Game2048CubeControllerPmFactory.CreateGame2048CubeControllerPm(controllerCtx);
-            AddDispose(_cubeController);
+            AddDisposable(_cubeController);
 
             _cubeController.OnCubeLaunched
                 .Subscribe(_ =>

@@ -1,12 +1,12 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Logic.UI
 {
-    internal class StartScreenView : BaseMonoBehaviour
+    internal class StartScreenView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using GameShorts.Gardener.View;
 using LightDI.Runtime;
@@ -8,7 +8,7 @@ using R3;
 
 namespace GameShorts.Gardener.Core
 {
-    internal class GardenerCorePm : BaseDisposable
+    internal class GardenerCorePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -34,7 +34,7 @@ namespace GameShorts.Gardener.Core
                 isPaused = _ctx.isPaused
             };
             _scene = new GardenerScenePm(sceneCtx);
-            AddDispose(_scene);
+            AddDisposable(_scene);
         }
 
         protected override void OnDispose()

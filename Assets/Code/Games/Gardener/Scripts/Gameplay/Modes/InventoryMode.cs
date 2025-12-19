@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.UI;
 using R3;
@@ -12,7 +12,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// <summary>
     /// Режим инвентаря - позволяет сажать семена из инвентаря на грядки
     /// </summary>
-    internal class InventoryMode : BaseDisposable, IGardenerMode
+    internal class InventoryMode : DisposableBase, IGardenerMode
     {
         public struct Ctx
         {
@@ -37,7 +37,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
             // Subscribe to inventory changes to update placeable items
             if (_ctx.inventoryManager != null)
             {
-                AddDispose(_ctx.inventoryManager.InventoryChanged
+                AddDisposable(_ctx.inventoryManager.InventoryChanged
                     .Subscribe(_ => UpdatePlaceableItems()));
             }
             

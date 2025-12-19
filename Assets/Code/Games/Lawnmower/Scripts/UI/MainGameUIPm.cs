@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using R3;
 
@@ -9,7 +9,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
     /// <summary>
     /// Presenter для управления основным игровым UI
     /// </summary>
-    internal class MainGameUIPm : BaseDisposable
+    internal class MainGameUIPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -19,7 +19,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
         }
 
         private readonly Ctx _ctx;
-        private CompositeDisposable _disposables = new CompositeDisposable();
         private float _lastProgressCheck = 0f;
         private const float PROGRESS_CHECK_INTERVAL = 0.1f; // Проверяем прогресс каждые 0.1 секунды
 
@@ -34,12 +33,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
             UpdateLevelUI();
             
             Debug.Log("MainGameUIPm initialized");
-        }
-
-        protected override void OnDispose()
-        {
-            _disposables?.Dispose();
-            base.OnDispose();
         }
 
         /// <summary>

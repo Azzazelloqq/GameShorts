@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 
 namespace GameShorts.Gardener.View
@@ -7,7 +7,7 @@ namespace GameShorts.Gardener.View
     /// Компонент, определяющий границы огорода
     /// Используется для проверки валидности размещения грядок
     /// </summary>
-    public class GardenBounds : BaseMonoBehaviour
+    public class GardenBounds : MonoBehaviourDisposable
     {
         [SerializeField] private BoxCollider _boundsCollider;
         private Vector3 _minBounds = new Vector3(-5, 0, -5);

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using Cysharp.Threading.Tasks;
 using GameShorts.CubeRunner.Core;
@@ -18,7 +18,7 @@ using Random = UnityEngine.Random;
 
 namespace GameShorts.CubeRunner.Gameplay
 {
-    internal class CubeRunnerGameplayPm : BaseDisposable
+    internal class CubeRunnerGameplayPm : DisposableBase
     {
         internal struct Ctx
         {

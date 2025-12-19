@@ -1,10 +1,10 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Games.Game2.Scripts.Core;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    internal class BlockMover : BaseMonoBehaviour
+    internal class BlockMover : MonoBehaviourDisposable
     {
         [Header("Movement Settings")]
         [SerializeField] private float speed = 2f;

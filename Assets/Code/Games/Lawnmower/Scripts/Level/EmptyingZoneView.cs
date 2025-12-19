@@ -1,12 +1,12 @@
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
     /// <summary>
     /// View компонент для зоны опустошения контейнера
     /// </summary>
-    internal class EmptyingZoneView : BaseMonoBehaviour
+    internal class EmptyingZoneView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

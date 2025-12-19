@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using R3;
 using UnityEngine;
@@ -11,7 +11,7 @@ namespace GameShorts.Gardener.Gameplay
     /// <summary>
     /// Manages the player's seed inventory with quantities
     /// </summary>
-    internal class InventoryManager : BaseDisposable
+    internal class InventoryManager : DisposableBase
     {
         private readonly Dictionary<PlantSettings, ReactiveProperty<int>> _seedInventory 
             = new Dictionary<PlantSettings, ReactiveProperty<int>>();

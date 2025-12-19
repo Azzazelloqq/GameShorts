@@ -3,14 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
-using Code.Core.ShortGamesCore.Game1.Scripts.View;
 using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
+using Disposable;
 using InGameLogger;
 using LightDI.Runtime;
-using Logic.Entities;
-using Logic.Scene;
 using ResourceLoader;
 using TickHandler;
 using UnityEngine;
@@ -18,7 +15,7 @@ using Object = UnityEngine.Object;
 
 namespace Logic.UI
 {
-    internal class FinishScreenPm : BaseDisposable
+    internal class FinishScreenPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -62,12 +59,19 @@ namespace Logic.UI
             }
         }
 
+        protected override void OnDispose()
+        {
+            base.OnDispose();
+            
+            Object.Destroy(_view.gameObject);
+        }
+
         private async Task LoadBaseUI()
         {
             var prefab =
                 await _resourceLoader.LoadResourceAsync<GameObject>(ResourceIdsContainer.GameAsteroids.FinishScreen,
                     _ctx.cancellationToken);
-            var objView = AddComponent(Object.Instantiate(prefab, _ctx.mainSceneContextView.UiParent, false));
+            var objView = Object.Instantiate(prefab, _ctx.mainSceneContextView.UiParent, false);
             _view = objView.GetComponent<FinishScreenView>();
             var player = _ctx.entitiesController.GetPlayerModel();
             _view.SetCtx(new FinishScreenView.Ctx

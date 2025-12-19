@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.UI;
@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
 {
-    internal class LawnmowerMainScenePm : BaseDisposable
+    internal class LawnmowerMainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -58,7 +58,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
                 cancellationToken = _ctx.cancellationToken
             };
             _levelManager = new LawnmowerLevelManager(levelManagerCtx);
-            AddDispose(_levelManager);
+            AddDisposable(_levelManager);
             
             ShowStartScreen();
         }
@@ -79,7 +79,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             };
             
             _startScreenPm = new LawnmowerStartScreenPm(startScreenCtx);
-            AddDispose(_startScreenPm);
+            AddDisposable(_startScreenPm);
             
             Debug.Log("Lawnmower: Start screen created");
         }
@@ -94,7 +94,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             };
             
             _cameraPm = new LawnmowerCameraPm(cameraCtx);
-            AddDispose(_cameraPm);
+            AddDisposable(_cameraPm);
             
             Debug.Log("LawnmowerMainScenePm: Camera system initialized");
         }
@@ -123,7 +123,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             };
             
             _playerPm = LawnmowerPlayerPmFactory.CreateLawnmowerPlayerPm(playerCtx);
-            AddDispose(_playerPm);
+            AddDisposable(_playerPm);
             
             // Создаем камеру
             InitializeCamera();

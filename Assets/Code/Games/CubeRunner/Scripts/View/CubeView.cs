@@ -1,12 +1,12 @@
 using System.Collections;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
 namespace GameShorts.CubeRunner.View
 {
-    internal class CubeView : BaseMonoBehaviour
+    internal class CubeView : MonoBehaviourDisposable
     {
         public struct Ctx
         {

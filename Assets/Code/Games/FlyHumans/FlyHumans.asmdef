@@ -2,15 +2,12 @@
     "name": "FlyHumans",
     "rootNamespace": "GameShorts.FlyHumans",
     "references": [
-        "R3.Unity",
-        "DOTween",
-        "BaseDisposable",
-        "Core.ShortGame",
-        "Code.Utils",
-        "LightDI",
-        "BaseDMDisposable",
-        "Utils",
-        "Tools"
+        "GUID:77221876cc6b8244180b96e320b1bcd4",
+        "GUID:97970e3b002e4b58b19827dcfb9b8064",
+        "GUID:c9f76ac6b5b2484789d93f0d3960dc33",
+        "GUID:4190320b639141cd9b32d4d3f06a8e13",
+        "GUID:0e6e4a9ef4644d21a397a36906ffc8e9",
+        "GUID:f3a29d15daa5e9345ab71de7276cd04b"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

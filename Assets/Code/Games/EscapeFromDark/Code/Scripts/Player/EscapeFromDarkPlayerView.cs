@@ -1,9 +1,9 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
 {
-    internal class EscapeFromDarkPlayerView : BaseMonoBehaviour
+    internal class EscapeFromDarkPlayerView : MonoBehaviourDisposable
     {
         [Header("Visual")]
         [SerializeField] private SpriteRenderer spriteRenderer;

@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using TMPro;
 using System;
@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace Code.Games
 {
-    internal class Game2048CubeView : BaseMonoBehaviour
+    internal class Game2048CubeView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

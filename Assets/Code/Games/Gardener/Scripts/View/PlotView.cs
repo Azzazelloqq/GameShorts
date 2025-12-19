@@ -1,10 +1,10 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using UnityEngine;
 
 namespace GameShorts.Gardener.View
 {
-    internal class PlotView : BaseMonoBehaviour
+    internal class PlotView : MonoBehaviourDisposable
     {
         [SerializeField] private Transform _plantContainer;
         [SerializeField] private GameObject _emptyPlotModel;

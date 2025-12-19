@@ -400,6 +400,39 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             Assert.IsFalse(_loader.IsGameLoaded(typeof(MockShortGame)), "Previous game should be unloaded");
             Assert.IsTrue(_loader.IsGameLoaded(typeof(MockPoolableShortGame)), "Active game should stay loaded");
         }
+
+        [Test]
+        public async Task ActivateNextGameAsync_UnloadsGamesOutsideVisibleWindow()
+        {
+            // Arrange
+            var gameTypes = new[]
+            {
+                typeof(MockShortGame),
+                typeof(MockPoolableShortGame),
+                typeof(MockShortGame2D)
+            };
+            _queueService.Initialize(gameTypes);
+
+            Assert.IsTrue(await _loader.ActivateNextGameAsync(), "Should activate first game");
+            await _loader.PreloadWindowAsync();
+            StartNextGameIfAvailable();
+
+            Assert.IsTrue(await _loader.ActivateNextGameAsync(), "Should activate second game");
+            await _loader.PreloadWindowAsync();
+            StartNextGameIfAvailable();
+
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockShortGame)), "First game should remain loaded");
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockPoolableShortGame)), "Second game should remain loaded");
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockShortGame2D)), "Third game should be loaded");
+
+            // Act
+            Assert.IsTrue(await _loader.ActivateNextGameAsync(), "Should activate last game");
+
+            // Assert
+            Assert.IsFalse(_loader.IsGameLoaded(typeof(MockShortGame)), "Game outside the window should be unloaded");
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockPoolableShortGame)), "Previous game should stay loaded");
+            Assert.IsTrue(_loader.IsGameLoaded(typeof(MockShortGame2D)), "Current game should stay loaded");
+        }
         
         [Test]
         public async Task Reset_ClearsQueueAndGames()
@@ -466,6 +499,20 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             // but Unity's test framework doesn't handle inheritance properly
             Assert.ThrowsAsync<TaskCanceledException>(async () =>
                 await _loader.LoadGameAsync(typeof(MockShortGame), cts.Token));
+        }
+        private void StartNextGameIfAvailable()
+        {
+            var nextType = _queueService.NextGameType;
+            if (nextType == null)
+            {
+                return;
+            }
+
+            var started = _loader.StartPreloadedGame(nextType);
+            if (!started)
+            {
+                Assert.Fail($"Failed to start preloaded game {nextType.Name}");
+            }
         }
     }
 }

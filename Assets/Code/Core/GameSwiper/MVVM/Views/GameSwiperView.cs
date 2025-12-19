@@ -7,6 +7,7 @@ using Code.Core.GameStats;
 using Code.Core.GameSwiper.InputHandlers;
 using Code.Core.GameSwiper.MVVM.ViewModels;
 using DG.Tweening;
+using R3;
 using TMPro;
 using UnityEngine;
 
@@ -159,12 +160,12 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 		compositeDisposable.AddDisposable(viewModel.SwipeProgress.Subscribe(OnSwipeProgressChanged));
 		compositeDisposable.AddDisposable(viewModel.CurrentGameViewModel.Subscribe(_ =>
 		{
-			BindCurrentPresentation(viewModel.CurrentGameViewModel.Value);
+			BindCurrentPresentation(viewModel.CurrentGameViewModel.CurrentValue);
 		}));
 		viewModel.OnNextGameStartedAsync += AnimateToNext;
 		viewModel.OnPreviousGameStartedAsync += AnimateToPrevious;
 
-		BindCurrentPresentation(viewModel.CurrentGameViewModel.Value);
+		BindCurrentPresentation(viewModel.CurrentGameViewModel.CurrentValue);
 	}
 
 	private void CleanupBindings()
@@ -195,9 +196,9 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 
 	private void UpdateGameViews(bool forceRefresh = false)
 	{
-		var targetPrevious = viewModel.PreviousGameViewModel.Value;
-		var targetCurrent = viewModel.CurrentGameViewModel.Value;
-		var targetNext = viewModel.NextGameViewModel.Value;
+		var targetPrevious = viewModel.PreviousGameViewModel.CurrentValue;
+		var targetCurrent = viewModel.CurrentGameViewModel.CurrentValue;
+		var targetNext = viewModel.NextGameViewModel.CurrentValue;
 
 		if (ShouldDeferViewRefresh && !forceRefresh)
 		{
@@ -396,7 +397,7 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 
 	private void HandleNextGameRequest()
 	{
-		if (IsInteractionLocked() || !viewModel.CanGoNext.Value)
+		if (IsInteractionLocked() || !viewModel.CanGoNext.CurrentValue)
 		{
 			return;
 		}
@@ -406,7 +407,7 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 
 	private void HandlePreviousGameRequest()
 	{
-		if (IsInteractionLocked() || !viewModel.CanGoPrevious.Value)
+		if (IsInteractionLocked() || !viewModel.CanGoPrevious.CurrentValue)
 		{
 			return;
 		}
@@ -502,8 +503,8 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 
 	private void UpdateNavigationStates()
 	{
-		var canGoNext = viewModel.CanGoNext.Value && !IsInteractionLocked();
-		var canGoPrevious = viewModel.CanGoPrevious.Value && !IsInteractionLocked();
+		var canGoNext = viewModel.CanGoNext.CurrentValue && !IsInteractionLocked();
+		var canGoPrevious = viewModel.CanGoPrevious.CurrentValue && !IsInteractionLocked();
 
 		foreach (var handler in _inputHandlers)
 		{

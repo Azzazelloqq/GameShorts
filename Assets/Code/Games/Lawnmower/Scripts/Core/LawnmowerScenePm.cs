@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic;
@@ -8,7 +8,7 @@ using LightDI;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Core
 {
-    internal class LawnmowerScenePm : BaseDisposable
+    internal class LawnmowerScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -32,7 +32,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Core
             };
             
             _mainScene = LawnmowerMainScenePmFactory.CreateLawnmowerMainScenePm(mainSceneCtx);
-            AddDispose(_mainScene);
+            AddDisposable(_mainScene);
         }
     }
 }

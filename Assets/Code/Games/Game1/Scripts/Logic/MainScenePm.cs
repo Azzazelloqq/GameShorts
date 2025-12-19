@@ -2,7 +2,7 @@
 using System.Threading;
 using Asteroids.Code.Games.Game1.Scripts.Logic;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using LightDI.Runtime;
 using Logic.Enemy;
@@ -11,7 +11,7 @@ using Logic.UI;
 
 namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
 {
-    internal class MainScenePm : BaseDisposable
+    internal class MainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -37,7 +37,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
             _inputManager.Initialize(_ctx.sceneContextView.Joystick);
             _currentState = GameState.WaitingToStart;
             _entitiesController = new EntitiesControllerPm(new EntitiesControllerPm.Ctx());
-            AddDispose(_entitiesController);
+            AddDisposable(_entitiesController);
 
             ShowStartScreen();
         }
@@ -57,7 +57,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
                 cancellationToken = _ctx.cancellationToken
             };
             _startScreen = StartScreenPmFactory.CreateStartScreenPm(startScreenCtx);
-            AddDispose(_startScreen);
+            AddDisposable(_startScreen);
         }
 
         private void StartGame()
@@ -82,7 +82,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
                 cancellationToken = _ctx.cancellationToken
             };
             _playerSpawnerPm = new PlayerSpawnerPm(playerSpawnerCtx);
-            AddDispose(_playerSpawnerPm);
+            AddDisposable(_playerSpawnerPm);
 
             EnemyManagerPm.Ctx enemyManagerCtx = new EnemyManagerPm.Ctx
             {
@@ -91,7 +91,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
                 cancellationToken = _ctx.cancellationToken
             };
             _enemyManager = new EnemyManagerPm(enemyManagerCtx);
-            AddDispose(_enemyManager);
+            AddDisposable(_enemyManager);
 
             MainScreenPm.Ctx mainScreenCtx = new MainScreenPm.Ctx
             {
@@ -100,7 +100,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
                 cancellationToken = _ctx.cancellationToken
             };
             _mainScreen = MainScreenPmFactory.CreateMainScreenPm(mainScreenCtx);
-            AddDispose(_mainScreen);
+            AddDisposable(_mainScreen);
         }
 
         private void ShowFinishScreen()
@@ -123,7 +123,7 @@ namespace Code.Core.ShortGamesCore.Game1.Scripts.Logic
                 restartGame = _ctx.restartGame,
                 cancellationToken = _ctx.cancellationToken
             };
-            AddDispose(FinishScreenPmFactory.CreateFinishScreenPm(FinishScreenCtx));
+            AddDisposable(FinishScreenPmFactory.CreateFinishScreenPm(FinishScreenCtx));
         }
     }
     internal enum GameState

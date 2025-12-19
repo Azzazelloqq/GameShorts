@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using LightDI;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
 {
-    internal class EscapeFromDarkScenePm : BaseDisposable
+    internal class EscapeFromDarkScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -28,7 +28,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
                 restartGame = _ctx.restartGame
             };
             var mainScenePm = EscapeFromDarkMainScenePmFactory.CreateEscapeFromDarkMainScenePm(mainSceneCtx);
-            AddDispose(mainScenePm);
+            AddDisposable(mainScenePm);
         }
     }
 }

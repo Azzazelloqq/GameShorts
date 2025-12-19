@@ -1,15 +1,15 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Disposable;
 using R3;
 using UnityEngine;
 
 namespace Lightseeker
 {
-    public class LightseekerGame : BaseMonoBehaviour, IShortGame3D
+    public class LightseekerGame : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private LightseekerSceneContextView _sceneContextView;

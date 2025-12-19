@@ -1,10 +1,10 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 
 namespace Code.Games
 {
-    internal class Game2048StartScreenPm : BaseDisposable
+    internal class Game2048StartScreenPm : DisposableBase
     {
         internal struct Ctx
         {

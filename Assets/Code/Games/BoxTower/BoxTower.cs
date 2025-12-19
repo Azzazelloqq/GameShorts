@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Disposable;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-public class BoxTower : BaseMonoBehaviour, IShortGame2D
+public class BoxTower : MonoBehaviourDisposable, IShortGame2D
 {
 	[SerializeField]
 	private Camera _camera;

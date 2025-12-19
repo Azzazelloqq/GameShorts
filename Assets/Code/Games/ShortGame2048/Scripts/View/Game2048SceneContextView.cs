@@ -1,4 +1,4 @@
-using Code.Core.ShortGamesCore.Game1.Scripts.View;
+using SceneContext;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,9 +8,9 @@ namespace Code.Games
     {
         [SerializeField] 
         private Transform _gameSpawnPoint;
+        
         [SerializeField] 
         private Transform _finishGamePoint;
-        
         
         [SerializeField]
         private Game2048InputAreaView _inputAreaView;

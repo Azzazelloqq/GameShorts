@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using GameShorts.Gardener.Core;
 using GameShorts.Gardener.Data;
@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace GameShorts.Gardener.Gameplay
 {
-    internal class GardenerGameplayPm : BaseDisposable
+    internal class GardenerGameplayPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -53,7 +53,7 @@ namespace GameShorts.Gardener.Gameplay
 
             // Создаем менеджер инвентаря
             _inventoryManager = new InventoryManager();
-            AddDispose(_inventoryManager);
+            AddDisposable(_inventoryManager);
 
             // Создаем менеджер UI баров
             _plotUIBarManager = PlotUIBarManagerFactory.CreatePlotUIBarManager(new PlotUIBarManager.Ctx
@@ -63,11 +63,11 @@ namespace GameShorts.Gardener.Gameplay
                 camera = _ctx.sceneContextView.MainCamera,
                 holderUI = _ctx.sceneContextView.PlotUiPlacer
             });
-            AddDispose(_plotUIBarManager);
+            AddDisposable(_plotUIBarManager);
 
             // Создаем менеджер режимов
             _modeManager = new GardenerModeManager();
-            AddDispose(_modeManager);
+            AddDisposable(_modeManager);
 
             // Регистрируем режимы
             RegisterModes();
@@ -80,7 +80,7 @@ namespace GameShorts.Gardener.Gameplay
                 findPlotAtPosition = (pos) => FindPlotAtPosition(pos),
                 isPaused = _ctx.isPaused
             });
-            AddDispose(_inputHandler);
+            AddDisposable(_inputHandler);
 
             // Создаем обработчик вращения платформы
             if (_ctx.sceneContextView.PlatformRotationView != null)
@@ -92,7 +92,7 @@ namespace GameShorts.Gardener.Gameplay
                     gameSettings = _ctx.gameSettings,
                     camera = _ctx.sceneContextView.MainCamera
                 });
-                AddDispose(rotationPm);
+                AddDisposable(rotationPm);
             }
         }
 

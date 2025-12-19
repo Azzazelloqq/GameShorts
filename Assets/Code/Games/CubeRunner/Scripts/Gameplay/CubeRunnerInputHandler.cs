@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using LightDI.Runtime;
 using R3;
 using TickHandler;
@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace GameShorts.CubeRunner.Gameplay
 {
-    internal class CubeRunnerInputHandler : BaseDisposable
+    internal class CubeRunnerInputHandler : DisposableBase
     {
         internal struct Ctx
         {
@@ -35,7 +35,7 @@ namespace GameShorts.CubeRunner.Gameplay
 
             if (_ctx.isPaused != null)
             {
-                AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+                AddDisposable(_ctx.isPaused.Subscribe(isPaused =>
                 {
                     _isInputEnabled = !isPaused;
                     ResetPointerState();

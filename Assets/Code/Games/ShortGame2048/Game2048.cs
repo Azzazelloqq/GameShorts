@@ -1,16 +1,16 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Disposable;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Code.Games
 {
-    public class Game2048 : BaseMonoBehaviour, IShortGame3D
+    public class Game2048 : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private Game2048SceneContextView _sceneContextView;
@@ -87,13 +87,6 @@ namespace Code.Games
             DisposeCore();
 
             _isDisposed = true;
-        }
-
-        protected override void OnDestroy()
-        {
-            // Гарантируем, что Dispose вызывается при уничтожении GameObject
-            // Это важно для корректного возврата кубов в пул
-            Dispose();
         }
 
         private void RecreateRoot()

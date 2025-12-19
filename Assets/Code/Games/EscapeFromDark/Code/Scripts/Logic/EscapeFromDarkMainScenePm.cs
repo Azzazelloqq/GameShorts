@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI;
@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
 {
-    internal class EscapeFromDarkMainScenePm : BaseDisposable
+    internal class EscapeFromDarkMainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -68,7 +68,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
             };
             
             _startScreenPm = new StartScreenPm(startScreenCtx);
-            AddDispose(_startScreenPm);
+            AddDisposable(_startScreenPm);
             
             Debug.Log("EscapeFromDark: Start screen created");
         }
@@ -112,7 +112,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
             };
             
             _levelPm = new EscapeFromDarkLevelPm(levelCtx);
-            AddDispose(_levelPm);
+            AddDisposable(_levelPm);
             
             Debug.Log($"EscapeFromDark: Level {_currentLevel} created");
         }
@@ -134,7 +134,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
             };
             
             _playerPm = EscapeFromDarkPlayerPmFactory.CreateEscapeFromDarkPlayerPm(playerCtx);
-            AddDispose(_playerPm);
+            AddDisposable(_playerPm);
             
             // Обновляем ссылку на игрока в ExitSpot
             _levelPm?.UpdatePlayerReference(_playerPm.GetPlayerView()?.transform);
@@ -159,7 +159,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
             };
             
             _cameraPm = new EscapeFromDarkCameraPm(cameraCtx);
-            AddDispose(_cameraPm);
+            AddDisposable(_cameraPm);
             
             Debug.Log("EscapeFromDark: Camera created");
         }

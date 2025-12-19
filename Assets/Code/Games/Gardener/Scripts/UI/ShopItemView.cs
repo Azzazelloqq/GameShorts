@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using TMPro;
 using UnityEngine;
@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace GameShorts.Gardener.UI
 {
-    internal class ShopItemView : BaseMonoBehaviour
+    internal class ShopItemView : MonoBehaviourDisposable
     {
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private TextMeshProUGUI _priceText;

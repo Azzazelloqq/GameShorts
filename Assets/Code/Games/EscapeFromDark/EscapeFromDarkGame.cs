@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark
 {
-public class EscapeFromDarkGame : BaseMonoBehaviour, IShortGame2D
+public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 {
 	[FormerlySerializedAs("sceneContextView")]
 	[SerializeField]

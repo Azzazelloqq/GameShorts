@@ -1,14 +1,14 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.InputManager;
+using Disposable;
 using LightDI.Runtime;
 using R3;
 using UnityEngine;
 
 namespace Lightseeker
 {
-    internal class LightseekerMainScenePm : BaseDisposable
+    internal class LightseekerMainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -79,7 +79,7 @@ namespace Lightseeker
             };
             
             _mainUIPm = new LightseekerMainUIPm(uiCtx);
-            AddDispose(_mainUIPm);
+            AddDisposable(_mainUIPm);
         }
 
         private void InitializeLevel()
@@ -93,7 +93,7 @@ namespace Lightseeker
             };
             
             _levelPm =  LightseekerLevelPmFactory.CreateLightseekerLevelPm(levelCtx);
-            AddDispose(_levelPm);
+            AddDisposable(_levelPm);
         }
 
         private void InitializePlayer()
@@ -106,7 +106,7 @@ namespace Lightseeker
             };
             
             _playerPm = LightseekerPlayerPmFactory.CreateLightseekerPlayerPm(playerCtx);
-            AddDispose(_playerPm);
+            AddDisposable(_playerPm);
         }
 
         private void OnStarCollected(int collectedStars)

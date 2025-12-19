@@ -3,7 +3,7 @@ using System.Threading;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
 using LightDI.Runtime;
@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace Logic.Player
 {
-    internal class PlayerPm : BaseDisposable
+    internal class PlayerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -74,7 +74,7 @@ namespace Logic.Player
                 useAcceleration = true,
                 isPlayer = true
             };
-            AddDispose(EntityMoverPmFactory.CreateEntityMoverPm(entityMoverCtx));
+            AddDisposable(EntityMoverPmFactory.CreateEntityMoverPm(entityMoverCtx));
             
             ProjectileWeaponPm.Ctx projectileWeaponCtx = new ProjectileWeaponPm.Ctx
             {
@@ -85,7 +85,7 @@ namespace Logic.Player
                 entitiesController = _ctx.entitiesController,
                 cancellationToken = _ctx.cancellationToken
             };
-            AddDispose(ProjectileWeaponPmFactory.CreateProjectileWeaponPm(projectileWeaponCtx));
+            AddDisposable(ProjectileWeaponPmFactory.CreateProjectileWeaponPm(projectileWeaponCtx));
 
             LaserWeaponPm.Ctx laserWeaponCtx = new LaserWeaponPm.Ctx
             {
@@ -95,14 +95,14 @@ namespace Logic.Player
                 laserSettings = _ctx.sceneContextView.laserSettings,
                 cancellationToken = _ctx.cancellationToken
             };
-            AddDispose(LaserWeaponPmFactory.CreateLaserWeaponPm(laserWeaponCtx));
+            AddDisposable(LaserWeaponPmFactory.CreateLaserWeaponPm(laserWeaponCtx));
             
             ScreenWraperPm.Ctx screenWraperCtx = new ScreenWraperPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
                 playerModel = _ctx.playerModel
             };
-            AddDispose(ScreenWraperPmFactory.CreateScreenWraperPm(screenWraperCtx));
+            AddDisposable(ScreenWraperPmFactory.CreateScreenWraperPm(screenWraperCtx));
         }
 
         private void Collided(CollidedInfo collidedInfo)

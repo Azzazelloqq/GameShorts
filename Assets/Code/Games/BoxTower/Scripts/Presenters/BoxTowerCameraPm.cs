@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using LightDI.Runtime;
 using UnityEngine;
 using R3;
@@ -8,7 +8,7 @@ using TickHandler;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    internal class BoxTowerCameraPm : BaseDisposable
+    internal class BoxTowerCameraPm : DisposableBase
     {
         public struct Ctx
         {
@@ -51,11 +51,11 @@ namespace Code.Core.ShortGamesCore.Game2
             }
             
             // Subscribe to tower height changes
-            AddDispose(_ctx.towerModel.TowerHeight.Subscribe(OnTowerHeightChanged));
+            AddDisposable(_ctx.towerModel.TowerHeight.Subscribe(OnTowerHeightChanged));
             
             // Subscribe to game state changes to reset camera
             // We'll need access to game model for this, for now just reset on tower height 0
-            AddDispose(_ctx.towerModel.TowerHeight.Where(height => height == 0f)
+            AddDisposable(_ctx.towerModel.TowerHeight.Where(height => height == 0f)
                 .Subscribe(_ => ResetCameraPosition()));
             
             // Subscribe to scene updates for smooth camera movement

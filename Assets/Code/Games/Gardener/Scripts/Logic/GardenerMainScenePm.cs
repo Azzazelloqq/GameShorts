@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Core;
 using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.View;
@@ -8,7 +8,7 @@ using R3;
 
 namespace GameShorts.Gardener.Logic
 {
-    internal class GardenerMainScenePm : BaseDisposable
+    internal class GardenerMainScenePm : DisposableBase
     {
         internal struct Ctx
         {

@@ -1,12 +1,13 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using R3;
+using CompositeDisposable = Disposable.CompositeDisposable;
 
 namespace Code.Games
 {
-    internal class Game2048InputPm : BaseDisposable
+    internal class Game2048InputPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -15,7 +16,6 @@ namespace Code.Games
         }
 
         private readonly Ctx _ctx;
-        private readonly CompositeDisposable _compositeDisposable = new();
         
         public readonly Subject<Vector2> OnPointerDown = new();
         public readonly Subject<Vector2> OnPointerMove = new();
@@ -28,10 +28,9 @@ namespace Code.Games
             _ctx = ctx;
             
             SetupInputBindings();
-            AddDispose(_compositeDisposable);
-            AddDispose(OnPointerDown);
-            AddDispose(OnPointerMove);
-            AddDispose(OnPointerUp);
+            AddDisposable(OnPointerDown);
+            AddDisposable(OnPointerMove);
+            AddDisposable(OnPointerUp);
         }
 
         private void SetupInputBindings()

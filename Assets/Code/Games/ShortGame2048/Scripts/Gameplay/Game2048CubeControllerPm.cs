@@ -1,14 +1,15 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using LightDI.Runtime;
 using UnityEngine;
 using R3;
 using TickHandler;
+using CompositeDisposable = R3.CompositeDisposable;
 
 namespace Code.Games
 {
-    internal class Game2048CubeControllerPm : BaseDisposable
+    internal class Game2048CubeControllerPm : DisposableBase
     {
         public struct Ctx
         {
@@ -40,8 +41,8 @@ namespace Code.Games
             
             SubscribeToInput();
             
-            AddDispose(_compositeDisposable);
-            AddDispose(OnCubeLaunched);
+            AddDisposable(_compositeDisposable);
+            AddDisposable(OnCubeLaunched);
         }
 
         protected override void OnDispose()

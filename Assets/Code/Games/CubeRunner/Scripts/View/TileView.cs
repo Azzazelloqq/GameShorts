@@ -1,9 +1,9 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 
 namespace GameShorts.CubeRunner.View
 {
-    public class TileView : BaseMonoBehaviour
+    public class TileView : MonoBehaviourDisposable
     {
         [SerializeField]
         private MeshRenderer _meshRenderer;

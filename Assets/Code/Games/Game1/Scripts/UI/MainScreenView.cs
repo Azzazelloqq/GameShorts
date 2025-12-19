@@ -1,10 +1,10 @@
-﻿using Code.Core.BaseDMDisposable.Scripts;
+﻿using Disposable;
 using TMPro;
 using UnityEngine;
 
 namespace Logic.UI
 {
-    internal class MainScreenView : BaseMonoBehaviour
+    internal class MainScreenView : MonoBehaviourDisposable
     {
         [SerializeField]
         private TextMeshProUGUI _score;

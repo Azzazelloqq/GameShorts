@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
-    internal class LawnmowerLevelManager : BaseDisposable
+    internal class LawnmowerLevelManager : DisposableBase
     {
         public struct Ctx
         {

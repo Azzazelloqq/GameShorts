@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BoxTowerCorePm : BaseDisposable
+    public class BoxTowerCorePm : DisposableBase
     {
         public struct Ctx
         {
@@ -25,7 +25,7 @@ namespace Code.Core.ShortGamesCore.Game2
             _ctx = ctx;
             _poolManager = poolManager;
             _diContainer = DiContainerFactory.CreateContainer();
-            AddDispose(_diContainer);
+            AddDisposable(_diContainer);
             
             // Create game scene presenter
             BoxTowerGameScenePm.Ctx gameSceneCtx = new BoxTowerGameScenePm.Ctx
@@ -35,7 +35,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 restartGame = _ctx.restartGame
             };
             _gameScene = new BoxTowerGameScenePm(gameSceneCtx);
-            AddDispose(_gameScene);
+            AddDisposable(_gameScene);
         }
 
         public void ResetForNewSession()

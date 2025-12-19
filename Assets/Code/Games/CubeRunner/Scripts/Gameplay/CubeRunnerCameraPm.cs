@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.CubeRunner.View;
 using LightDI.Runtime;
 using TickHandler;
@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameShorts.CubeRunner.Gameplay
 {
-    internal class CubeRunnerCameraPm : BaseDisposable
+    internal class CubeRunnerCameraPm : DisposableBase
     {
         internal struct Ctx
         {

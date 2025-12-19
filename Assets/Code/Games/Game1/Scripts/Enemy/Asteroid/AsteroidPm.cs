@@ -4,7 +4,7 @@ using Asteroids.Code.Games.Game1.Scripts.Enemy.Asteroid;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
 using LightDI.Runtime;
@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace Logic.Enemy.Asteroid
 {
-    internal class AsteroidPm : BaseDisposable
+    internal class AsteroidPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -53,14 +53,14 @@ namespace Logic.Enemy.Asteroid
                 model = _ctx.asteroidModel,
                 useAcceleration = false
             };
-            AddDispose(EntityMoverPmFactory.CreateEntityMoverPm(entityMoverCtx));
+            AddDisposable(EntityMoverPmFactory.CreateEntityMoverPm(entityMoverCtx));
             BorderControllerPm.Ctx borderCtx = new BorderControllerPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
                 model = _ctx.asteroidModel,
                 entitiesController = _ctx.entitiesController
             };
-            AddDispose(BorderControllerPmFactory.CreateBorderControllerPm(borderCtx));
+            AddDisposable(BorderControllerPmFactory.CreateBorderControllerPm(borderCtx));
             
             _resourceLoader.LoadResource<GameObject>(ResourceIdsContainer.GameAsteroids.Asteroid, pref =>
             {

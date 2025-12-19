@@ -2,39 +2,47 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Azzazelloqq.MVVM.Core;
-using Azzazelloqq.MVVM.ReactiveLibrary;
 using Code.Core.GameStats;
+using R3;
 using UnityEngine;
 
 namespace Code.Core.GameSwiper.MVVM.Models
 {
 internal class GameSwiperModel : ModelBase
 {
-	public IReactiveProperty<GameItemModel> PreviousGame { get; }
-	public IReactiveProperty<GameItemModel> CurrentGame { get; }
-	public IReactiveProperty<GameItemModel> NextGame { get; }
-	public IReactiveProperty<int> CurrentGameIndex { get; }
-	public IReactiveProperty<bool> CanGoNext { get; }
-	public IReactiveProperty<bool> CanGoPrevious { get; }
-	public IReactiveProperty<bool> IsTransitioning { get; }
-	public IReactiveProperty<bool> IsLoading { get; }
+	public ReadOnlyReactiveProperty<GameItemModel> PreviousGame => _previousGame;
+	public ReadOnlyReactiveProperty<GameItemModel> CurrentGame => _currentGame;
+	public ReadOnlyReactiveProperty<GameItemModel> NextGame => _nextGame;
+	public ReadOnlyReactiveProperty<int> CurrentGameIndex => _currentGameIndex;
+	public ReadOnlyReactiveProperty<bool> CanGoNext => _canGoNext;
+	public ReadOnlyReactiveProperty<bool> CanGoPrevious => _canGoPrevious;
+	public ReadOnlyReactiveProperty<bool> IsTransitioning => _isTransitioning;
+	public ReadOnlyReactiveProperty<bool> IsLoading => _isLoading;
 	public SwiperSettings Settings { get; }
 
 	private readonly Dictionary<int, GameItemModel> _gameItemsCache;
+	private readonly ReactiveProperty<GameItemModel> _previousGame;
+	private readonly ReactiveProperty<GameItemModel> _currentGame;
+	private readonly ReactiveProperty<GameItemModel> _nextGame;
+	private readonly ReactiveProperty<int> _currentGameIndex;
+	private readonly ReactiveProperty<bool> _canGoNext;
+	private readonly ReactiveProperty<bool> _canGoPrevious;
+	private readonly ReactiveProperty<bool> _isTransitioning;
+	private readonly ReactiveProperty<bool> _isLoading;
 
 	public GameSwiperModel(
 		SwiperSettings settings = null)
 	{
 		Settings = settings ?? new SwiperSettings();
 
-		PreviousGame = new ReactiveProperty<GameItemModel>(null);
-		CurrentGame = new ReactiveProperty<GameItemModel>(null);
-		NextGame = new ReactiveProperty<GameItemModel>(null);
-		CurrentGameIndex = new ReactiveProperty<int>(0);
-		CanGoNext = new ReactiveProperty<bool>(false);
-		CanGoPrevious = new ReactiveProperty<bool>(false);
-		IsTransitioning = new ReactiveProperty<bool>(false);
-		IsLoading = new ReactiveProperty<bool>(false);
+		_previousGame = AddDisposable(new ReactiveProperty<GameItemModel>(null));
+		_currentGame = AddDisposable(new ReactiveProperty<GameItemModel>(null));
+		_nextGame = AddDisposable(new ReactiveProperty<GameItemModel>(null));
+		_currentGameIndex = AddDisposable(new ReactiveProperty<int>(0));
+		_canGoNext = AddDisposable(new ReactiveProperty<bool>(false));
+		_canGoPrevious = AddDisposable(new ReactiveProperty<bool>(false));
+		_isTransitioning = AddDisposable(new ReactiveProperty<bool>(false));
+		_isLoading = AddDisposable(new ReactiveProperty<bool>(false));
 
 		_gameItemsCache = new Dictionary<int, GameItemModel>();
 	}
@@ -51,15 +59,6 @@ internal class GameSwiperModel : ModelBase
 
 	protected override void OnDispose()
 	{
-		PreviousGame?.Dispose();
-		CurrentGame?.Dispose();
-		NextGame?.Dispose();
-		CurrentGameIndex?.Dispose();
-		CanGoNext?.Dispose();
-		CanGoPrevious?.Dispose();
-		IsTransitioning?.Dispose();
-		IsLoading?.Dispose();
-
 		_gameItemsCache?.Clear();
 	}
 
@@ -70,23 +69,24 @@ internal class GameSwiperModel : ModelBase
 
 	public void SetLoadingState(bool isLoading)
 	{
-		IsLoading.SetValue(isLoading);
+		_isLoading.Value = isLoading;
 	}
 
 	public void SetTransitionState(bool isTransitioning)
 	{
-		IsTransitioning.SetValue(isTransitioning);
+		_isTransitioning.Value = isTransitioning;
 	}
 
 	public void UpdateCurrentGameIndex(int index)
 	{
-		CurrentGameIndex.SetValue(index);
+		_currentGameIndex.Value = index;
 	}
 
 	public void UpdateNavigationState(bool hasPreviousGame, bool hasNextGame)
 	{
-		CanGoPrevious.SetValue(hasPreviousGame);
-		CanGoNext.SetValue(hasNextGame);
+		_canGoPrevious.Value = hasPreviousGame;
+		
+		_canGoNext.Value = hasNextGame;
 	}
 
 	/// <summary>
@@ -98,19 +98,9 @@ internal class GameSwiperModel : ModelBase
 	/// <param name="activeIndex">Index of the active game.</param>
 	public void UpdateGameSlots(GameSlotState previous, GameSlotState current, GameSlotState next, int activeIndex)
 	{
-		UpdateSlot(PreviousGame, previous, activeIndex);
-		UpdateSlot(CurrentGame, current, activeIndex);
-		UpdateSlot(NextGame, next, activeIndex);
-	}
-
-	/// <summary>
-	/// Clears data for all cached slots.
-	/// </summary>
-	public void ClearSlots()
-	{
-		PreviousGame.SetValue(null);
-		CurrentGame.SetValue(null);
-		NextGame.SetValue(null);
+		UpdateSlot(_previousGame, previous, activeIndex);
+		UpdateSlot(_currentGame, current, activeIndex);
+		UpdateSlot(_nextGame, next, activeIndex);
 	}
 
 	private GameItemModel GetOrCreateGameItem(int index)
@@ -137,7 +127,7 @@ internal class GameSwiperModel : ModelBase
 		}
 	}
 
-	private void UpdateSlot(IReactiveProperty<GameItemModel> slotProperty, GameSlotState state, int activeIndex)
+	private void UpdateSlot(ReactiveProperty<GameItemModel> slotProperty, GameSlotState state, int activeIndex)
 	{
 		var gameItem = GetOrCreateGameItem(state.Index);
 		gameItem.UpdateRenderTexture(state.RenderTexture);
@@ -145,7 +135,7 @@ internal class GameSwiperModel : ModelBase
 		gameItem.SetActiveState(state.Index == activeIndex);
 		gameItem.SetPresentationData(state.PresentationData);
 
-		slotProperty.SetValue(gameItem);
+		slotProperty.Value = gameItem;
 	}
 }
 

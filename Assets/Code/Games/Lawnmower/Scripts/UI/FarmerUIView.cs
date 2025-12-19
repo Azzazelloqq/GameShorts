@@ -1,12 +1,12 @@
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
     /// <summary>
     /// View компонент для UI фермера
     /// </summary>
-    internal class FarmerUIView : BaseMonoBehaviour
+    internal class FarmerUIView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

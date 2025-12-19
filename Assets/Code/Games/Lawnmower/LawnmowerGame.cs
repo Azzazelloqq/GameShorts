@@ -1,18 +1,18 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Core;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Disposable;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.Lawnmower
 {
-public class LawnmowerGame : BaseMonoBehaviour, IShortGame2D
+public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 {
 	[FormerlySerializedAs("sceneContextView")]
 	[SerializeField]

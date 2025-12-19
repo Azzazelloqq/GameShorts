@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
@@ -12,7 +12,7 @@ using TickHandler;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 {
-    internal class LawnmowerPlayerPm : BaseDisposable
+    internal class LawnmowerPlayerPm : DisposableBase
     {
         public struct Ctx
         {
@@ -102,7 +102,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             };
             
             _playerMover = LawnmowerPlayerMoverPmFactory.CreateLawnmowerPlayerMoverPm(moverCtx);
-            AddDispose(_playerMover);
+            AddDisposable(_playerMover);
         }
 
         private void InitializeContainerManager()
@@ -121,7 +121,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
                     activeColor = Color.green
                 };
                 emptyingZonePm = new EmptyingZonePm(emptyingZoneCtx);
-                AddDispose(emptyingZonePm);
+                AddDisposable(emptyingZonePm);
             }
             
             var containerCtx = new GrassContainerManager.Ctx
@@ -132,7 +132,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             };
             
             _containerManager = new GrassContainerManager(containerCtx);
-            AddDispose(_containerManager);
+            AddDisposable(_containerManager);
             
             Debug.Log($"Container manager initialized with emptying zone: {emptyingZoneView?.name ?? "None"}");
         }
@@ -149,7 +149,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             };
             
             _farmerUIPm = new FarmerUIPm(farmerUICtx);
-            AddDispose(_farmerUIPm);
+            AddDisposable(_farmerUIPm);
             
             Debug.Log("Farmer UI MVP initialized");
         }
@@ -164,15 +164,15 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             };
                 
             _mainGameUIPm = new MainGameUIPm(mainGameUICtx);
-            AddDispose(_mainGameUIPm);
+            AddDisposable(_mainGameUIPm);
         }
 
         private void StartInputHandling()
         {
             // Подписываемся на изменения позиции модели для синхронизации с визуальным представлением
-            AddDispose(_playerModel.Position.Subscribe(OnPositionChanged));
-            AddDispose(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
-            AddDispose(_playerModel.CurrentRotation.Subscribe(OnRotationChanged));
+            AddDisposable(_playerModel.Position.Subscribe(OnPositionChanged));
+            AddDisposable(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
+            AddDisposable(_playerModel.CurrentRotation.Subscribe(OnRotationChanged));
             
             _tickHandler.PhysicUpdate += HandleGrassCutting;
             _tickHandler.FrameUpdate += HandleContainerEmptying;

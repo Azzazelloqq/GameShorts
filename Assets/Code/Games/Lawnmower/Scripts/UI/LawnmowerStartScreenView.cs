@@ -1,11 +1,11 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
-    internal class LawnmowerStartScreenView : BaseMonoBehaviour
+    internal class LawnmowerStartScreenView : MonoBehaviourDisposable
     {
         [Header("UI Elements")]
         [SerializeField] private Button startButton;
