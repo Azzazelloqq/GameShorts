@@ -193,9 +193,3 @@ internal readonly struct VoteAnimationRequest
 	public GameStatsData StatsData { get; }
 }
 }
-
-
-
-
-
-

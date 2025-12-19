@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Code.Games.AngryHumans
 {
@@ -14,9 +13,6 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	[SerializeField]
 	private Camera _uiCamera;
-
-	[SerializeField]
-	private GraphicRaycaster _graphicRaycaster;
 
 	[Header("Game Components")]
 	[SerializeField]
@@ -128,8 +124,6 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public void EnableInput()
 	{
-		_graphicRaycaster.enabled = true;
-
 		if (_inputHandler != null)
 		{
 			_inputHandler.enabled = true;
@@ -138,8 +132,6 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public void DisableInput()
 	{
-		_graphicRaycaster.enabled = false;
-
 		if (_inputHandler != null)
 		{
 			_inputHandler.enabled = false;

@@ -1,38 +1,106 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Code.Games.AngryHumans
 {
 /// <summary>
-/// Handles UI input and forwards it to LaunchController
-/// Should be placed on a UI Panel under Canvas
+/// Handles input via raycast and forwards it to LaunchController
+/// Can be enabled/disabled to control input
 /// </summary>
-internal class InputHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+internal class InputHandler : MonoBehaviour
 {
 	[SerializeField]
 	private LaunchController _launchController;
 
-	public void OnPointerDown(PointerEventData eventData)
+	[SerializeField]
+	private Camera _camera;
+
+	private bool _isPointerDown;
+
+	private void Awake()
 	{
-		if (_launchController != null)
+		if (_camera == null)
 		{
-			_launchController.OnPointerDown(eventData);
+			_camera = Camera.main;
 		}
 	}
 
-	public void OnDrag(PointerEventData eventData)
+	private void Update()
 	{
-		if (_launchController != null)
+		if (_launchController == null)
 		{
-			_launchController.OnDrag(eventData);
+			return;
+		}
+
+		var inputPosition = GetInputPosition(out var hasInput);
+
+		if (!hasInput)
+		{
+			if (_isPointerDown)
+			{
+				_isPointerDown = false;
+				_launchController.OnPointerUp(inputPosition);
+			}
+
+			return;
+		}
+
+		if (IsPointerDown())
+		{
+			if (!_isPointerDown)
+			{
+				_isPointerDown = true;
+				_launchController.OnPointerDown(inputPosition);
+			}
+			else
+			{
+				_launchController.OnDrag(inputPosition);
+			}
+		}
+		else if (_isPointerDown)
+		{
+			_isPointerDown = false;
+			_launchController.OnPointerUp(inputPosition);
 		}
 	}
 
-	public void OnPointerUp(PointerEventData eventData)
+	private Vector2 GetInputPosition(out bool hasInput)
 	{
-		if (_launchController != null)
+#if UNITY_EDITOR || UNITY_STANDALONE
+		hasInput = true;
+		return Input.mousePosition;
+#else
+		if (Input.touchCount > 0)
 		{
-			_launchController.OnPointerUp(eventData);
+			hasInput = true;
+			return Input.GetTouch(0).position;
+		}
+
+		hasInput = false;
+		return Vector2.zero;
+#endif
+	}
+
+	private bool IsPointerDown()
+	{
+#if UNITY_EDITOR || UNITY_STANDALONE
+		return Input.GetMouseButton(0);
+#else
+		if (Input.touchCount > 0)
+		{
+			var phase = Input.GetTouch(0).phase;
+			return phase == TouchPhase.Began || phase == TouchPhase.Moved || phase == TouchPhase.Stationary;
+		}
+
+		return false;
+#endif
+	}
+
+	private void OnDisable()
+	{
+		if (_isPointerDown && _launchController != null)
+		{
+			_isPointerDown = false;
+			_launchController.OnPointerUp(Vector2.zero);
 		}
 	}
 }

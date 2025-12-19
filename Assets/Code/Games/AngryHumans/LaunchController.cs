@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 namespace Code.Games.AngryHumans
@@ -74,7 +73,7 @@ internal class LaunchController : MonoBehaviour
 		}
 	}
 
-	public void OnPointerDown(PointerEventData eventData)
+	public void OnPointerDown(Vector2 screenPosition)
 	{
 		if (_launchPlatform == null)
 		{
@@ -88,7 +87,7 @@ internal class LaunchController : MonoBehaviour
 			return;
 		}
 
-		var worldPosition = GetWorldPosition(eventData.position);
+		var worldPosition = GetWorldPosition(screenPosition);
 		_grabbedPoint = _currentHuman.GetNearestGrabPoint(worldPosition);
 
 		_grabbedRigidbody = _grabbedPoint.GetComponent<Rigidbody>();
@@ -109,20 +108,20 @@ internal class LaunchController : MonoBehaviour
 
 		_screenSwipePositions.Clear();
 		_screenSwipeTimes.Clear();
-		_screenSwipePositions.Add(eventData.position);
+		_screenSwipePositions.Add(screenPosition);
 		_screenSwipeTimes.Add(Time.time);
 
 		_lastSwipeVelocity = Vector3.zero;
 	}
 
-	public void OnDrag(PointerEventData eventData)
+	public void OnDrag(Vector2 screenPosition)
 	{
 		if (!_isDragging || _currentHuman == null || _grabbedPoint == null)
 		{
 			return;
 		}
 
-		var worldPosition = GetWorldPosition(eventData.position);
+		var worldPosition = GetWorldPosition(screenPosition);
 		var currentTime = Time.time;
 
 		_targetDragPosition = worldPosition;
@@ -136,7 +135,7 @@ internal class LaunchController : MonoBehaviour
 			_swipeTimes.RemoveAt(0);
 		}
 
-		_screenSwipePositions.Add(eventData.position);
+		_screenSwipePositions.Add(screenPosition);
 		_screenSwipeTimes.Add(currentTime);
 
 		while (_screenSwipePositions.Count > _velocitySamples)
@@ -165,7 +164,7 @@ internal class LaunchController : MonoBehaviour
 		}
 	}
 
-	public void OnPointerUp(PointerEventData eventData)
+	public void OnPointerUp(Vector2 screenPosition)
 	{
 		if (!_isDragging || _currentHuman == null || _grabbedPoint == null)
 		{
