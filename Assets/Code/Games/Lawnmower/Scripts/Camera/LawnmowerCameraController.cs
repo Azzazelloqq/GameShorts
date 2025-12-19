@@ -24,6 +24,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         private Vector3 _currentVelocity; // Для SmoothDamp
         private Vector3 _lookAheadOffset; // Текущий офсет "взгляда вперед"
         private Vector3 _targetPosition;
+        private bool _adaptiveZoomApplied;
 
         public LawnmowerCameraController(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
@@ -42,25 +43,24 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
                 return;
             }
 
-            // Устанавливаем начальные параметры камеры
-            if (_ctx.settings != null)
+            if (_ctx.settings == null)
             {
-                _ctx.camera.orthographicSize = _ctx.settings.DefaultOrthographicSize;
-                
-                if (_ctx.settings.AdaptiveZoom)
-                {
-                    AdaptZoomToLevel();
-                }
+                Debug.LogError("LawnmowerCameraController: Settings is null!");
+                return;
+            }
+
+            // Устанавливаем начальные параметры камеры
+            _ctx.camera.orthographicSize = _ctx.settings.DefaultOrthographicSize;
+            _adaptiveZoomApplied = false;
+            if (_ctx.settings.AdaptiveZoom && CanAdaptZoomToLevelNow())
+            {
+                AdaptZoomToLevel();
+                _adaptiveZoomApplied = true;
             }
             
-            // Устанавливаем начальную позицию камеры на игрока
-            if (_ctx.playerPm != null)
-            {
-                Vector3 playerPos = _ctx.playerPm.GetPlayerPosition();
-                Vector3 initialPos = playerPos + _ctx.settings.Offset;
-                _ctx.camera.transform.position = initialPos;
-                _targetPosition = initialPos;
-            }
+            // Ставим камеру сразу в корректную целевую позицию (с учетом bounds),
+            // чтобы не ждать первого движения игрока/первого эмита позиции.
+            SyncToPlayerImmediate();
         }
 
         private void StartFollowing()
@@ -151,7 +151,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             float maxY = bounds.max.y - cameraBounds.y - _ctx.settings.BoundsPadding;
             
             float clampedX = Mathf.Clamp(position.x, minX, maxX);
-            float clampedY = Mathf.Clamp(position.y, float.MinValue, maxY);
+            float clampedY = Mathf.Clamp(position.y, minY, maxY);
             
             return new Vector3(clampedX, clampedY, position.z);
         }
@@ -186,9 +186,41 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             _ctx.camera.orthographicSize = optimalSize;
         }
 
+        private bool CanAdaptZoomToLevelNow()
+        {
+            var currentLevel = _ctx.levelManager?.GetCurrentLevel();
+            return currentLevel?.LevelBounds != null;
+        }
+
+        private void SyncToPlayerImmediate()
+        {
+            if (_ctx.camera == null || _ctx.settings == null || _ctx.playerPm == null) return;
+
+            Vector3 playerPos3 = _ctx.playerPm.GetPlayerPosition();
+            UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y));
+
+            _ctx.camera.transform.position = _targetPosition;
+            _currentVelocity = Vector3.zero;
+        }
+
         private void UpdateCamera(float deltaTime)
         {
             if (_ctx.camera == null || _ctx.settings == null) return;
+
+            // Важно: уровень может "стартовать" уже после создания камеры.
+            // Если игрок стоит, Position может не эмититься — поэтому пересчитываем цель каждый кадр.
+            if (_ctx.playerPm != null)
+            {
+                Vector3 playerPos3 = _ctx.playerPm.GetPlayerPosition();
+                UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y));
+            }
+
+            // Если adaptive zoom включен, но в момент инициализации bounds еще не было — применяем позже.
+            if (_ctx.settings.AdaptiveZoom && !_adaptiveZoomApplied && CanAdaptZoomToLevelNow())
+            {
+                AdaptZoomToLevel();
+                _adaptiveZoomApplied = true;
+            }
 
             Vector3 currentPosition = _ctx.camera.transform.position;
             
