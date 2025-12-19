@@ -1,5 +1,5 @@
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using LightDI.Runtime;
 using R3;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Lightseeker
 {
-    internal class LightseekerPlayerPm : BaseDisposable
+    internal class LightseekerPlayerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -63,7 +63,7 @@ namespace Lightseeker
 
         private void SubscribeToPause()
         {
-            AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+            AddDisposable(_ctx.isPaused.Subscribe(isPaused =>
             {
                 _isInputEnabled = !isPaused;
             }));

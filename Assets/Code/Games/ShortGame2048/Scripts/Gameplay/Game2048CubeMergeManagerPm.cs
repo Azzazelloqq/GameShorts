@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
-using R3;
+using CompositeDisposable = Disposable.CompositeDisposable;
+using Random = UnityEngine.Random;
 
 namespace Code.Games
 {
-    internal class Game2048CubeMergeManagerPm : BaseDisposable
+    internal class Game2048CubeMergeManagerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -29,7 +29,7 @@ namespace Code.Games
         {
             _ctx = ctx;
             
-            AddDispose(_compositeDisposable);
+            AddDisposable(_compositeDisposable);
         }
 
         public void OnCubeCollision(Guid cubeId1, Guid cubeId2)
@@ -96,9 +96,9 @@ namespace Code.Games
 
             // Добавляем небольшое вращение для эффектности (уменьшил интенсивность)
             Vector3 randomTorque = new Vector3(
-                UnityEngine.Random.Range(-0.5f, 0.5f),
-                UnityEngine.Random.Range(-0.5f, 0.5f),
-                UnityEngine.Random.Range(-0.5f, 0.5f)
+                Random.Range(-0.5f, 0.5f),
+                Random.Range(-0.5f, 0.5f),
+                Random.Range(-0.5f, 0.5f)
             ) * 1.5f;
             rigidbody.AddTorque(randomTorque, ForceMode.Impulse);
         }
@@ -134,7 +134,7 @@ namespace Code.Games
 
             // Если не найден похожий куб, возвращаем случайное боковое направление (без Z)
             // Чтобы не мешать основному движению вперед
-            return new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, 0).normalized;
+            return new Vector3(Random.Range(-1f, 1f), 0, 0).normalized;
         }
 
         protected override void OnDispose()

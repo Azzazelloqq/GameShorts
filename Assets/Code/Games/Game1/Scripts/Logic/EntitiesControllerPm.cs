@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
 using UnityEngine;
 
 namespace Asteroids.Code.Games.Game1.Scripts.Logic
 {
-    internal class EntitiesControllerPm : BaseDisposable, IEntitiesController
+    internal class EntitiesControllerPm : DisposableBase, IEntitiesController
     {
         internal struct Ctx
         {
@@ -33,7 +33,7 @@ namespace Asteroids.Code.Games.Game1.Scripts.Logic
         public bool TryDestroyEntity(int id, int? killer = null)
         {
             // Check if this controller is disposed
-            if (isDisposed)
+            if (IsDisposed)
             {
                 return false;
             }

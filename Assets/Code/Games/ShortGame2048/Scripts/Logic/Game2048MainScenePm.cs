@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 
 namespace Code.Games
 {
-    internal class Game2048MainScenePm : BaseDisposable
+    internal class Game2048MainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -45,7 +45,7 @@ namespace Code.Games
             };
             
             _finishScreenPm = new Game2048FinishScreenPm(finishCtx);
-            AddDispose(_finishScreenPm);
+            AddDisposable(_finishScreenPm);
         }
 
         private void ShowStartScreen()
@@ -61,7 +61,7 @@ namespace Code.Games
                 cancellationToken = _ctx.cancellationToken
             };
             _startScreenPm = new Game2048StartScreenPm(startScreenCtx);
-            AddDispose(_startScreenPm);
+            AddDisposable(_startScreenPm);
         }
 
         private void StartGame()
@@ -110,9 +110,9 @@ namespace Code.Games
             };
             
             _pausePm = new Game2048PausePm(pauseCtx);
-            AddDispose(_pausePm);
+            AddDisposable(_pausePm);
             
-            AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+            AddDisposable(_ctx.isPaused.Subscribe(isPaused =>
                 {
                     // Блокируем/разблокируем инпут при паузе
                     _inputPm.SetInputEnabled(!isPaused);
@@ -128,7 +128,7 @@ namespace Code.Games
             };
             
             _inputPm = new Game2048InputPm(inputCtx);
-            AddDispose(_inputPm);
+            AddDisposable(_inputPm);
         }
 
         private void InitializeGameplay()
@@ -146,7 +146,7 @@ namespace Code.Games
             };
             
             _gameplayPm = Game2048GameplayPmFactory.CreateGame2048GameplayPm(gameplayCtx);
-            AddDispose(_gameplayPm);
+            AddDisposable(_gameplayPm);
             
             InitializeMainUI();
         }
@@ -161,7 +161,7 @@ namespace Code.Games
             };
             
             _mainUIPm = new Game2048MainUIPm(mainUICtx);
-            AddDispose(_mainUIPm);
+            AddDisposable(_mainUIPm);
         }
 
         public void ShowFinishScreen(int finalScore)

@@ -1,11 +1,11 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 {
-    internal class EscapeFromDarkLevelView : BaseMonoBehaviour
+    internal class EscapeFromDarkLevelView : MonoBehaviourDisposable
     {
         [Header("Tilemap Settings")]
         [SerializeField] private Tilemap _tilemap;

@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Gameplay.Modes;
 using LightDI.Runtime;
 using R3;
@@ -13,7 +13,7 @@ namespace GameShorts.Gardener.Gameplay
     /// Обработчик ввода для игры Gardener
     /// Обрабатывает клики/тапы на грядки и передает события в текущий режим
     /// </summary>
-    internal class GardenerInputHandler : BaseDisposable
+    internal class GardenerInputHandler : DisposableBase
     {
         public struct Ctx
         {
@@ -42,7 +42,7 @@ namespace GameShorts.Gardener.Gameplay
             // Подписываемся на паузу
             if (_ctx.isPaused != null)
             {
-                AddDispose(_ctx.isPaused.Subscribe(isPaused =>
+                AddDisposable(_ctx.isPaused.Subscribe(isPaused =>
                 {
                     _isInputEnabled = !isPaused;
                 }));

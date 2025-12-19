@@ -3,7 +3,7 @@ using Asteroids.Code.Games.Game1.Scripts.Enemy;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using LightDI.Runtime;
 using Logic.Entities;
 using Logic.Settings;
@@ -13,7 +13,7 @@ using Random = UnityEngine.Random;
 
 namespace Logic.Enemy
 {
-    internal class EnemyCoutControllerPm : BaseDisposable
+    internal class EnemyCoutControllerPm : DisposableBase
     {
         public event Action<EnemySpawnInfo> SpawnEnemy;
         internal struct Ctx

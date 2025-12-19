@@ -1,47 +1,52 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Azzazelloqq.MVVM.Core;
-using Azzazelloqq.MVVM.ReactiveLibrary;
 using Code.Core.GameStats;
+using R3;
 using UnityEngine;
 
 namespace Code.Core.GameSwiper.MVVM.Models
 {
 internal class GameItemModel : ModelBase
 {
-	public IReactiveProperty<RenderTexture> RenderTexture { get; }
-	public IReactiveProperty<bool> IsLoading { get; }
-	public IReactiveProperty<bool> IsActive { get; }
-	public IReactiveProperty<GamePresentationData?> PresentationData { get; }
+	public ReadOnlyReactiveProperty<RenderTexture> RenderTexture => _renderTexture;
+	public ReadOnlyReactiveProperty<bool> IsLoading => _isLoading;
+	public ReadOnlyReactiveProperty<bool> IsActive => _isActive;
+	public ReadOnlyReactiveProperty<GamePresentationData?> PresentationData => _presentationData;
 	public int Index { get; }
+	
+	private readonly ReactiveProperty<GamePresentationData?> _presentationData;
+	private readonly ReactiveProperty<bool> _isActive;
+	private readonly ReactiveProperty<bool> _isLoading;
+	private readonly ReactiveProperty<RenderTexture> _renderTexture;
 
 	public GameItemModel(int index)
 	{
 		Index = index;
-		RenderTexture = new ReactiveProperty<RenderTexture>(null);
-		IsLoading = new ReactiveProperty<bool>(false);
-		IsActive = new ReactiveProperty<bool>(false);
-		PresentationData = new ReactiveProperty<GamePresentationData?>(null);
+		_renderTexture = AddDisposable(new ReactiveProperty<RenderTexture>(null));
+		_isLoading = AddDisposable(new ReactiveProperty<bool>(false));
+		_isActive = AddDisposable(new ReactiveProperty<bool>(false));
+		_presentationData = AddDisposable(new ReactiveProperty<GamePresentationData?>(null));
 	}
 
 	public void UpdateRenderTexture(RenderTexture texture)
 	{
-		RenderTexture.SetValue(texture);
+		_renderTexture.Value = texture;
 	}
 
 	public void SetLoadingState(bool isLoading)
 	{
-		IsLoading.SetValue(isLoading);
+		_isLoading.Value = isLoading;
 	}
 
 	public void SetActiveState(bool isActive)
 	{
-		IsActive.SetValue(isActive);
+		_isActive.Value = isActive;
 	}
 
 	public void SetPresentationData(GamePresentationData? data)
 	{
-		PresentationData.SetValue(data);
+		_presentationData.Value = data;
 	}
 
 	protected override void OnInitialize()
@@ -55,19 +60,10 @@ internal class GameItemModel : ModelBase
 
 	protected override void OnDispose()
 	{
-		RenderTexture?.Dispose();
-		IsLoading?.Dispose();
-		IsActive?.Dispose();
-		PresentationData?.Dispose();
 	}
 
 	protected override ValueTask OnDisposeAsync(CancellationToken token)
 	{
-		RenderTexture?.Dispose();
-		IsLoading?.Dispose();
-		IsActive?.Dispose();
-		PresentationData?.Dispose();
-
 		return default;
 	}
 }

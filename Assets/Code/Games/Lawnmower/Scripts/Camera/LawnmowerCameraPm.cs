@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 {
-    internal class LawnmowerCameraPm : BaseDisposable
+    internal class LawnmowerCameraPm : DisposableBase
     {
         public struct Ctx
         {
@@ -44,7 +44,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             };
 
             _cameraController = LawnmowerCameraControllerFactory.CreateLawnmowerCameraController(cameraCtx);
-            AddDispose(_cameraController);
+            AddDisposable(_cameraController);
             
             Debug.Log("LawnmowerCameraPm: Camera controller initialized");
         }

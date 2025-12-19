@@ -1,11 +1,11 @@
-﻿using Code.Core.BaseDMDisposable.Scripts;
+﻿using Disposable;
 using UnityEngine;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
 
 namespace Logic.UI
 {
-    internal class LaserChargeUiView : BaseMonoBehaviour
+    internal class LaserChargeUiView : MonoBehaviourDisposable
     {
         [SerializeField]
         private Slider _slider;

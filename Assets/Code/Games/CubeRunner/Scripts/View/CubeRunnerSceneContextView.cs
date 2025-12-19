@@ -1,10 +1,10 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.CubeRunner.Data;
 using UnityEngine;
 
 namespace GameShorts.CubeRunner.View
 {
-    internal class CubeRunnerSceneContextView : BaseMonoBehaviour
+    internal class CubeRunnerSceneContextView : MonoBehaviourDisposable
     {
         [Header("Scene Roots")]
         [SerializeField]

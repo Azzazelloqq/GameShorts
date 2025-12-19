@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.Tools.Pool;
-using Cysharp.Threading.Tasks;
+using Disposable;
 using GameShorts.CubeRunner.Data;
-using GameShorts.CubeRunner.Gameplay;
 using GameShorts.CubeRunner.View;
 using LightDI.Runtime;
 using UnityEngine;
+using Random = System.Random;
 
 namespace GameShorts.CubeRunner.Level
 {
@@ -21,7 +18,7 @@ namespace GameShorts.CubeRunner.Level
         Right // ⭢
     }
 
-    internal class LevelManager : BaseDisposable
+    internal class LevelManager : DisposableBase
     {
         internal struct Ctx
         {
@@ -38,7 +35,7 @@ namespace GameShorts.CubeRunner.Level
         private int _consecutiveGapRows;
         private int _consecutiveSolidRows;
 
-        private readonly System.Random _random = new System.Random();
+        private readonly Random _random = new Random();
         private readonly IPoolManager _poolManager;
 
         private int[,] _levelGrid;

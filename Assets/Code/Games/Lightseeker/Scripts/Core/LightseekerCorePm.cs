@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.InputManager;
 using Code.Core.Tools.Pool;
+using Disposable;
 using LightDI.Runtime;
 using R3;
 using TickHandler;
@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Lightseeker
 {
-    internal class LightseekerCorePm : BaseDisposable
+    internal class LightseekerCorePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -33,7 +33,7 @@ namespace Lightseeker
             _ctx = ctx;
             _poolManager = poolManager;
             _diContainer = DiContainerFactory.CreateContainer();
-            AddDispose(_diContainer);
+            AddDisposable(_diContainer);
             
             // Создаем и регистрируем InputManager
             _inputManager = new InputManager();
@@ -48,7 +48,7 @@ namespace Lightseeker
                 isPaused = _ctx.isPaused
             };
             _mainScene = LightseekerMainScenePmFactory.CreateLightseekerMainScenePm(mainSceneCtx);
-            AddDispose(_mainScene);
+            AddDisposable(_mainScene);
         }
 
         protected override void OnDispose()

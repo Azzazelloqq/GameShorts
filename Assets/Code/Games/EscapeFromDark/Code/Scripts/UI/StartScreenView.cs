@@ -1,11 +1,11 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI
 {
-    internal class StartScreenView : BaseMonoBehaviour
+    internal class StartScreenView : MonoBehaviourDisposable
     {
         [Header("UI Elements")]
         [SerializeField] private Button startButton;

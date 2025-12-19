@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using UnityEngine;
 
 namespace Lightseeker
 {
-    internal class LightseekerLevelPm : BaseDisposable
+    internal class LightseekerLevelPm : DisposableBase
     {
         internal struct Ctx
         {

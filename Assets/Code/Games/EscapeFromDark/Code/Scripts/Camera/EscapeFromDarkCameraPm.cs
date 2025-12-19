@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Camera
 {
-    internal class EscapeFromDarkCameraPm : BaseDisposable
+    internal class EscapeFromDarkCameraPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -44,7 +44,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Camera
             };
 
             _cameraController = EscapeFromDarkCameraControllerFactory.CreateEscapeFromDarkCameraController(cameraCtx);
-            AddDispose(_cameraController);
+            AddDisposable(_cameraController);
             
             // Принудительно фокусируемся на игроке
             _cameraController.FocusOnPlayer();

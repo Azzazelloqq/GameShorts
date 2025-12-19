@@ -1,11 +1,11 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.FlyHumans.Gameplay;
 using GameShorts.FlyHumans.UI;
 using UnityEngine;
 
 namespace GameShorts.FlyHumans.View
 {
-    internal class FlyHumansSceneContextView : BaseMonoBehaviour
+    internal class FlyHumansSceneContextView : MonoBehaviourDisposable
     {
         [Header("Player")]
         [SerializeField] private CharacterView _character;

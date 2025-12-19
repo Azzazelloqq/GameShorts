@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using GameShorts.FlyHumans.Core;
@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace GameShorts.FlyHumans
 {
-    public class FlyHumansGame : BaseMonoBehaviour, IShortGame3D
+    public class FlyHumansGame : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private FlyHumansSceneContextView _sceneContextView;

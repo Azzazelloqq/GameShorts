@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.Tools.Pool;
+using Disposable;
 using GameShorts.FlyHumans.Logic;
 using GameShorts.FlyHumans.View;
 using LightDI.Runtime;
@@ -11,7 +11,7 @@ namespace GameShorts.FlyHumans.Presenters
     /// <summary>
     /// Презентер для управления блоками мира
     /// </summary>
-    internal class WorldBlocksPm : BaseDisposable
+    internal class WorldBlocksPm : DisposableBase
     {
         internal struct Ctx
         {

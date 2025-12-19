@@ -1,5 +1,5 @@
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using TickHandler;
@@ -8,7 +8,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 {
-    internal class LawnmowerCameraController : BaseDisposable
+    internal class LawnmowerCameraController : DisposableBase
     {
         public struct Ctx
         {
@@ -71,8 +71,8 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             var playerModel = _ctx.playerPm.GetPlayerModel();
             if (playerModel != null)
             {
-                AddDispose(playerModel.Position.Subscribe(OnPlayerPositionChanged));
-                AddDispose(playerModel.MovementDirection.Subscribe(OnPlayerDirectionChanged));
+                AddDisposable(playerModel.Position.Subscribe(OnPlayerPositionChanged));
+                AddDisposable(playerModel.MovementDirection.Subscribe(OnPlayerDirectionChanged));
             }
 
             // Подписываемся на обновления камеры

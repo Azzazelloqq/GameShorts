@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using GameShorts.Gardener.Core;
@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace GameShorts.Gardener
 {
-    public class GardenerGame : BaseMonoBehaviour, IShortGame3D
+    public class GardenerGame : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private GardenerSceneContextView _sceneContextView;

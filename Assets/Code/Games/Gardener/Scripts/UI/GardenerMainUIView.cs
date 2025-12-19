@@ -1,11 +1,11 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace GameShorts.Gardener.UI
 {
-    internal class GardenerMainUIView : BaseMonoBehaviour
+    internal class GardenerMainUIView : MonoBehaviourDisposable
     {
         [Header("Mode Buttons")]
         [SerializeField] private Button _harveyModeButton;

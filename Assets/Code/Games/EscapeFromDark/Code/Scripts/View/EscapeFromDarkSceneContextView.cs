@@ -1,5 +1,5 @@
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI;
@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View
 {
-    internal class EscapeFromDarkSceneContextView : BaseMonoBehaviour
+    internal class EscapeFromDarkSceneContextView : MonoBehaviourDisposable
     {
         [Header("Player")]
         [SerializeField] private EscapeFromDarkPlayerView playerPrefab;

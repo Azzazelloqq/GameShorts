@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using Code.Games.Game2.Scripts.Core;
 using LightDI.Runtime;
@@ -11,7 +11,7 @@ using TickHandler;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    internal class BoxTowerTowerPm : BaseDisposable
+    internal class BoxTowerTowerPm : DisposableBase
     {
         public struct Ctx
         {
@@ -48,8 +48,8 @@ namespace Code.Core.ShortGamesCore.Game2
             _tickHandler = tickHandler;
             _poolManager = poolManager;
             // Subscribe to model events
-            AddDispose(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
-            AddDispose(_ctx.gameModel.IsPaused.Subscribe(SetPauseState));
+            AddDisposable(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
+            AddDisposable(_ctx.gameModel.IsPaused.Subscribe(SetPauseState));
             _ctx.towerModel.OnChunkCreated += CreateChunk;
             
             // Subscribe to scene updates
@@ -329,7 +329,7 @@ namespace Code.Core.ShortGamesCore.Game2
             }
 
             // Return to pool after some time
-            AddDispose(Observable.Timer(TimeSpan.FromSeconds(3f)).Subscribe(_ => 
+            AddDisposable(Observable.Timer(TimeSpan.FromSeconds(3f)).Subscribe(_ => 
             {
                 ReturnFallingBlock(fallingBlock);
             }));
@@ -368,7 +368,7 @@ namespace Code.Core.ShortGamesCore.Game2
                 }
 
                 // Return chunk to pool after lifetime
-                AddDispose(Observable.Timer(TimeSpan.FromSeconds(1.5f)).Subscribe(_ => ReturnChunk(chunk)));
+                AddDisposable(Observable.Timer(TimeSpan.FromSeconds(1.5f)).Subscribe(_ => ReturnChunk(chunk)));
             }
         }
 

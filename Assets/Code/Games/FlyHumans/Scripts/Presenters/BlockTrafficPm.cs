@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using GameShorts.FlyHumans.Logic;
 using GameShorts.FlyHumans.View;
@@ -12,7 +12,7 @@ namespace GameShorts.FlyHumans.Presenters
     /// Презентер для управления трафиком внутри одного блока
     /// Поддерживает машины и самолеты
     /// </summary>
-    internal class BlockTrafficPm : BaseDisposable
+    internal class BlockTrafficPm : DisposableBase
     {
         internal struct Ctx
         {

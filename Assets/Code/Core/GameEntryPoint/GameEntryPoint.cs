@@ -61,25 +61,31 @@ public sealed class GameEntryPoint : MonoBehaviour
 
 	private async void Start()
 	{
-		_cancellationTokenSource = new CancellationTokenSource();
-		var exitGameCancellationToken = Application.exitCancellationToken;
-
-		if (_gamesParent == null)
+		try
 		{
-			_gamesParent = transform;
-		}
+			_cancellationTokenSource = new CancellationTokenSource();
+			var exitGameCancellationToken = Application.exitCancellationToken;
 
-		if (_uiParent == null)
+			if (_gamesParent == null)
+			{
+				_gamesParent = transform;
+			}
+
+			if (_uiParent == null)
+			{
+				var uiRoot = new GameObject("UI Root");
+				_uiParent = uiRoot.transform;
+				_uiParent.SetParent(transform);
+			}
+
+			_globalGameDiContainer = DiContainerFactory.CreateContainer();
+
+			await InitializeAsync(exitGameCancellationToken);
+		}
+		catch (Exception e)
 		{
-			// Создаем отдельный родительский объект для UI, если не задан
-			var uiRoot = new GameObject("UI Root");
-			_uiParent = uiRoot.transform;
-			_uiParent.SetParent(transform);
+			_logger.LogException(e);
 		}
-
-		_globalGameDiContainer = DiContainerFactory.CreateContainer();
-
-		await InitializeAsync(exitGameCancellationToken);
 	}
 
 	private async Task InitializeAsync(CancellationToken cancellationToken)

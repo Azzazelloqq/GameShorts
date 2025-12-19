@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using GameShorts.Gardener.Gameplay;
 using LightDI.Runtime;
@@ -13,7 +13,7 @@ namespace GameShorts.Gardener.UI
     /// Менеджер UI баров для грядок
     /// Создает, обновляет и удаляет бары над грядками
     /// </summary>
-    internal class PlotUIBarManager : BaseDisposable
+    internal class PlotUIBarManager : DisposableBase
     {
         public struct Ctx
         {
@@ -57,11 +57,11 @@ namespace GameShorts.Gardener.UI
             _plotBars[plot] = barView;
             
             // Подписываемся на изменения в грядке
-            AddDispose(plot.GrowthProgressObservable?.Subscribe(progress => barView.SetGrowthProgress(progress)));
-            AddDispose(plot.WaterLevelObservable?.Subscribe(level => barView.SetWaterLevel(level)));
+            AddDisposable(plot.GrowthProgressObservable?.Subscribe(progress => barView.SetGrowthProgress(progress)));
+            AddDisposable(plot.WaterLevelObservable?.Subscribe(level => barView.SetWaterLevel(level)));
             
             // Подписываемся на изменение состояния, чтобы скрывать бар для пустых грядок, созревших и гнилых растений
-            AddDispose(plot.CurrentStateObservable?.Subscribe(state =>
+            AddDisposable(plot.CurrentStateObservable?.Subscribe(state =>
             {
                 // Скрываем бар для:
                 // - Пустых грядок (Empty)

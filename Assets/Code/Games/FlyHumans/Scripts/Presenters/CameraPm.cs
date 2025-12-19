@@ -1,5 +1,6 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using DG.Tweening;
+using Disposable;
 using GameShorts.FlyHumans.View;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace GameShorts.FlyHumans.Presenters
     /// <summary>
     /// Презентер для управления камерой
     /// </summary>
-    internal class CameraPm : BaseDisposable
+    internal class CameraPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -144,10 +145,11 @@ namespace GameShorts.FlyHumans.Presenters
             Debug.Log($"Camera reset: offset={_initialCameraOffset}, rotation={_initialCameraRotation.eulerAngles}");
         }
 
-        protected override void OnDispose()
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+            
             StopCameraAnimation();
-            base.OnDispose();
         }
     }
 }

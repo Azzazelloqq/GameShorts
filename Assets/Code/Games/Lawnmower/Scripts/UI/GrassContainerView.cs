@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
     /// <summary>
     /// View компонент для отображения состояния контейнера травы
     /// </summary>
-    internal class GrassContainerView : BaseMonoBehaviour
+    internal class GrassContainerView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

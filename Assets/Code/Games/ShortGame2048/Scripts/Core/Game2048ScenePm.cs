@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 
 namespace Code.Games
 {
-    internal class Game2048ScenePm : BaseDisposable
+    internal class Game2048ScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -29,7 +29,7 @@ namespace Code.Games
                 isPaused = _ctx.isPaused
             };
             Game2048MainScenePm mainScenePm = new Game2048MainScenePm(mainSceneCtx);
-            AddDispose(mainScenePm);
+            AddDisposable(mainScenePm);
         }
     }
 }

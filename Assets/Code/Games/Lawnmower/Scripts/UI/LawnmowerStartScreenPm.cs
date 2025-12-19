@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
-    internal class LawnmowerStartScreenPm : BaseDisposable
+    internal class LawnmowerStartScreenPm : DisposableBase
     {
         internal struct Ctx
         {

@@ -1,13 +1,14 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
+using Disposable;
 using GameShorts.FlyHumans.Logic;
 using GameShorts.FlyHumans.View;
 using R3;
 
 namespace GameShorts.FlyHumans.Core
 {
-    internal class FlyHumansScenePm : BaseDisposable
+    internal class FlyHumansScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -31,7 +32,7 @@ namespace GameShorts.FlyHumans.Core
                 isPaused = _ctx.isPaused
             };
             FlyHumansMainScenePm mainScenePm = new FlyHumansMainScenePm(mainSceneCtx);
-            AddDispose(mainScenePm);
+            AddDisposable(mainScenePm);
         }
     }
 }

@@ -1,9 +1,9 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 
 namespace Asteroids.Code.Games.Game1.Scripts.Core
 {
-    internal class DifficultyScaler : BaseDisposable
+    internal class DifficultyScaler : DisposableBase
     {
         private const int SCORE_THRESHOLD = 500; 
         private const float PLAYER_SPEED_MULTIPLIER = 1.3f; // Увеличение скорости игрока
@@ -29,7 +29,7 @@ namespace Asteroids.Code.Games.Game1.Scripts.Core
             CurrentDifficultyLevel = new ReactiveProperty<int>(0);
 
             // Подписываемся на изменения счета
-            AddDispose(_score.Subscribe(OnScoreChanged));
+            AddDisposable(_score.Subscribe(OnScoreChanged));
         }
 
         private void OnScoreChanged(int newScore)

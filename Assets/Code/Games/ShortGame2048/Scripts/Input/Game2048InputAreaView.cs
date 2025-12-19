@@ -1,11 +1,11 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Code.Games
 {
-    internal class Game2048InputAreaView : BaseMonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+    internal class Game2048InputAreaView : MonoBehaviourDisposable, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         internal struct Ctx
         {

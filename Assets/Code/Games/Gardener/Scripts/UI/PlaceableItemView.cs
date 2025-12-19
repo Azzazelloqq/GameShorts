@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Gameplay.Modes;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,7 +12,7 @@ namespace GameShorts.Gardener.UI
     /// View для отображения элемента drag-and-drop
     /// Только отображение и передача событий в Presenter
     /// </summary>
-    public class PlaceableItemView : BaseMonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class PlaceableItemView : MonoBehaviourDisposable, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField] private Image _icon;
         [SerializeField] private TextMeshProUGUI _nameText;

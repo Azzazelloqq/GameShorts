@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Asteroids.Code.Games.Game1
 {
-public class AsteroidsGame : BaseMonoBehaviour, IShortGame2D
+public class AsteroidsGame : MonoBehaviourDisposable, IShortGame2D
 {
 	[SerializeField]
 	private MainSceneContextView _sceneContextView;

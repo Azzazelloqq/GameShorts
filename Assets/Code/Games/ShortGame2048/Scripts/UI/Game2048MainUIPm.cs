@@ -1,12 +1,12 @@
-using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 using UnityEngine;
+using CompositeDisposable = R3.CompositeDisposable;
 
 namespace Code.Games
 {
-    internal class Game2048MainUIPm : BaseDisposable
+    internal class Game2048MainUIPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -31,7 +31,7 @@ namespace Code.Games
             InitializeView();
             SubscribeToScore();
             
-            AddDispose(_compositeDisposable);
+            AddDisposable(_compositeDisposable);
         }
 
         private void LoadBestScore()

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Azzazelloqq.MVVM.Core;
-using Azzazelloqq.MVVM.ReactiveLibrary;
-using Code.Core.GameStats;
 using Code.Core.GamesLoader;
+using Code.Core.GameStats;
 using Code.Core.GameSwiper.MVVM.Models;
 using Code.Core.ShortGamesCore.Source.GameCore;
-using Disposable;
+using Cysharp.Threading.Tasks;
 using InGameLogger;
 using LightDI.Runtime;
+using R3;
 using UnityEngine;
 
 namespace Code.Core.GameSwiper.MVVM.ViewModels
@@ -20,20 +20,20 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 	private readonly IInGameLogger _logger;
 	private readonly IShortGameServiceProvider _gameServiceProvider;
 	private readonly IGameStatsService _gameStatsService;
-	public IReadOnlyReactiveProperty<int> CurrentGameIndex => model.CurrentGameIndex;
-	public IReadOnlyReactiveProperty<bool> CanGoNext => model.CanGoNext;
-	public IReadOnlyReactiveProperty<bool> CanGoPrevious => model.CanGoPrevious;
-	public IReadOnlyReactiveProperty<bool> IsTransitioning => model.IsTransitioning;
-	public IReadOnlyReactiveProperty<bool> IsLoading => model.IsLoading;
-	public IReactiveProperty<bool> ShouldShowLoadingIndicator { get; }
+	public ReadOnlyReactiveProperty<int> CurrentGameIndex => model.CurrentGameIndex;
+	public ReadOnlyReactiveProperty<bool> CanGoNext => model.CanGoNext;
+	public ReadOnlyReactiveProperty<bool> CanGoPrevious => model.CanGoPrevious;
+	public ReadOnlyReactiveProperty<bool> IsTransitioning => model.IsTransitioning;
+	public ReadOnlyReactiveProperty<bool> IsLoading => model.IsLoading;
+	public ReadOnlyReactiveProperty<bool> ShouldShowLoadingIndicator => _shouldShowLoadingIndicator;
 
-	public IReactiveProperty<float> SwipeProgress { get; }
-	public IReactiveProperty<bool> IsEnabled { get; }
-	public IReactiveProperty<SwipeDirection> LastSwipeDirection { get; }
+	public ReadOnlyReactiveProperty<float> SwipeProgress => _swipeProgress;
+	public ReadOnlyReactiveProperty<bool> IsEnabled => _isEnabled;
+	public ReadOnlyReactiveProperty<SwipeDirection> LastSwipeDirection => _lastSwipeDirection;
 
-	public IReadOnlyReactiveProperty<GameItemViewModel> PreviousGameViewModel { get; }
-	public IReadOnlyReactiveProperty<GameItemViewModel> CurrentGameViewModel { get; }
-	public IReadOnlyReactiveProperty<GameItemViewModel> NextGameViewModel { get; }
+	public ReadOnlyReactiveProperty<GameItemViewModel> PreviousGameViewModel { get; }
+	public ReadOnlyReactiveProperty<GameItemViewModel> CurrentGameViewModel { get; }
+	public ReadOnlyReactiveProperty<GameItemViewModel> NextGameViewModel { get; }
 
 	public IActionAsyncCommand GoToNextCommand { get; private set; }
 	public IActionAsyncCommand GoToPreviousCommand { get; private set; }
@@ -47,8 +47,12 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 	private readonly ReactiveProperty<GameItemViewModel> _currentGameVM;
 	private readonly ReactiveProperty<GameItemViewModel> _nextGameVM;
 	private readonly Dictionary<int, GameItemViewModel> _gameViewModelCache;
+	private readonly ReactiveProperty<bool> _isEnabled;
 	private CancellationTokenSource _navigationCts;
 	private CancellationTokenSource _loadingIndicatorCts;
+	private readonly ReactiveProperty<bool> _shouldShowLoadingIndicator;
+	private readonly ReactiveProperty<float> _swipeProgress;
+	private readonly ReactiveProperty<SwipeDirection> _lastSwipeDirection;
 
 	private const float LoadingIndicatorDelaySeconds = 0.1f;
 
@@ -61,14 +65,14 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 		_logger = logger;
 		_gameServiceProvider = gameServiceProvider ?? throw new ArgumentNullException(nameof(gameServiceProvider));
 		_gameStatsService = gameStatsService ?? throw new ArgumentNullException(nameof(gameStatsService));
-		SwipeProgress = new ReactiveProperty<float>(0f);
-		IsEnabled = new ReactiveProperty<bool>(true);
-		LastSwipeDirection = new ReactiveProperty<SwipeDirection>(SwipeDirection.None);
-		ShouldShowLoadingIndicator = new ReactiveProperty<bool>(false);
+		_swipeProgress = AddDisposable(new ReactiveProperty<float>(0f));
+		_isEnabled = AddDisposable(new ReactiveProperty<bool>(true));
+		_lastSwipeDirection = AddDisposable(new ReactiveProperty<SwipeDirection>(SwipeDirection.None));
+		_shouldShowLoadingIndicator = AddDisposable(new ReactiveProperty<bool>(false));
 
-		_previousGameVM = new ReactiveProperty<GameItemViewModel>(null);
-		_currentGameVM = new ReactiveProperty<GameItemViewModel>(null);
-		_nextGameVM = new ReactiveProperty<GameItemViewModel>(null);
+		_previousGameVM = AddDisposable(new ReactiveProperty<GameItemViewModel>(null));
+		_currentGameVM = AddDisposable(new ReactiveProperty<GameItemViewModel>(null));
+		_nextGameVM = AddDisposable(new ReactiveProperty<GameItemViewModel>(null));
 
 		PreviousGameViewModel = _previousGameVM;
 		CurrentGameViewModel = _currentGameVM;
@@ -174,13 +178,13 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 
 		if (gameModel == null)
 		{
-			slotProperty.SetValue(null);
+			slotProperty.Value = null;
 			previousViewModel?.UpdateUIVisibility(false, 0f);
 			return;
 		}
 
 		var viewModel = GetOrCreateGameViewModel(gameModel);
-		slotProperty.SetValue(viewModel);
+		slotProperty.Value = viewModel;
 		ApplySlotPresentation(viewModel, slot);
 	}
 
@@ -222,7 +226,7 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 
 	private void OnTransitioningChanged(bool isTransitioning)
 	{
-		IsEnabled.SetValue(!isTransitioning);
+		_isEnabled.Value = isTransitioning;
 	}
 
 	private void OnModelLoadingStateChanged(bool isLoading)
@@ -233,16 +237,16 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 
 		if (!isLoading)
 		{
-			ShouldShowLoadingIndicator.SetValue(false);
+			_shouldShowLoadingIndicator.Value = false;
 			return;
 		}
 
-		ShouldShowLoadingIndicator.SetValue(false);
+		_shouldShowLoadingIndicator.Value = false;
 		_loadingIndicatorCts = new CancellationTokenSource();
 		_ = ShowGlobalLoadingIndicatorWithDelayAsync(_loadingIndicatorCts.Token);
 	}
 
-	private async Task ShowGlobalLoadingIndicatorWithDelayAsync(CancellationToken token)
+	private async UniTask ShowGlobalLoadingIndicatorWithDelayAsync(CancellationToken token)
 	{
 		try
 		{
@@ -253,20 +257,20 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 			return;
 		}
 
-		if (!token.IsCancellationRequested && model.IsLoading.Value)
+		if (!token.IsCancellationRequested && model.IsLoading.CurrentValue)
 		{
-			ShouldShowLoadingIndicator.SetValue(true);
+			_shouldShowLoadingIndicator.Value = true;
 		}
 	}
 
 	private bool CanGoToNext()
 	{
-		return model.CanGoNext.Value && !model.IsTransitioning.Value;
+		return model.CanGoNext.CurrentValue && !model.IsTransitioning.CurrentValue;
 	}
 
-	private async Task OnGoToNext()
+	private async UniTask OnGoToNext()
 	{
-		LastSwipeDirection.SetValue(SwipeDirection.Up);
+		_lastSwipeDirection.Value = SwipeDirection.Up;
 
 		var success = await NavigateAsync(
 			ct => _gameServiceProvider.SwipeToNextGameAsync(ct),
@@ -283,12 +287,12 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 
 	private bool CanGoToPrevious()
 	{
-		return model.CanGoPrevious.Value && !model.IsTransitioning.Value;
+		return model.CanGoPrevious.CurrentValue && !model.IsTransitioning.CurrentValue;
 	}
 
-	private async Task OnGoToPrevious()
+	private async UniTask OnGoToPrevious()
 	{
-		LastSwipeDirection.SetValue(SwipeDirection.Down);
+		_lastSwipeDirection.Value = SwipeDirection.Down;
 
 		var success = await NavigateAsync(
 			ct => _gameServiceProvider.SwipeToPreviousGameAsync(ct),
@@ -317,7 +321,7 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 			if (_gameServiceProvider.IsCurrentGameReady)
 			{
 				_gameServiceProvider.StartCurrentGame();
-				model.UpdateActiveStates(model.CurrentGameIndex.Value);
+				model.UpdateActiveStates(model.CurrentGameIndex.CurrentValue);
 			}
 		}
 		finally
@@ -326,7 +330,7 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 		}
 	}
 
-	private async Task WaitForGameReadyAsync(Func<bool> predicate, CancellationToken token)
+	private async UniTask WaitForGameReadyAsync(Func<bool> predicate, CancellationToken token)
 	{
 		if (predicate())
 		{
@@ -343,9 +347,9 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 		}
 	}
 
-	private async Task RefreshGamesFromServiceAsync(CancellationToken token)
+	private async UniTask RefreshGamesFromServiceAsync(CancellationToken token)
 	{
-		var currentIndex = model.CurrentGameIndex.Value;
+		var currentIndex = model.CurrentGameIndex.CurrentValue;
 
 		var previous = _gameServiceProvider.HasPreviousGame
 			? await BuildSlotStateAsync(
@@ -380,7 +384,7 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 		model.UpdateGameSlots(previous, current, next, currentIndex);
 	}
 
-	private async Task<GameSlotState> BuildSlotStateAsync(
+	private async UniTask<GameSlotState> BuildSlotStateAsync(
 		int index,
 		RenderTexture renderTexture,
 		bool isReady,
@@ -410,14 +414,14 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 		return gameType?.Name ?? "Unknown Game";
 	}
 
-	private async Task<bool> NavigateAsync(
+	private async UniTask<bool> NavigateAsync(
 		Func<CancellationToken, Task<bool>> navigationAction,
 		Func<bool> isTargetGameReady,
 		Func<bool> hasTargetGame,
 		int direction,
 		Func<Task> transitionAction = null)
 	{
-		if (!hasTargetGame() || model.IsTransitioning.Value)
+		if (!hasTargetGame() || model.IsTransitioning.CurrentValue)
 		{
 			return false;
 		}
@@ -447,7 +451,7 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 
 			if (success)
 			{
-				var newIndex = model.CurrentGameIndex.Value + direction;
+				var newIndex = model.CurrentGameIndex.CurrentValue + direction;
 				model.UpdateCurrentGameIndex(newIndex);
 
 				await RefreshGamesFromServiceAsync(navigationToken);
@@ -478,24 +482,24 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 
 	private void OnUpdateSwipeProgress(float progress)
 	{
-		SwipeProgress.SetValue(progress);
+		_swipeProgress.Value = progress;
 		OnSwipeProgressChanged?.Invoke(progress);
 	}
 
 	private void ResetSwipeProgress()
 	{
-		SwipeProgress.SetValue(0f);
-		LastSwipeDirection.SetValue(SwipeDirection.None);
+		_swipeProgress.Value = 0f;
+		_lastSwipeDirection.Value = SwipeDirection.None;
 	}
 
 	public void HandleSwipeInput(float deltaY)
 	{
-		if (!IsEnabled.Value)
+		if (!IsEnabled.CurrentValue)
 		{
 			return;
 		}
 
-		var progress = Mathf.Clamp(SwipeProgress.Value + deltaY, -1f, 1f);
+		var progress = Mathf.Clamp(SwipeProgress.CurrentValue + deltaY, -1f, 1f);
 		UpdateSwipeProgressCommand.Execute(progress);
 
 		const float swipeThreshold = 0.4f;

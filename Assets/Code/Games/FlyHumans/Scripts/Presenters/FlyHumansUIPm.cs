@@ -1,13 +1,12 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.FlyHumans.View;
 using R3;
-using R3.Triggers;
 
 namespace GameShorts.FlyHumans.Gameplay
 {
-    internal class FlyHumansUIPm : BaseDisposable
+    internal class FlyHumansUIPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -46,7 +45,7 @@ namespace GameShorts.FlyHumans.Gameplay
                 _startButtonSubscription = _ctx.sceneContextView.StartUIView.StartButton.OnClickAsObservable()
                     .Subscribe(_ => OnStartButtonClicked());
                     
-                AddDispose(_startButtonSubscription);
+                AddDisposable(_startButtonSubscription);
             }
         }
 

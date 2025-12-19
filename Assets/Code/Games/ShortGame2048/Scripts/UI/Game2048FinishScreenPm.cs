@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 
 namespace Code.Games
 {
-    internal class Game2048FinishScreenPm : BaseDisposable
+    internal class Game2048FinishScreenPm : DisposableBase
     {
         internal struct Ctx
         {

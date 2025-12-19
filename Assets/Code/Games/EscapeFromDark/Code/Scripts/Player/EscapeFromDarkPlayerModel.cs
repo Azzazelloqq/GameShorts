@@ -1,11 +1,11 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
 {
-    internal class EscapeFromDarkPlayerModel : BaseDisposable
+    internal class EscapeFromDarkPlayerModel : DisposableBase
     {
         internal struct Ctx
         {
@@ -36,10 +36,10 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
             _movementDirection.Value = Vector2.zero;
             _currentRotation.Value = 0f;
 
-            AddDispose(_position);
-            AddDispose(_isMoving);
-            AddDispose(_movementDirection);
-            AddDispose(_currentRotation);
+            AddDisposable(_position);
+            AddDisposable(_isMoving);
+            AddDisposable(_movementDirection);
+            AddDisposable(_currentRotation);
 
             Debug.Log($"EscapeFromDarkPlayerModel: Initialized with speed={_moveSpeed}");
         }

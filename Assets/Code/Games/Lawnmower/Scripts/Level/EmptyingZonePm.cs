@@ -1,13 +1,13 @@
 using System;
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
     /// <summary>
     /// Presenter для управления зоной опустошения контейнера
     /// </summary>
-    internal class EmptyingZonePm : BaseDisposable
+    internal class EmptyingZonePm : DisposableBase
     {
         internal struct Ctx
         {

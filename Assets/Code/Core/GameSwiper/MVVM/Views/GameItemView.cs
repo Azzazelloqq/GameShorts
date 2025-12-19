@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Azzazelloqq.MVVM.Core;
 using Code.Core.GameSwiper.MVVM.ViewModels;
 using DG.Tweening;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 

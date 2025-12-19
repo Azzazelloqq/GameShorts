@@ -1,13 +1,12 @@
-using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
-using UnityEngine;
-using UnityEngine.UI;
+using Disposable;
 using R3;
+using UnityEngine;
+using CompositeDisposable = Disposable.CompositeDisposable;
 
 namespace Code.Games
 {
-    internal class Game2048PausePm : BaseDisposable
+    internal class Game2048PausePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -25,8 +24,8 @@ namespace Code.Games
             
             InitializePauseUI();
 
-            AddDispose(_ctx.isPaused.Subscribe(SetPause));
-            AddDispose(_compositeDisposable);
+            AddDisposable(_ctx.isPaused.Subscribe(SetPause));
+            AddDisposable(_compositeDisposable);
         }
 
         private void InitializePauseUI()

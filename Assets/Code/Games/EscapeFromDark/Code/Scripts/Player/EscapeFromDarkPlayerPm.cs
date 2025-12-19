@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level;
@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
 {
-    internal class EscapeFromDarkPlayerPm : BaseDisposable
+    internal class EscapeFromDarkPlayerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -54,7 +54,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
             };
             
             _playerModel = new EscapeFromDarkPlayerModel(modelCtx);
-            AddDispose(_playerModel);
+            AddDisposable(_playerModel);
             
             Debug.Log($"EscapeFromDarkPlayerPm: Player model initialized at {_spawnPosition}");
         }
@@ -80,7 +80,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player
         private void StartInputHandling()
         {
             // Подписываемся на изменения модели игрока
-            AddDispose(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
+            AddDisposable(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
             
             // Подписываемся на обновления
             _tickHandler.PhysicUpdate += HandleMovement;

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
+using Disposable;
 using GameShorts.FlyHumans.Gameplay;
 using GameShorts.FlyHumans.Presenters;
 using GameShorts.FlyHumans.View;
@@ -8,7 +9,7 @@ using R3;
 
 namespace GameShorts.FlyHumans.Logic
 {
-    internal class FlyHumansMainScenePm : BaseDisposable
+    internal class FlyHumansMainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -36,7 +37,7 @@ namespace GameShorts.FlyHumans.Logic
                     cameraView = _ctx.sceneContextView.CameraView,
                     targetTransform = _ctx.sceneContextView.Character.transform
                 });
-                AddDispose(_cameraPm);
+                AddDisposable(_cameraPm);
             }
             
             // Создаем World Blocks Presenter (включая трафик на блоках)
@@ -47,7 +48,7 @@ namespace GameShorts.FlyHumans.Logic
                     worldBlocksView = _ctx.sceneContextView.WorldBlocksView,
                     characterTransform = _ctx.sceneContextView.Character.transform
                 });
-                AddDispose(_worldBlocksPm);
+                AddDisposable(_worldBlocksPm);
             }
             
             // Создаем Gameplay Presenter
@@ -60,7 +61,7 @@ namespace GameShorts.FlyHumans.Logic
                 worldBlocksPm = _worldBlocksPm
             };
             _gameplayPm = new FlyHumansGameplayPm(gameplayCtx);
-            AddDispose(_gameplayPm);
+            AddDisposable(_gameplayPm);
             
             // Создаем UI Presenter
             FlyHumansUIPm.Ctx uiCtx = new FlyHumansUIPm.Ctx
@@ -72,7 +73,7 @@ namespace GameShorts.FlyHumans.Logic
                 isPaused = _ctx.isPaused
             };
             _uiPm = new FlyHumansUIPm(uiCtx);
-            AddDispose(_uiPm);
+            AddDisposable(_uiPm);
         }
     }
 }

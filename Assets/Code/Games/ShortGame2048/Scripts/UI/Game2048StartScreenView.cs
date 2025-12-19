@@ -1,10 +1,10 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Code.Games
 {
-    internal class Game2048StartScreenView : BaseMonoBehaviour
+    internal class Game2048StartScreenView : MonoBehaviourDisposable
     {
 
         [SerializeField] 

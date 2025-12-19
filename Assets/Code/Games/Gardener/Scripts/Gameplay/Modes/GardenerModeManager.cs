@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 
 namespace GameShorts.Gardener.Gameplay.Modes
@@ -9,7 +9,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// Менеджер режимов игры Gardener
     /// Управляет переключением между режимами и оповещает UI об изменениях
     /// </summary>
-    internal class GardenerModeManager : BaseDisposable
+    internal class GardenerModeManager : DisposableBase
     {
         private readonly Dictionary<string, IGardenerMode> _modes = new Dictionary<string, IGardenerMode>();
         private IGardenerMode _currentMode;

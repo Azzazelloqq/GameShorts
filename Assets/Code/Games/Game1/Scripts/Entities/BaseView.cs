@@ -1,12 +1,12 @@
 ﻿using System;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Logic.Entities.Core;
 using UnityEngine;
 
 namespace Logic.Entities
 {
-    internal class BaseView : BaseMonoBehaviour, IEntityView
+    internal class BaseView : MonoBehaviourDisposable, IEntityView
     {
         internal struct Ctx
         {

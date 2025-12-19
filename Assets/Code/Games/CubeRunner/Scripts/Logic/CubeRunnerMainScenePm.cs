@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using GameShorts.CubeRunner.Data;
 using GameShorts.CubeRunner.Gameplay;
@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace GameShorts.CubeRunner.Logic
 {
-    internal class CubeRunnerMainScenePm : BaseDisposable
+    internal class CubeRunnerMainScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -45,13 +45,13 @@ namespace GameShorts.CubeRunner.Logic
                 gameSettings = _settings,
                 tilesRoot = _ctx.sceneContextView.TilesRoot,
             });
-            AddDispose(_levelManager);
+            AddDisposable(_levelManager);
 
             _cubeManager = CubeManagerFactory.CreateCubeManager(new CubeManager.Ctx()
             {
                 sceneContextView = _ctx.sceneContextView,
             });
-            AddDispose(_cubeManager);
+            AddDisposable(_cubeManager);
             
             var cameraCtx = new CubeRunnerCameraPm.Ctx
             {
@@ -60,14 +60,14 @@ namespace GameShorts.CubeRunner.Logic
                 fixedHorizontalDistance = 0f
             };
             _cameraPm = CubeRunnerCameraPmFactory.CreateCubeRunnerCameraPm(cameraCtx);
-            AddDispose(_cameraPm);
+            AddDisposable(_cameraPm);
             
             _inputHandler = CubeRunnerInputHandlerFactory.CreateCubeRunnerInputHandler(new CubeRunnerInputHandler.Ctx
             {
                 isPaused = _ctx.isPaused,
             });
-            AddDispose(_inputHandler);
-            AddDispose(_inputHandler.Swipes.Subscribe(direction => _cubeManager.TryMove(direction)));
+            AddDisposable(_inputHandler);
+            AddDisposable(_inputHandler.Swipes.Subscribe(direction => _cubeManager.TryMove(direction)));
 
             CubeRunnerGameplayPm.Ctx gameplayCtx = new CubeRunnerGameplayPm.Ctx
             {
@@ -78,7 +78,7 @@ namespace GameShorts.CubeRunner.Logic
                 levelManager = _levelManager,
             };
             _gameplayPm = CubeRunnerGameplayPmFactory.CreateCubeRunnerGameplayPm(gameplayCtx);
-            AddDispose(_gameplayPm);
+            AddDisposable(_gameplayPm);
             
             _gameplayPm.StartNewLevel();
         }

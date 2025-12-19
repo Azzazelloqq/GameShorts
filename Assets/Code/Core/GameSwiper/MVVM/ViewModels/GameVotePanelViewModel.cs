@@ -2,10 +2,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azzazelloqq.MVVM.Core;
-using Azzazelloqq.MVVM.ReactiveLibrary;
 using Code.Core.GameStats;
 using Code.Core.GameSwiper.MVVM.Models;
+using Cysharp.Threading.Tasks;
 using InGameLogger;
+using R3;
 
 namespace Code.Core.GameSwiper.MVVM.ViewModels
 {
@@ -42,12 +43,12 @@ internal class GameVotePanelViewModel : ViewModelBase<GameVotePanelModel>
 		compositeDisposable.AddDisposable(_isInteractable);
 	}
 
-	public IReadOnlyReactiveProperty<int> LikesCount => _likesCount;
-	public IReadOnlyReactiveProperty<int> DislikesCount => _dislikesCount;
-	public IReadOnlyReactiveProperty<float> LikeRatio => _likeRatio;
-	public IReadOnlyReactiveProperty<bool> HasStats => _hasStats;
-	public IReadOnlyReactiveProperty<bool> IsInteractable => _isInteractable;
-	public IReactiveProperty<bool> IsBusy => model.IsBusy;
+	public ReadOnlyReactiveProperty<int> LikesCount => _likesCount;
+	public ReadOnlyReactiveProperty<int> DislikesCount => _dislikesCount;
+	public ReadOnlyReactiveProperty<float> LikeRatio => _likeRatio;
+	public ReadOnlyReactiveProperty<bool> HasStats => _hasStats;
+	public ReadOnlyReactiveProperty<bool> IsInteractable => _isInteractable;
+	public ReadOnlyReactiveProperty<bool> IsBusy => model.IsBusy;
 
 	public IActionAsyncCommand LikeCommand { get; private set; }
 	public IActionAsyncCommand DislikeCommand { get; private set; }
@@ -101,7 +102,7 @@ internal class GameVotePanelViewModel : ViewModelBase<GameVotePanelModel>
 
 	private void RefreshState()
 	{
-		OnPresentationChanged(model.Owner.PresentationData.Value);
+		OnPresentationChanged(model.Owner.PresentationData.CurrentValue);
 		UpdateInteractableState();
 	}
 
@@ -111,17 +112,17 @@ internal class GameVotePanelViewModel : ViewModelBase<GameVotePanelModel>
 		if (presentation.HasValue)
 		{
 			var stats = presentation.Value.StatsData;
-			_likesCount.SetValue(stats.Likes);
-			_dislikesCount.SetValue(stats.Dislikes);
-			_likeRatio.SetValue(stats.LikeRatio);
-			_hasStats.SetValue(true);
+			_likesCount.Value = stats.Likes;
+			_dislikesCount.Value = stats.Dislikes;
+			_likeRatio.Value = stats.LikeRatio;
+			_hasStats.Value = true;
 		}
 		else
 		{
-			_likesCount.SetValue(0);
-			_dislikesCount.SetValue(0);
-			_likeRatio.SetValue(0f);
-			_hasStats.SetValue(false);
+			_likesCount.Value = 0;
+			_dislikesCount.Value = 0;
+			_likeRatio.Value = 0;
+			_hasStats.Value = false;
 		}
 
 		UpdateInteractableState();
@@ -129,16 +130,16 @@ internal class GameVotePanelViewModel : ViewModelBase<GameVotePanelModel>
 
 	private bool CanVote()
 	{
-		return _currentPresentation.HasValue && !model.IsBusy.Value && _isInteractable.Value;
+		return _currentPresentation.HasValue && !model.IsBusy.CurrentValue && _isInteractable.Value;
 	}
 
 	private void UpdateInteractableState()
 	{
-		var canInteract = model.Owner.IsActive.Value && _currentPresentation.HasValue && !model.IsBusy.Value;
-		_isInteractable.SetValue(canInteract);
+		var canInteract = model.Owner.IsActive.CurrentValue && _currentPresentation.HasValue && !model.IsBusy.CurrentValue;
+		_isInteractable.Value = canInteract;
 	}
 
-	private async Task SubmitVoteAsync(GameVoteType voteType)
+	private async UniTask SubmitVoteAsync(GameVoteType voteType)
 	{
 		if (!CanVote())
 		{
@@ -151,7 +152,7 @@ internal class GameVotePanelViewModel : ViewModelBase<GameVotePanelModel>
 			return;
 		}
 
-		model.IsBusy.SetValue(true);
+		model.MakeBusy();
 		UpdateInteractableState();
 
 		try
@@ -174,7 +175,7 @@ internal class GameVotePanelViewModel : ViewModelBase<GameVotePanelModel>
 		}
 		finally
 		{
-			model.IsBusy.SetValue(false);
+			model.MakeNotBusy();
 			UpdateInteractableState();
 		}
 	}
@@ -192,5 +193,9 @@ internal readonly struct VoteAnimationRequest
 	public GameStatsData StatsData { get; }
 }
 }
+
+
+
+
 
 

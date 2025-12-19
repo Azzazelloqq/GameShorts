@@ -1,10 +1,10 @@
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using R3;
 
 namespace Lightseeker
 {
-    internal class LightseekerMainUIPm : BaseDisposable
+    internal class LightseekerMainUIPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -25,8 +25,8 @@ namespace Lightseeker
 
         private void SubscribeToModelChanges()
         {
-            AddDispose(_ctx.gameModel.CurrentLevel.Subscribe(_ => UpdateUI()));
-            AddDispose(_ctx.gameModel.CollectedStars.Subscribe(_ => UpdateUI()));
+            AddDisposable(_ctx.gameModel.CurrentLevel.Subscribe(_ => UpdateUI()));
+            AddDisposable(_ctx.gameModel.CollectedStars.Subscribe(_ => UpdateUI()));
         }
 
         private void UpdateUI()

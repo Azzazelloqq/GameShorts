@@ -6,6 +6,7 @@ using Azzazelloqq.MVVM.Core;
 using Code.Core.GameStats;
 using Code.Core.GameSwiper.MVVM.ViewModels;
 using DG.Tweening;
+using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -190,7 +191,7 @@ internal class GameVotePanelView : ViewMonoBehavior<GameVotePanelViewModel>
 		}
 
 		viewModel.VoteAnimationRequested += HandleVoteAnimationRequested;
-		SetButtonsInteractable(viewModel.IsInteractable.Value);
+		SetButtonsInteractable(viewModel.IsInteractable.CurrentValue);
 	}
 
 	private void Unbind()
@@ -555,5 +556,9 @@ internal class GameVotePanelView : ViewMonoBehavior<GameVotePanelViewModel>
 	}
 }
 }
+
+
+
+
 
 

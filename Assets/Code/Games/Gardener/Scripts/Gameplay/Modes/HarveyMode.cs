@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.UI;
 using LightDI.Runtime;
@@ -12,7 +12,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// Режим сбора урожая Harvey
     /// Позволяет собирать урожай удержанием и размещать грядки через drag-and-drop
     /// </summary>
-    internal class HarveyMode : BaseDisposable, IGardenerMode
+    internal class HarveyMode : DisposableBase, IGardenerMode
     {
         public struct Ctx
         {

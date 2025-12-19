@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
 using R3;
 
@@ -7,7 +7,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
     /// <summary>
     /// Presenter для управления UI контейнера травы
     /// </summary>
-    internal class GrassContainerPm : BaseDisposable
+    internal class GrassContainerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -16,7 +16,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
         }
 
         private readonly Ctx _ctx;
-        private CompositeDisposable _disposables = new CompositeDisposable();
 
         public GrassContainerPm(Ctx ctx)
         {
@@ -26,17 +25,11 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
             _ctx.view.SetCtx(new GrassContainerView.Ctx());
             
             // Подписываемся на изменения модели
-            _disposables.Add(_ctx.playerModel.GrassContainerCurrentAmount.Subscribe(OnContainerAmountChanged));
-            _disposables.Add(_ctx.playerModel.GrassContainerMaxCapacity.Subscribe(OnContainerCapacityChanged));
+            AddDisposable(_ctx.playerModel.GrassContainerCurrentAmount.Subscribe(OnContainerAmountChanged));
+            AddDisposable(_ctx.playerModel.GrassContainerMaxCapacity.Subscribe(OnContainerCapacityChanged));
             
             // Обновляем UI с текущими значениями
             UpdateUI();
-        }
-
-        protected override void OnDispose()
-        {
-            _disposables?.Dispose();
-            base.OnDispose();
         }
 
         private void OnContainerAmountChanged(float newAmount)

@@ -1,5 +1,5 @@
 using UnityEngine;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level;
 using TickHandler;
@@ -8,7 +8,7 @@ using R3;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Camera
 {
-    internal class EscapeFromDarkCameraController : BaseDisposable
+    internal class EscapeFromDarkCameraController : DisposableBase
     {
         public struct Ctx
         {
@@ -80,7 +80,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Camera
             var playerModel = _ctx.playerPm.GetPlayerModel();
             if (playerModel != null)
             {
-                AddDispose(playerModel.Position.Subscribe(OnPlayerPositionChanged));
+                AddDisposable(playerModel.Position.Subscribe(OnPlayerPositionChanged));
                 Debug.Log("EscapeFromDarkCameraController: Subscribed to player position changes");
             }
             else

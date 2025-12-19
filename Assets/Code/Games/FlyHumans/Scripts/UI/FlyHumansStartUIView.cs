@@ -1,10 +1,10 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace GameShorts.FlyHumans.UI
 {
-    internal class FlyHumansStartUIView : BaseMonoBehaviour
+    internal class FlyHumansStartUIView : MonoBehaviourDisposable
     {
         [SerializeField] 
         private Button _startButton;

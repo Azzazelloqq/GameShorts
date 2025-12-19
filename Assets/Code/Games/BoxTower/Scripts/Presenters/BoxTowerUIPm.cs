@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Games.Game2.Scripts.Core;
 using R3;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    internal class BoxTowerUIPm : BaseDisposable
+    internal class BoxTowerUIPm : DisposableBase
     {
         public struct Ctx
         {
@@ -23,11 +23,11 @@ namespace Code.Core.ShortGamesCore.Game2
             _ctx = ctx;
             
             // Subscribe to model changes
-            AddDispose(_ctx.gameModel.Score.Subscribe(OnScoreChanged));
-            AddDispose(_ctx.gameModel.BestScore.Subscribe(OnBestScoreChanged));
-            AddDispose(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
-            AddDispose(_ctx.gameModel.IsFirstPlay.Subscribe(OnFirstPlayChanged));
-            AddDispose(_ctx.gameModel.IsPaused.Subscribe(OnPauseStateChanged));
+            AddDisposable(_ctx.gameModel.Score.Subscribe(OnScoreChanged));
+            AddDisposable(_ctx.gameModel.BestScore.Subscribe(OnBestScoreChanged));
+            AddDisposable(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
+            AddDisposable(_ctx.gameModel.IsFirstPlay.Subscribe(OnFirstPlayChanged));
+            AddDisposable(_ctx.gameModel.IsPaused.Subscribe(OnPauseStateChanged));
             
             // Setup button listeners
             SetupButtonListeners();

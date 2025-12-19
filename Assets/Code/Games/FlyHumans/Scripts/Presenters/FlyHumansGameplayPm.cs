@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.FlyHumans.Presenters;
 using GameShorts.FlyHumans.View;
 using R3;
@@ -12,7 +12,7 @@ namespace GameShorts.FlyHumans.Gameplay
     /// <summary>
     /// Главный презентер геймплея - координирует работу персонажа с камерой и миром
     /// </summary>
-    internal class FlyHumansGameplayPm : BaseDisposable
+    internal class FlyHumansGameplayPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -63,8 +63,8 @@ namespace GameShorts.FlyHumans.Gameplay
                         .Subscribe(_ => Jump());
                 }
                 
-                AddDispose(_updateSubscription);
-                AddDispose(_inputSubscription);
+                AddDisposable(_updateSubscription);
+                AddDisposable(_inputSubscription);
             }
         }
         
@@ -201,11 +201,12 @@ namespace GameShorts.FlyHumans.Gameplay
                 .Subscribe(_ => StartGame());
         }
 
-        protected override void OnDispose()
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
             _resetDelaySubscription?.Dispose();
             _jumpTrigger?.Dispose();
-            base.OnDispose();
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Code.Core.ShortGamesCore.Game1.Scripts.View;
-using Logic.Settings;
+﻿using Logic.Settings;
+using SceneContext;
 using UnityEngine;
 
 namespace Asteroids.Code.Games.Game1.Scripts.View

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using R3;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
@@ -9,7 +9,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
     /// <summary>
     /// Менеджер контейнера для травы - отвечает за заполнение и опустошение
     /// </summary>
-    internal class GrassContainerManager : BaseDisposable
+    internal class GrassContainerManager : DisposableBase
     {
         public struct Ctx
         {
@@ -41,7 +41,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             }
             
             // Подписываемся на изменения состояния зоны для обновления опустошения
-            AddDispose(_ctx.playerModel.IsInEmptyingZone.Subscribe(OnEmptyingZoneStateChanged));
+            AddDisposable(_ctx.playerModel.IsInEmptyingZone.Subscribe(OnEmptyingZoneStateChanged));
         }
 
         protected override void OnDispose()

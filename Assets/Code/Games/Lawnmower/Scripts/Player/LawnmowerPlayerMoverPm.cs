@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using LightDI.Runtime;
@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 {
-    internal class LawnmowerPlayerMoverPm : BaseDisposable
+    internal class LawnmowerPlayerMoverPm : DisposableBase
     {
     internal struct Ctx
     {

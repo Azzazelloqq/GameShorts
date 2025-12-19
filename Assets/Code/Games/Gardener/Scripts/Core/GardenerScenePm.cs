@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Logic;
 using GameShorts.Gardener.View;
 using R3;
 
 namespace GameShorts.Gardener.Core
 {
-    internal class GardenerScenePm : BaseDisposable
+    internal class GardenerScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -32,7 +32,7 @@ namespace GameShorts.Gardener.Core
                 isPaused = _ctx.isPaused
             };
             _mainScenePm = new GardenerMainScenePm(mainSceneCtx);
-            AddDispose(_mainScenePm);
+            AddDisposable(_mainScenePm);
         }
     }
 }

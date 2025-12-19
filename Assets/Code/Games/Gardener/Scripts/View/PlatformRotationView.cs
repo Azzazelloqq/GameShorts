@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,7 +9,7 @@ namespace GameShorts.Gardener.View
     /// View компонент для обработки ввода пользователя для вращения платформы
     /// Реализует интерфейсы EventSystem для получения событий от мыши/тача
     /// </summary>
-    internal class PlatformRotationView : BaseMonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+    internal class PlatformRotationView : MonoBehaviourDisposable, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         [Header("Debug")]
         [SerializeField] private bool _enableDebugLogs = false;

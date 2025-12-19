@@ -353,6 +353,8 @@ public class QueueShortGamesLoader : IGamesLoader
 		_logger.Log($"Started preloaded game: {gameType.Name}");
 		OnGameLoadingCompleted?.Invoke(gameType, game);
 
+		TrimLoadedGames();
+
 		return true;
 	}
 
@@ -702,6 +704,20 @@ public class QueueShortGamesLoader : IGamesLoader
 
 	private void TrimLoadedGames()
 	{
+		var allowedWindow = BuildAllowedLoadedWindow();
+		if (allowedWindow.Count > 0)
+		{
+			var outsideWindow = _loadedGames.Keys
+				.Where(type => !allowedWindow.Contains(type))
+				.ToList();
+
+			foreach (var type in outsideWindow)
+			{
+				_logger.Log($"Unloading {type.Name} outside of the active window");
+				UnloadGame(type);
+			}
+		}
+
 		if (_settings.MaxLoadedGames <= 0)
 		{
 			return;
@@ -727,6 +743,24 @@ public class QueueShortGamesLoader : IGamesLoader
 
 			_logger.Log($"Unloading {candidate.Type.Name} to satisfy MaxLoadedGames limit {_settings.MaxLoadedGames}");
 			UnloadGame(candidate.Type);
+		}
+	}
+
+	private HashSet<Type> BuildAllowedLoadedWindow()
+	{
+		var allowed = new HashSet<Type>();
+		AddIfNotNull(allowed, _queueService?.PreviousGameType);
+		AddIfNotNull(allowed, _queueService?.CurrentGameType);
+		AddIfNotNull(allowed, _queueService?.NextGameType);
+		AddIfNotNull(allowed, _activeGameType);
+		return allowed;
+	}
+
+	private static void AddIfNotNull(ISet<Type> set, Type type)
+	{
+		if (type != null)
+		{
+			set.Add(type);
 		}
 	}
 

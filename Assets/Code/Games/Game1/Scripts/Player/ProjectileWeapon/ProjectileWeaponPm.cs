@@ -2,7 +2,7 @@
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
 using Code.Core.Tools.Pool;
 using Code.Generated.Addressables;
@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Logic.Player.ProjectileWeapon
 {
-    internal class ProjectileWeaponPm : BaseDisposable
+    internal class ProjectileWeaponPm : DisposableBase
     {
         internal struct Ctx
         {

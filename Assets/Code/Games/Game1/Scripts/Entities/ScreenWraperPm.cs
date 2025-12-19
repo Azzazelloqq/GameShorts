@@ -1,14 +1,14 @@
 ﻿
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using LightDI.Runtime;
 using TickHandler;
 using UnityEngine;
 
 namespace Logic.Entities
 {
-	internal class ScreenWraperPm : BaseDisposable
+	internal class ScreenWraperPm : DisposableBase
 	{
 		internal struct Ctx
 		{

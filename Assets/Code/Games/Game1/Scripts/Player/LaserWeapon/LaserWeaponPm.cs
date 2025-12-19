@@ -2,7 +2,7 @@
 using System.Threading;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.Entities.Core;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Game1;
 using Code.Core.ShortGamesCore.Game1.Scripts.Entities;
 using Code.Core.Tools.Pool;
@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace Logic.Player.LaserWeapon
 {
-    internal class LaserWeaponPm : BaseDisposable
+    internal class LaserWeaponPm : DisposableBase
     {
         internal struct Ctx
         {

@@ -1,14 +1,13 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
-using Code.Core.Tools.Pool;
+using Disposable;
 using GameShorts.CubeRunner.Logic;
 using GameShorts.CubeRunner.View;
 using R3;
 
 namespace GameShorts.CubeRunner.Core
 {
-    internal class CubeRunnerScenePm : BaseDisposable
+    internal class CubeRunnerScenePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -31,7 +30,7 @@ namespace GameShorts.CubeRunner.Core
             };
 
             _mainScenePm = new CubeRunnerMainScenePm(mainSceneCtx);
-            AddDispose(_mainScenePm);
+            AddDisposable(_mainScenePm);
         }
     }
 }

@@ -12,7 +12,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "3c4d5983bdb88745a937cd9273497dfce092dfa4"
+      "hash": "7430aa4e92db0a12e0023da5b055880e2afe183b"
     },
     "com.azzazello.lightdi": {
       "version": "https://github.com/Azzazelloqq/LightDI.git",
@@ -42,7 +42,7 @@
       "dependencies": {
         "com.azzazello.disposable": "https://github.com/Azzazelloqq/Disposable.git#v1.0.1"
       },
-      "hash": "b3f57098fb3e9af20dd5aebd07838fa26dac27a8"
+      "hash": "06f81d1fb8affa0ef03313c814b925db4e729646"
     },
     "com.azzazello.resourceloader": {
       "version": "https://github.com/Azzazelloqq/ResourceLoader.git",

@@ -1,14 +1,15 @@
 using UnityEngine;
 using R3;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
+using CompositeDisposable = Disposable.CompositeDisposable;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
     /// <summary>
     /// Presenter для управления UI фермера, который следует за игроком
     /// </summary>
-    internal class FarmerUIPm : BaseDisposable
+    internal class FarmerUIPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -21,7 +22,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
         private readonly Ctx _ctx;
         private FarmerUIView _farmerUIView;
         private GrassContainerPm _containerPm;
-        private CompositeDisposable _disposables = new CompositeDisposable();
 
         public FarmerUIPm(Ctx ctx)
         {
@@ -31,12 +31,11 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
             InitializeContainerPm();
             
             // Подписываемся на изменения позиции игрока
-            _disposables.Add(_ctx.playerModel.Position.Subscribe(OnPlayerPositionChanged));
+            AddDisposable(_ctx.playerModel.Position.Subscribe(OnPlayerPositionChanged));
         }
 
         protected override void OnDispose()
         {
-            _disposables?.Dispose();
             _containerPm?.Dispose();
             
             if (_farmerUIView != null)

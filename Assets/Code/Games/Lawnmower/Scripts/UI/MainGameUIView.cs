@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
     /// <summary>
     /// View компонент для основного игрового UI
     /// </summary>
-    internal class MainGameUIView : BaseMonoBehaviour
+    internal class MainGameUIView : MonoBehaviourDisposable
     {
         internal struct Ctx
         {

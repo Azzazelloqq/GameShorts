@@ -1,12 +1,12 @@
 ﻿using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using UnityEngine;
 
 namespace Code.Games
 {
-    internal class CubePm : BaseDisposable
+    internal class CubePm : DisposableBase
     {
         public struct Ctx
         {

@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
-using Code.Core.BaseDMDisposable.Scripts;
 using Code.Core.Tools.Pool;
+using Disposable;
 using LightDI.Runtime;
 using R3;
 
 namespace Code.Games
 {
-    internal class Game2048CorePm : BaseDisposable
+    internal class Game2048CorePm : DisposableBase
     {
         internal struct Ctx
         {
@@ -28,7 +28,7 @@ namespace Code.Games
             _poolManager = poolManager;
             _diContainer = DiContainerFactory.CreateContainer();
             
-            AddDispose(_diContainer);
+            AddDisposable(_diContainer);
             
             Game2048ScenePm.Ctx sceneCtx = new Game2048ScenePm.Ctx
             {
@@ -38,7 +38,7 @@ namespace Code.Games
                 isPaused = _ctx.isPaused
             };
             _scene = new Game2048ScenePm(sceneCtx);
-            AddDispose(_scene);
+            AddDisposable(_scene);
         }
 
         protected override void OnDispose()

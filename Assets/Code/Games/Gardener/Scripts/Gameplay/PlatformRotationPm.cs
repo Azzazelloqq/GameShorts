@@ -1,4 +1,4 @@
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.View;
 using UnityEngine;
@@ -9,7 +9,7 @@ namespace GameShorts.Gardener.Gameplay
     /// Presenter для управления вращением платформы
     /// Обрабатывает события от View и применяет вращение к Transform
     /// </summary>
-    internal class PlatformRotationPm : BaseDisposable
+    internal class PlatformRotationPm : DisposableBase
     {
         internal struct Ctx
         {

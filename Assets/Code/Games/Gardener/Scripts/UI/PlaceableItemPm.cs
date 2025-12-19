@@ -1,5 +1,5 @@
 using System;
-using Code.Core.BaseDMDisposable.Scripts;
+using Disposable;
 using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.Gameplay.Modes;
 using GameShorts.Gardener.View;
@@ -11,7 +11,7 @@ namespace GameShorts.Gardener.UI
     /// <summary>
     /// Presenter для PlaceableItem - содержит всю логику drag-and-drop
     /// </summary>
-    internal class PlaceableItemPm : BaseDisposable
+    internal class PlaceableItemPm : DisposableBase
     {
         public struct Ctx
         {

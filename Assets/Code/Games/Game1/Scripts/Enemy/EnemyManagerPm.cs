@@ -1,16 +1,11 @@
 ﻿using System.Threading;
 using Asteroids.Code.Games.Game1.Scripts.Entities;
 using Asteroids.Code.Games.Game1.Scripts.View;
-using Code.Core.BaseDMDisposable.Scripts;
-using Code.Core.ShortGamesCore.Game1.Scripts.View;
-using Code.Core.Tools.Pool;
-using Logic.Entities;
-using Logic.Scene;
-using ResourceLoader;
+using Disposable;
 
 namespace Logic.Enemy
 {
-    internal class EnemyManagerPm : BaseDisposable
+    internal class EnemyManagerPm : DisposableBase
     {
         internal struct Ctx
         {
@@ -31,7 +26,7 @@ namespace Logic.Enemy
                 entitiesController = _ctx.entitiesController
             };
             var enemyController = EnemyCoutControllerPmFactory.CreateEnemyCoutControllerPm(enemyCoutControllerCtx);
-            AddDispose(enemyController);
+            AddDisposable(enemyController);
 
             EnemySpawnerPm.Ctx enemySpawnerCtx = new EnemySpawnerPm.Ctx
             {
@@ -40,7 +35,7 @@ namespace Logic.Enemy
                 entitiesController = _ctx.entitiesController,
                 cancellationToken = _ctx.cancellationToken
             };
-            AddDispose(EnemySpawnerPmFactory.CreateEnemySpawnerPm(enemySpawnerCtx));
+            AddDisposable(EnemySpawnerPmFactory.CreateEnemySpawnerPm(enemySpawnerCtx));
         }
     }
 }

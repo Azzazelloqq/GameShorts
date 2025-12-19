@@ -2,14 +2,14 @@
   "name": "BoxTower",
   "rootNamespace": "",
   "references": [
-    "Core.ShortGame",
-    "BaseDMDisposable",
-    "LightDI",
-    "TickHandler",
-    "Unity.TextMeshPro",
-    "Tools",
-    "R3.Unity",
-    "Utils"
+    "GUID:97970e3b002e4b58b19827dcfb9b8064",
+    "GUID:c9f76ac6b5b2484789d93f0d3960dc33",
+    "GUID:21443193b9119fc458cebc6c25737dbb",
+    "GUID:6055be8ebefd69e48b49212b09b47b2f",
+    "GUID:0e6e4a9ef4644d21a397a36906ffc8e9",
+    "GUID:77221876cc6b8244180b96e320b1bcd4",
+    "GUID:4190320b639141cd9b32d4d3f06a8e13",
+    "GUID:f3a29d15daa5e9345ab71de7276cd04b"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
