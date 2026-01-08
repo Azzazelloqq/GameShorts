@@ -281,10 +281,8 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 			1,
 			() => OnNextGameStartedAsync?.Invoke() ?? Task.CompletedTask);
 
-		if (success)
-		{
-			ResetSwipeProgress();
-		}
+		// Always reset swipe progress after an attempt to avoid leaving UI in an offset state when navigation fails.
+		ResetSwipeProgress();
 	}
 
 	private bool CanGoToPrevious()
@@ -303,10 +301,8 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 			-1,
 			() => OnPreviousGameStartedAsync?.Invoke() ?? Task.CompletedTask);
 
-		if (success)
-		{
-			ResetSwipeProgress();
-		}
+		// Always reset swipe progress after an attempt to avoid leaving UI in an offset state when navigation fails.
+		ResetSwipeProgress();
 	}
 
 	private async ValueTask InitializeGameSwiperAsync(CancellationToken token)

@@ -859,7 +859,8 @@ PlayerSettings:
   platformArchitecture: {}
   scriptingBackend:
     Android: 1
-  il2cppCompilerConfiguration: {}
+  il2cppCompilerConfiguration:
+    Android: 2
   il2cppCodeGeneration:
     Android: 1
   il2cppStacktraceInformation: {}

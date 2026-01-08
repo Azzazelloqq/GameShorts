@@ -75,6 +75,19 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 	private float _targetSwipeProgress;
 	private float _visualSwipeProgress;
 	private float _swipeProgressVelocity;
+
+	[Header("Swipe Commit")]
+	[SerializeField]
+	[Tooltip("Prevents visual 'bounce' at the end of a successful swipe by freezing the last drag progress until transition starts.")]
+	private bool _freezeProgressOnCommit = true;
+
+	[SerializeField]
+	[Tooltip("Safety timeout for commit freeze in case navigation never starts.")]
+	[Range(0.1f, 2f)]
+	private float _commitFreezeTimeoutSeconds = 0.75f;
+
+	private bool _isCommitFreezeActive;
+	private float _commitFreezeStartUnscaledTime;
 	
 	private float ActualImageSpacing => _useScreenHeight ? Screen.height : _imageSpacing;
 
@@ -146,11 +159,28 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 		_targetSwipeProgress = 0f;
 		_visualSwipeProgress = 0f;
 		_swipeProgressVelocity = 0f;
+		_isCommitFreezeActive = false;
+		_commitFreezeStartUnscaledTime = 0f;
 	}
 
 	private void LateUpdate()
 	{
-		if (!_isInitialized || IsInteractionLocked())
+		if (!_isInitialized)
+		{
+			return;
+		}
+
+		if (_isCommitFreezeActive && !IsInteractionLocked())
+		{
+			var elapsed = Time.unscaledTime - _commitFreezeStartUnscaledTime;
+			if (elapsed > _commitFreezeTimeoutSeconds)
+			{
+				CancelCommitFreezeAndReset();
+				return;
+			}
+		}
+
+		if (IsInteractionLocked())
 		{
 			return;
 		}
@@ -429,6 +459,7 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 			return;
 		}
 
+		BeginCommitFreezeIfNeeded(1f);
 		_ = viewModel.GoToNextCommand.ExecuteAsync();
 	}
 
@@ -439,6 +470,7 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 			return;
 		}
 
+		BeginCommitFreezeIfNeeded(-1f);
 		_ = viewModel.GoToPreviousCommand.ExecuteAsync();
 	}
 
@@ -446,6 +478,13 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 	{
 		if (IsInteractionLocked())
 		{
+			return;
+		}
+
+		if (_isCommitFreezeActive)
+		{
+			// Ignore incoming 0/return-to-center updates that can happen on pointer release.
+			// This keeps the last drag position stable until the transition/animation starts.
 			return;
 		}
 
@@ -547,6 +586,12 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 	{
 		_isModelTransitioning = isTransitioning;
 
+		if (isTransitioning)
+		{
+			// Navigation/transition started; we no longer need to freeze drag progress.
+			_isCommitFreezeActive = false;
+		}
+
 		if (!isTransitioning && !_isAnimating && _hasPendingViewRefresh)
 		{
 			UpdateGameViews(true);
@@ -635,9 +680,54 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 	private void FinishAnimation()
 	{
 		ResetLayoutPositions(0f);
+		ResetSwipeVisualState();
 		_isAnimating = false;
 		UpdateGameViews(true);
 		UpdateInteractionState();
+	}
+
+	private void BeginCommitFreezeIfNeeded(float directionSign)
+	{
+		if (!_freezeProgressOnCommit)
+		{
+			return;
+		}
+
+		_isCommitFreezeActive = true;
+		_commitFreezeStartUnscaledTime = Time.unscaledTime;
+
+		// Freeze the current visual progress (avoid snapping to 1/-1 which can look like a jump).
+		var frozen = Mathf.Clamp(_visualSwipeProgress, -1f, 1f);
+
+		if (Mathf.Abs(frozen) < DragProgressEpsilon)
+		{
+			frozen = Mathf.Sign(directionSign);
+		}
+
+		frozen = Mathf.Abs(frozen) * Mathf.Sign(directionSign);
+
+		_targetSwipeProgress = frozen;
+		_visualSwipeProgress = frozen;
+		_swipeProgressVelocity = 0f;
+		ApplySwipeOffset(_visualSwipeProgress);
+	}
+
+	private void CancelCommitFreezeAndReset()
+	{
+		_isCommitFreezeActive = false;
+		_commitFreezeStartUnscaledTime = 0f;
+		ResetSwipeVisualState();
+		viewModel?.ResetSwipeCommand?.Execute();
+	}
+
+	private void ResetSwipeVisualState()
+	{
+		_isCommitFreezeActive = false;
+		_commitFreezeStartUnscaledTime = 0f;
+		_targetSwipeProgress = 0f;
+		_visualSwipeProgress = 0f;
+		_swipeProgressVelocity = 0f;
+		ApplySwipeOffset(0f);
 	}
 
 	private void ResetLayoutPositions(float duration = 0.2f)
