@@ -1,11 +1,11 @@
 {
-    "name": "Utils",
-    "rootNamespace": "",
+    "name": "IngameDebugConsole.Editor",
     "references": [
-        "IngameDebugConsole.Runtime",
-        "Unity.TextMeshPro"
+        "IngameDebugConsole.Runtime"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
