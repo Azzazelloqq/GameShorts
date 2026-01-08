@@ -61,6 +61,20 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 	[Tooltip("Fraction of the full distance the cards travel while the player is dragging.")]
 	[Range(0.1f, 1f)]
 	private float _maxSwipeVisualOffsetRatio = 0.33f;
+
+	[Header("Drag Smoothing")]
+	[SerializeField]
+	[Tooltip("Smooths visual swipe motion between discrete UI drag events. Helps on devices where UI drag doesn't fire every frame.")]
+	private bool _useSwipeSmoothing = true;
+
+	[SerializeField]
+	[Tooltip("Time constant for SmoothDamp of swipe progress. Lower = snappier, higher = smoother.")]
+	[Range(0.01f, 0.2f)]
+	private float _swipeSmoothingTime = 0.05f;
+
+	private float _targetSwipeProgress;
+	private float _visualSwipeProgress;
+	private float _swipeProgressVelocity;
 	
 	private float ActualImageSpacing => _useScreenHeight ? Screen.height : _imageSpacing;
 
@@ -129,6 +143,19 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 		SetupInputHandlers();
 		BindToViewModel();
 		ResetLayoutPositions(0f);
+		_targetSwipeProgress = 0f;
+		_visualSwipeProgress = 0f;
+		_swipeProgressVelocity = 0f;
+	}
+
+	private void LateUpdate()
+	{
+		if (!_isInitialized || IsInteractionLocked())
+		{
+			return;
+		}
+
+		UpdateSwipeVisuals(Time.unscaledDeltaTime);
 	}
 
 	private void CacheSlotComponents()
@@ -434,7 +461,15 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 			return;
 		}
 
-		ApplySwipeOffset(progress);
+		_targetSwipeProgress = progress;
+
+		// If smoothing is disabled, apply immediately to keep exact 1:1 dragging.
+		if (!_useSwipeSmoothing)
+		{
+			_visualSwipeProgress = progress;
+			_swipeProgressVelocity = 0f;
+			ApplySwipeOffset(_visualSwipeProgress);
+		}
 	}
 
 	private void UpdateUserDraggingState(float progress)
@@ -469,6 +504,25 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 		SetSlotPosition(_previousRect, ActualImageSpacing + offset);
 		SetSlotPosition(_currentRect, offset);
 		SetSlotPosition(_nextRect, -ActualImageSpacing + offset);
+	}
+
+	private void UpdateSwipeVisuals(float deltaTime)
+	{
+		if (!_useSwipeSmoothing)
+		{
+			ApplySwipeOffset(_targetSwipeProgress);
+			return;
+		}
+
+		_visualSwipeProgress = Mathf.SmoothDamp(
+			_visualSwipeProgress,
+			_targetSwipeProgress,
+			ref _swipeProgressVelocity,
+			_swipeSmoothingTime,
+			Mathf.Infinity,
+			deltaTime);
+
+		ApplySwipeOffset(_visualSwipeProgress);
 	}
 
 	private void SetSlotPosition(RectTransform rect, float targetY)

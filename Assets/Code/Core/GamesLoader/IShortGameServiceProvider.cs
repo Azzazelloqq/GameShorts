@@ -223,5 +223,11 @@ public interface IShortGameServiceProvider : IDisposable
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>true if successful, false otherwise</returns>
 	Task<bool> SwipeToPreviousGameAsync(CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Enables or disables rendering for neighbour games (next/previous) without changing the active game.
+	/// Useful for swipe previews: render the target neighbour while the user is dragging, keep neighbours disabled when idle.
+	/// </summary>
+	void SetNeighbourRenderingEnabled(bool enableNext, bool enablePrevious);
 }
 }

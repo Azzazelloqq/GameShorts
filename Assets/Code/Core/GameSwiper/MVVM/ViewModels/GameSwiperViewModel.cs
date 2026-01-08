@@ -53,8 +53,10 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 	private readonly ReactiveProperty<bool> _shouldShowLoadingIndicator;
 	private readonly ReactiveProperty<float> _swipeProgress;
 	private readonly ReactiveProperty<SwipeDirection> _lastSwipeDirection;
+	private SwipeDirection _activePreviewDirection = SwipeDirection.None;
 
 	private const float LoadingIndicatorDelaySeconds = 0.1f;
+	private const float SwipePreviewEpsilon = 0.001f;
 
 	public GameSwiperViewModel(
 		GameSwiperModel model,
@@ -483,7 +485,38 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 	private void OnUpdateSwipeProgress(float progress)
 	{
 		_swipeProgress.Value = progress;
+		UpdateNeighbourPreviewRendering(progress);
 		OnSwipeProgressChanged?.Invoke(progress);
+	}
+
+	private void UpdateNeighbourPreviewRendering(float progress)
+	{
+		var direction = progress switch
+		{
+			> SwipePreviewEpsilon => SwipeDirection.Up,
+			< -SwipePreviewEpsilon => SwipeDirection.Down,
+			_ => SwipeDirection.None
+		};
+
+		if (direction == _activePreviewDirection)
+		{
+			return;
+		}
+
+		_activePreviewDirection = direction;
+
+		switch (direction)
+		{
+			case SwipeDirection.Up:
+				_gameServiceProvider.SetNeighbourRenderingEnabled(enableNext: true, enablePrevious: false);
+				break;
+			case SwipeDirection.Down:
+				_gameServiceProvider.SetNeighbourRenderingEnabled(enableNext: false, enablePrevious: true);
+				break;
+			default:
+				_gameServiceProvider.SetNeighbourRenderingEnabled(enableNext: false, enablePrevious: false);
+				break;
+		}
 	}
 
 	private void ResetSwipeProgress()

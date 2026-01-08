@@ -112,6 +112,10 @@ public class CircularJoystickInputHandler : GameSwiperInputHandler,
 			}
 		}
 
+		// Performance: GooeyJoystickEffect already gets updated manually when the joystick moves / returns.
+		// Disabling its per-frame Update() avoids unnecessary work when idle.
+		_gooeyEffect?.SetRealtimeUpdate(false);
+
 		CalculateCircleParameters();
 	}
 

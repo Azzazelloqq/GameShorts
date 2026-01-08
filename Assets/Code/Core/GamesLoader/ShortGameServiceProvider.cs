@@ -382,6 +382,20 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		}
 	}
 
+	public void SetNeighbourRenderingEnabled(bool enableNext, bool enablePrevious)
+	{
+		if (_disposed)
+		{
+			return;
+		}
+
+		// Always keep the current game rendering enabled.
+		SetGameCamerasEnabled(CurrentGame, true);
+
+		SetGameCamerasEnabled(NextGame, enableNext);
+		SetGameCamerasEnabled(PreviousGame, enablePrevious);
+	}
+
 	public ValueTask InitializeSwiperUIAsync(Transform uiRoot, CancellationToken cancellationToken = default)
 	{
 		throw new NotImplementedException();
@@ -417,6 +431,41 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		EnableCurrentGameInput();
 		DisableNextGameInput();
 		DisablePreviousGameInput();
+
+		// Performance: preloaded neighbour games are instantiated as active GameObjects.
+		// Many short games attach their cameras to full-screen RenderTextures in PreloadGameAsync,
+		// so if we keep all cameras enabled, the device may end up rendering multiple full-screen RTs each frame.
+		// We only need the current game to render continuously; neighbours can keep a static preview.
+		SetGameCamerasEnabled(CurrentGame, true);
+		SetGameCamerasEnabled(NextGame, false);
+		SetGameCamerasEnabled(PreviousGame, false);
+
+		// Best-effort CPU savings (individual games decide what "pause" means).
+		CurrentGame?.UnpauseGame();
+		NextGame?.PauseGame();
+		PreviousGame?.PauseGame();
+	}
+
+	private static void SetGameCamerasEnabled(IShortGame game, bool enabled)
+	{
+		if (game is not Component component)
+		{
+			return;
+		}
+
+		var cameras = component.GetComponentsInChildren<Camera>(true);
+		if (cameras == null || cameras.Length == 0)
+		{
+			return;
+		}
+
+		foreach (var camera in cameras)
+		{
+			if (camera != null)
+			{
+				camera.enabled = enabled;
+			}
+		}
 	}
 }
 }
