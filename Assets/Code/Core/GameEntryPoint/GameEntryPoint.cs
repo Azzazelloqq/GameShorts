@@ -112,7 +112,12 @@ public sealed class GameEntryPoint : MonoBehaviour
 				_gamePositioningConfig);
 		_globalGameDiContainer.RegisterAsSingleton<IShortGameFactory>(factory);
 
-		var gameLoaderSettings = new ShortGameLoaderSettings();
+		// We keep a sliding window of games in memory:
+		// - previous: kept loaded so the player can go back and resume
+		// - current: active
+		// - next: preloaded for instant start on swipe
+		// Everything older than "previous" should be unloaded (StopGame + Dispose via IShortGame API).
+		var gameLoaderSettings = new ShortGameLoaderSettings(preloadRadius: 1, maxLoadedGames: 2);
 		var games = GetPlayableGames();
 		var registry = GameRegistryFactory.CreateGameRegistry();
 		_globalGameDiContainer.RegisterAsSingleton<IGameRegistry>(registry);

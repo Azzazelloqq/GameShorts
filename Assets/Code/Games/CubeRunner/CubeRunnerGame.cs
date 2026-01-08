@@ -65,7 +65,8 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 
 	public void StopGame()
 	{
-		Dispose();
+		PauseGame();
+		DisableInput();
 	}
 
 	public void EnableInput()
@@ -92,7 +93,10 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 		}
 
 		DisposeCore();
+		RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera);
+		IsPreloaded = false;
 		_isDisposed = true;
+		Destroy(gameObject);
 	}
 
 	private void RecreateRoot()

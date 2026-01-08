@@ -57,7 +57,7 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void UnpauseGame()
 	{
-		throw new NotImplementedException();
+		// No-op for now (individual gameplay systems decide what "pause" means).
 	}
 
 	public void ResumeGame()
@@ -72,7 +72,8 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StopGame()
 	{
-		Dispose();
+		PauseGame();
+		DisableInput();
 	}
 
 	public void EnableInput()
@@ -93,8 +94,11 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 		}
 
 		DisposeCore();
+		RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera);
+		IsPreloaded = false;
 
 		_isDisposed = true;
+		Destroy(gameObject);
 	}
 
 	private void RecreateRoot()

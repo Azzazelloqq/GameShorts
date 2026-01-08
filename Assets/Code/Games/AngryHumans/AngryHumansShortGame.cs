@@ -40,6 +40,7 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 	private bool _isGameActive;
 	private bool _isPaused;
 	private bool _isStarting;
+	private bool _disposed;
 	private int _currentScore = 0;
 
 	public bool IsPreloaded { get; private set; }
@@ -63,7 +64,25 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public void Dispose()
 	{
-		_renderTexture = null;
+		if (_disposed)
+		{
+			return;
+		}
+
+		_disposed = true;
+
+		// Best-effort: ensure runtime subscriptions/state are cleaned up even if Dispose is called directly.
+		StopGame();
+
+		RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera, _uiCamera);
+		IsPreloaded = false;
+
+		Destroy(gameObject);
+	}
+	
+	private void OnDestroy()
+	{
+		Dispose();
 	}
 
 	public async void StartGame()
@@ -71,6 +90,11 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		if (_isStarting)
 		{
 			Debug.LogWarning("[AngryHumans] StartGame called while already starting, ignoring.");
+			return;
+		}
+		
+		if (_disposed)
+		{
 			return;
 		}
 
@@ -81,6 +105,11 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 		InitializeScoreController();
 		await LoadLevel();
+		if (_disposed)
+		{
+			_isStarting = false;
+			return;
+		}
 		SubscribeToTargetEvents();
 
 		SpawnNewHuman();

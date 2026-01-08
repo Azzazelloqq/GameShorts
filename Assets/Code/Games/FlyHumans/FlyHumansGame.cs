@@ -67,7 +67,8 @@ namespace GameShorts.FlyHumans
 
         public void StopGame()
         {
-            Dispose();
+            PauseGame();
+            DisableInput();
         }
 
         public void EnableInput()
@@ -94,8 +95,11 @@ namespace GameShorts.FlyHumans
             }
 
             DisposeCore();
+            RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera);
+            IsPreloaded = false;
 
             _isDisposed = true;
+            Destroy(gameObject);
         }
 
         private void OnDestroy()

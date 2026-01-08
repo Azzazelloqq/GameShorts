@@ -63,7 +63,8 @@ namespace Lightseeker
 
         public void StopGame()
         {
-            Dispose();
+            PauseGame();
+            DisableInput();
         }
 
         public void EnableInput()
@@ -82,8 +83,11 @@ namespace Lightseeker
             }
 
             DisposeCore();
+            RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera, _cameraUI);
+            IsPreloaded = false;
 
             _isDisposed = true;
+            Destroy(gameObject);
         }
 
         protected override void OnDestroy()

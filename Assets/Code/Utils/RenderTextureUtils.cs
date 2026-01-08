@@ -10,6 +10,11 @@ public static class RenderTextureUtils
 		{
 			mainGameCamera.targetTexture = null;
 		}
+		
+		if (uiCamera != null)
+		{
+			uiCamera.targetTexture = null;
+		}
 
 		var width = Screen.width;
 		var height = Screen.height;
@@ -37,6 +42,44 @@ public static class RenderTextureUtils
 		}
 
 		return renderTexture;
+	}
+	
+	/// <summary>
+	/// Releases GPU memory and destroys the RenderTexture instance. Also detaches it from provided cameras.
+	/// </summary>
+	public static void ReleaseAndDestroy(ref RenderTexture renderTexture, params Camera[] cameras)
+	{
+		if (renderTexture == null)
+		{
+			return;
+		}
+
+		if (cameras != null)
+		{
+			foreach (var camera in cameras)
+			{
+				if (camera != null && camera.targetTexture == renderTexture)
+				{
+					camera.targetTexture = null;
+				}
+			}
+		}
+
+		if (renderTexture.IsCreated())
+		{
+			renderTexture.Release();
+		}
+
+		if (Application.isEditor && !Application.isPlaying)
+		{
+			UnityEngine.Object.DestroyImmediate(renderTexture);
+		}
+		else
+		{
+			UnityEngine.Object.Destroy(renderTexture);
+		}
+
+		renderTexture = null;
 	}
 }
 }

@@ -71,7 +71,8 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StopGame()
 	{
-		Dispose();
+		PauseGame();
+		DisableInput();
 	}
 
 	public void EnableInput()
@@ -92,8 +93,11 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 		}
 
 		DisposeCore();
+		RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera);
+		IsPreloaded = false;
 
 		_isDisposed = true;
+		Destroy(gameObject);
 	}
 
 	private void RecreateRoot()

@@ -353,8 +353,6 @@ public class QueueShortGamesLoader : IGamesLoader
 		_logger.Log($"Started preloaded game: {gameType.Name}");
 		OnGameLoadingCompleted?.Invoke(gameType, game);
 
-		TrimLoadedGames();
-
 		return true;
 	}
 
@@ -444,64 +442,62 @@ public class QueueShortGamesLoader : IGamesLoader
 			return;
 		}
 
-		// Remove from loaded games
-		if (_loadedGames.TryGetValue(gameType, out var loadedGame))
+		_loadedGames.TryGetValue(gameType, out var loadedGame);
+		_preloadedGames.TryGetValue(gameType, out var preloadedGame);
+
+		// Safety: it should never happen, but if both maps point to the same instance, unload it once.
+		if (loadedGame != null && preloadedGame != null && ReferenceEquals(loadedGame, preloadedGame))
 		{
-			_logger.Log($"Unloading loaded game: {gameType.Name}");
-			loadedGame.StopGame();
-			loadedGame.Dispose();
+			_logger.LogWarning($"Game {gameType.Name} is present in both LoadedGames and PreloadedGames. Unloading once.");
 			_loadedGames.Remove(gameType);
-		}
-
-		// Remove from preloaded games
-		if (_preloadedGames.TryGetValue(gameType, out var preloadedGame))
-		{
-			_logger.Log($"Unloading preloaded game: {gameType.Name}");
-			preloadedGame.Dispose();
 			_preloadedGames.Remove(gameType);
+			SafeStopGame(gameType, loadedGame, "both-loaded-and-preloaded");
+			SafeDispose(gameType, loadedGame, "both-loaded-and-preloaded");
+		}
+		else
+		{
+			// Remove from loaded games
+			if (loadedGame != null)
+			{
+				_logger.Log($"Unloading loaded game: {gameType.Name}");
+				_loadedGames.Remove(gameType);
+				SafeStopGame(gameType, loadedGame, "loaded");
+				SafeDispose(gameType, loadedGame, "loaded");
+			}
+
+			// Remove from preloaded games
+			if (preloadedGame != null)
+			{
+				_logger.Log($"Unloading preloaded game: {gameType.Name}");
+				_preloadedGames.Remove(gameType);
+				SafeDispose(gameType, preloadedGame, "preloaded");
+			}
 		}
 
-	if (_activeGameType == gameType)
-	{
-		_activeGameType = null;
-	}
+		if (_activeGameType == gameType)
+		{
+			_activeGameType = null;
+		}
 	}
 
 	public void UnloadAllGames()
 	{
 		_logger.Log("Unloading all games");
 
-		// Unload loaded games
-		foreach (var kvp in _loadedGames)
+		var allTypes = _loadedGames.Keys
+			.Concat(_preloadedGames.Keys)
+			.Where(type => type != null)
+			.Distinct()
+			.ToList();
+
+		foreach (var type in allTypes)
 		{
-			try
-			{
-				kvp.Value.StopGame();
-				kvp.Value.Dispose();
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Error unloading game {kvp.Key.Name}: {ex.Message}");
-			}
+			UnloadGame(type);
 		}
 
 		_loadedGames.Clear();
-
-		// Unload preloaded games
-		foreach (var kvp in _preloadedGames)
-		{
-			try
-			{
-				kvp.Value.Dispose();
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Error unloading preloaded game {kvp.Key.Name}: {ex.Message}");
-			}
-		}
-
 		_preloadedGames.Clear();
-	_activeGameType = null;
+		_activeGameType = null;
 	}
 
 	public IShortGame GetGame(Type gameType)
@@ -704,20 +700,6 @@ public class QueueShortGamesLoader : IGamesLoader
 
 	private void TrimLoadedGames()
 	{
-		var allowedWindow = BuildAllowedLoadedWindow();
-		if (allowedWindow.Count > 0)
-		{
-			var outsideWindow = _loadedGames.Keys
-				.Where(type => !allowedWindow.Contains(type))
-				.ToList();
-
-			foreach (var type in outsideWindow)
-			{
-				_logger.Log($"Unloading {type.Name} outside of the active window");
-				UnloadGame(type);
-			}
-		}
-
 		if (_settings.MaxLoadedGames <= 0)
 		{
 			return;
@@ -746,24 +728,6 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	private HashSet<Type> BuildAllowedLoadedWindow()
-	{
-		var allowed = new HashSet<Type>();
-		AddIfNotNull(allowed, _queueService?.PreviousGameType);
-		AddIfNotNull(allowed, _queueService?.CurrentGameType);
-		AddIfNotNull(allowed, _queueService?.NextGameType);
-		AddIfNotNull(allowed, _activeGameType);
-		return allowed;
-	}
-
-	private static void AddIfNotNull(ISet<Type> set, Type type)
-	{
-		if (type != null)
-		{
-			set.Add(type);
-		}
-	}
-
 	private void TrimPreloadedGames(ICollection<Type> windowTypes)
 	{
 		var allowed = new HashSet<Type>(windowTypes);
@@ -778,20 +742,42 @@ public class QueueShortGamesLoader : IGamesLoader
 
 		foreach (var type in toRemove)
 		{
-			if (_preloadedGames.TryGetValue(type, out var game))
-			{
-				try
-				{
-					_logger.Log($"Evicting preloaded game outside window: {type.Name}");
-					game.Dispose();
-				}
-				catch (Exception ex)
-				{
-					_logger.LogError($"Failed to dispose preloaded game {type.Name}: {ex.Message}");
-				}
-			}
+			_logger.Log($"Evicting preloaded game outside window: {type.Name}");
+			UnloadGame(type);
+		}
+	}
 
-			_preloadedGames.Remove(type);
+	private void SafeStopGame(Type gameType, IShortGame game, string reason)
+	{
+		if (game == null)
+		{
+			return;
+		}
+
+		try
+		{
+			game.StopGame();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to stop game {gameType?.Name} ({reason}): {ex.Message}");
+		}
+	}
+
+	private void SafeDispose(Type gameType, IShortGame game, string reason)
+	{
+		if (game == null)
+		{
+			return;
+		}
+
+		try
+		{
+			game.Dispose();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to dispose game {gameType?.Name} ({reason}): {ex.Message}");
 		}
 	}
 
