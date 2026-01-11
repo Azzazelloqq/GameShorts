@@ -122,74 +122,74 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		StartGameForType(_queueService?.PreviousGameType, "previous");
 	}
 
-	public void PauseCurrentGame()
+	public void DisableCurrentGame()
 	{
 		if (CurrentGame != null)
 		{
-			_logger.Log("Pausing current game");
-			CurrentGame.PauseGame();
+			_logger.Log("Disabling current game");
+			CurrentGame.Disable();
 		}
 	}
 
-	public void UnpauseCurrentGame()
+	public void EnableCurrentGame()
 	{
 		if (CurrentGame != null)
 		{
-			_logger.Log("Unpausing current game");
-			CurrentGame.UnpauseGame();
+			_logger.Log("Enabling current game");
+			CurrentGame.Enable();
 		}
 	}
 
-	public void PauseNextGame()
+	public void DisableNextGame()
 	{
 		if (NextGame != null)
 		{
-			_logger.Log("Pausing next game");
-			NextGame.PauseGame();
+			_logger.Log("Disabling next game");
+			NextGame.Disable();
 		}
 	}
 
-	public void UnpauseNextGame()
+	public void EnableNextGame()
 	{
 		if (NextGame != null)
 		{
-			_logger.Log("Unpausing next game");
-			NextGame.UnpauseGame();
+			_logger.Log("Enabling next game");
+			NextGame.Enable();
 		}
 	}
 
-	public void PausePreviousGame()
+	public void DisablePreviousGame()
 	{
 		if (PreviousGame != null)
 		{
-			_logger.Log("Pausing previous game");
-			PreviousGame.PauseGame();
+			_logger.Log("Disabling previous game");
+			PreviousGame.Disable();
 		}
 	}
 
-	public void UnpausePreviousGame()
+	public void EnablePreviousGame()
 	{
 		if (PreviousGame != null)
 		{
-			_logger.Log("Unpausing previous game");
-			PreviousGame.UnpauseGame();
+			_logger.Log("Enabling previous game");
+			PreviousGame.Enable();
 		}
 	}
 
-	public void PauseAllGames()
+	public void DisableAllGames()
 	{
-		_logger.Log("Pausing all games");
-		PauseCurrentGame();
-		PauseNextGame();
-		PausePreviousGame();
+		_logger.Log("Disabling all games");
+		DisableCurrentGame();
+		DisableNextGame();
+		DisablePreviousGame();
 	}
 
-	public void UnpauseAllGames()
+	public void EnableAllGames()
 	{
-		_logger.Log("Unpausing all games");
-		UnpauseCurrentGame();
-		UnpauseNextGame();
-		UnpausePreviousGame();
+		_logger.Log("Enabling all games");
+		EnableCurrentGame();
+		EnableNextGame();
+		EnablePreviousGame();
 	}
 
 	public void StopCurrentGame()
@@ -389,11 +389,42 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 			return;
 		}
 
-		// Always keep the current game rendering enabled.
-		SetGameCamerasEnabled(CurrentGame, true);
+		// Contract: at any moment, only ONE game should be enabled.
+		if (enableNext)
+		{
+			if (NextGame == null)
+			{
+				EnableCurrentGame();
+				DisableNextGame();
+				DisablePreviousGame();
+				return;
+			}
 
-		SetGameCamerasEnabled(NextGame, enableNext);
-		SetGameCamerasEnabled(PreviousGame, enablePrevious);
+			DisableCurrentGame();
+			EnableNextGame();
+			DisablePreviousGame();
+			return;
+		}
+
+		if (enablePrevious)
+		{
+			if (PreviousGame == null)
+			{
+				EnableCurrentGame();
+				DisableNextGame();
+				DisablePreviousGame();
+				return;
+			}
+
+			DisableCurrentGame();
+			DisableNextGame();
+			EnablePreviousGame();
+			return;
+		}
+
+		EnableCurrentGame();
+		DisableNextGame();
+		DisablePreviousGame();
 	}
 
 	public ValueTask InitializeSwiperUIAsync(Transform uiRoot, CancellationToken cancellationToken = default)
@@ -432,40 +463,10 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		DisableNextGameInput();
 		DisablePreviousGameInput();
 
-		// Performance: preloaded neighbour games are instantiated as active GameObjects.
-		// Many short games attach their cameras to full-screen RenderTextures in PreloadGameAsync,
-		// so if we keep all cameras enabled, the device may end up rendering multiple full-screen RTs each frame.
-		// We only need the current game to render continuously; neighbours can keep a static preview.
-		SetGameCamerasEnabled(CurrentGame, true);
-		SetGameCamerasEnabled(NextGame, false);
-		SetGameCamerasEnabled(PreviousGame, false);
-
-		// Best-effort CPU savings (individual games decide what "pause" means).
-		CurrentGame?.UnpauseGame();
-		NextGame?.PauseGame();
-		PreviousGame?.PauseGame();
-	}
-
-	private static void SetGameCamerasEnabled(IShortGame game, bool enabled)
-	{
-		if (game is not Component component)
-		{
-			return;
-		}
-
-		var cameras = component.GetComponentsInChildren<Camera>(true);
-		if (cameras == null || cameras.Length == 0)
-		{
-			return;
-		}
-
-		foreach (var camera in cameras)
-		{
-			if (camera != null)
-			{
-				camera.enabled = enabled;
-			}
-		}
+		// Performance: keep exactly one game enabled when idle.
+		EnableCurrentGame();
+		DisableNextGame();
+		DisablePreviousGame();
 	}
 }
 }

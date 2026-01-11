@@ -116,14 +116,14 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		_isStarting = false;
 	}
 
-	public void PauseGame()
+	public void Disable()
 	{
-		_isPaused = true;
+		gameObject.SetActive(false);
 	}
 
-	public void UnpauseGame()
+	public void Enable()
 	{
-		_isPaused = false;
+		gameObject.SetActive(true);
 	}
 
 	public void RestartGame()

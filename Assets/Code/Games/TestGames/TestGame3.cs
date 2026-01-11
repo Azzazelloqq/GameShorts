@@ -100,22 +100,14 @@ public class TestGame3: MonoBehaviour, IShortGame3D
 		}
 	}
 
-	public void PauseGame()
+	public void Disable()
 	{
-		if (_rotateRoutine != null)
-		{
-			StopCoroutine(_rotateRoutine);
-		}
+		gameObject.SetActive(false);
 	}
 
-	public void UnpauseGame()
+	public void Enable()
 	{
-		if (_rotateRoutine != null)
-		{
-			StopCoroutine(_rotateRoutine);
-		}
-		
-		_rotateRoutine = StartCoroutine(RotateTarget());
+		gameObject.SetActive(true);
 	}
 
 	public void RestartGame()

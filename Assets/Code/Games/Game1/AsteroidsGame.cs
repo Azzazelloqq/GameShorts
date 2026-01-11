@@ -49,13 +49,14 @@ public class AsteroidsGame : MonoBehaviourDisposable, IShortGame2D
 		CreateRoot();
 	}
 
-	public void PauseGame()
+	public void Disable()
 	{
+		gameObject.SetActive(false);
 	}
 
-	public void UnpauseGame()
+	public void Enable()
 	{
-		// No-op for now (individual gameplay systems decide what "pause" means).
+		gameObject.SetActive(true);
 	}
 
 	public void ResumeGame()
@@ -69,7 +70,7 @@ public class AsteroidsGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StopGame()
 	{
-		PauseGame();
+		Disable();
 		DisableInput();
 	}
 

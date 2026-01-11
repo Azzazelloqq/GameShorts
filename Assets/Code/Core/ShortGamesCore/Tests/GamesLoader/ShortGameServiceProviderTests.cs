@@ -199,7 +199,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
         }
         
         [Test]
-        public async Task PauseCurrentGame_PausesTheGame()
+        public async Task DisableCurrentGame_DisablesTheGame()
         {
             // Arrange
             _queueService.MoveNext();
@@ -207,32 +207,32 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             Assert.IsNotNull(loadedGame, "Failed to load game");
             
             // Act
-            _serviceProvider.PauseCurrentGame();
+            _serviceProvider.DisableCurrentGame();
             
             // Assert
             var game = _serviceProvider.CurrentGame as MockShortGame;
             Assert.IsNotNull(game, "CurrentGame should not be null");
-            Assert.IsTrue(game.IsPaused);
+            Assert.IsFalse(game.gameObject.activeSelf);
         }
         
         [Test]
-        public async Task UnpauseCurrentGame_UnpausesTheGame()
+        public async Task EnableCurrentGame_EnablesTheGame()
         {
             // Arrange
             _queueService.MoveNext();
             await _loader.LoadGameAsync(typeof(MockShortGame));
-            _serviceProvider.PauseCurrentGame();
+            _serviceProvider.DisableCurrentGame();
             
             // Act
-            _serviceProvider.UnpauseCurrentGame();
+            _serviceProvider.EnableCurrentGame();
             
             // Assert
             var game = _serviceProvider.CurrentGame as MockShortGame;
-            Assert.IsFalse(game.IsPaused);
+            Assert.IsTrue(game.gameObject.activeSelf);
         }
         
         [Test]
-        public async Task PauseAllGames_PausesAllLoadedGames()
+        public async Task DisableAllGames_DisablesAllLoadedGames()
         {
             // Arrange
             _queueService.MoveToIndex(1);
@@ -248,7 +248,7 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             _serviceProvider.StartPreviousGame();
             
             // Act
-            _serviceProvider.PauseAllGames();
+            _serviceProvider.DisableAllGames();
             
             // Assert
             var current = _serviceProvider.CurrentGame as MockPoolableShortGame;
@@ -259,9 +259,9 @@ namespace Code.Core.ShortGamesCore.Tests.GamesLoader
             Assert.IsNotNull(next, "Next game cast failed");
             Assert.IsNotNull(previous, "Previous game cast failed");
             
-            Assert.IsTrue(current.IsPaused);
-            Assert.IsTrue(next.IsPaused);
-            Assert.IsTrue(previous.IsPaused);
+            Assert.IsFalse(current.gameObject.activeSelf);
+            Assert.IsFalse(next.gameObject.activeSelf);
+            Assert.IsFalse(previous.gameObject.activeSelf);
         }
         
         [Test]

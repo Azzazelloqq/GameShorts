@@ -31,14 +31,14 @@ namespace Code.Core.ShortGamesCore.Source.GameCore
         public void StartGame();
         
         /// <summary>
-        /// Pauses the game
+        /// Disables the game (best-effort: games should simply toggle their root GameObject on/off)
         /// </summary>
-        public void PauseGame();
+        public void Disable();
         
         /// <summary>
-        /// Unpauses the game
+        /// Enables the game (best-effort: games should simply toggle their root GameObject on/off)
         /// </summary>
-        public void UnpauseGame();
+        public void Enable();
         
         /// <summary>
         /// Restarts the game

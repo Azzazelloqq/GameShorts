@@ -105,44 +105,44 @@ public interface IShortGameServiceProvider : IDisposable
 	void StartPreviousGame();
 
 	/// <summary>
-	/// Pauses the current game
+	/// Disables the current game (best-effort: should just toggle its root GameObject off)
 	/// </summary>
-	void PauseCurrentGame();
+	void DisableCurrentGame();
 
 	/// <summary>
-	/// Unpauses the current game
+	/// Enables the current game (best-effort: should just toggle its root GameObject on)
 	/// </summary>
-	void UnpauseCurrentGame();
+	void EnableCurrentGame();
 
 	/// <summary>
-	/// Pauses the next game
+	/// Disables the next game (best-effort: should just toggle its root GameObject off)
 	/// </summary>
-	void PauseNextGame();
+	void DisableNextGame();
 
 	/// <summary>
-	/// Unpauses the next game
+	/// Enables the next game (best-effort: should just toggle its root GameObject on)
 	/// </summary>
-	void UnpauseNextGame();
+	void EnableNextGame();
 
 	/// <summary>
-	/// Pauses the previous game
+	/// Disables the previous game (best-effort: should just toggle its root GameObject off)
 	/// </summary>
-	void PausePreviousGame();
+	void DisablePreviousGame();
 
 	/// <summary>
-	/// Unpauses the previous game
+	/// Enables the previous game (best-effort: should just toggle its root GameObject on)
 	/// </summary>
-	void UnpausePreviousGame();
+	void EnablePreviousGame();
 
 	/// <summary>
-	/// Pauses all games
+	/// Disables all games (best-effort: should just toggle their root GameObjects off)
 	/// </summary>
-	void PauseAllGames();
+	void DisableAllGames();
 
 	/// <summary>
-	/// Unpauses all games
+	/// Enables all games (best-effort: should just toggle their root GameObjects on)
 	/// </summary>
-	void UnpauseAllGames();
+	void EnableAllGames();
 
 	/// <summary>
 	/// Stops the current game
@@ -225,8 +225,11 @@ public interface IShortGameServiceProvider : IDisposable
 	Task<bool> SwipeToPreviousGameAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Enables or disables rendering for neighbour games (next/previous) without changing the active game.
-	/// Useful for swipe previews: render the target neighbour while the user is dragging, keep neighbours disabled when idle.
+	/// Sets which neighbour game is enabled for swipe previews (without changing the active game).
+	/// Contract: at any moment, only ONE game should be enabled:
+	/// - if enableNext == true: enable Next, disable Current and Previous
+	/// - if enablePrevious == true: enable Previous, disable Current and Next
+	/// - otherwise: enable Current, disable Next and Previous
 	/// </summary>
 	void SetNeighbourRenderingEnabled(bool enableNext, bool enablePrevious);
 }

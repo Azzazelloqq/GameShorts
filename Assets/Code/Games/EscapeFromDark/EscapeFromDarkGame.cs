@@ -50,13 +50,14 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 		CreateRoot();
 	}
 
-	public void PauseGame()
+	public void Disable()
 	{
-		// TODO: Реализовать паузу игры
+		gameObject.SetActive(false);
 	}
 
-	public void UnpauseGame()
+	public void Enable()
 	{
+		gameObject.SetActive(true);
 	}
 
 	public void ResumeGame()
@@ -71,7 +72,7 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StopGame()
 	{
-		PauseGame();
+		Disable();
 		DisableInput();
 	}
 

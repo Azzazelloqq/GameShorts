@@ -110,8 +110,8 @@ var puzzleGame = await gamesLoader.LoadGameAsync(typeof(PuzzleGame));
 
 // Control games through provider
 gameProvider.StopCurrentGame();
-gameProvider.PauseCurrentGame();
-gameProvider.UnpauseCurrentGame();
+gameProvider.DisableCurrentGame();
+gameProvider.EnableCurrentGame();
 
 // Access render textures
 var texture = gameProvider.CurrentGameRenderTexture;

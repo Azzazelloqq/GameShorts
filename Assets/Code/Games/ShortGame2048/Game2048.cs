@@ -47,14 +47,14 @@ namespace Code.Games
             CreateRoot();
         }
 
-        public void PauseGame()
+        public void Disable()
         {
-            _isPaused.Value = true;
+            gameObject.SetActive(false);
         }
 
-        public void UnpauseGame()
+        public void Enable()
         {
-            _isPaused.Value = false;
+            gameObject.SetActive(true);
         }
 
         public void RestartGame()
@@ -64,7 +64,7 @@ namespace Code.Games
 
         public void StopGame()
         {
-            PauseGame();
+            Disable();
             DisableInput();
         }
 

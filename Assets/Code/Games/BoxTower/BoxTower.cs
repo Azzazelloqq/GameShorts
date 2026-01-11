@@ -52,12 +52,14 @@ public class BoxTower : MonoBehaviourDisposable, IShortGame2D
 		}
 	}
 
-	public void PauseGame()
+	public void Disable()
 	{
+		gameObject.SetActive(false);
 	}
 
-	public void UnpauseGame()
+	public void Enable()
 	{
+		gameObject.SetActive(true);
 	}
 
 	public void ResumeGame()
@@ -78,7 +80,7 @@ public class BoxTower : MonoBehaviourDisposable, IShortGame2D
 
 	public void StopGame()
 	{
-		PauseGame();
+		Disable();
 		DisableInput();
 	}
 

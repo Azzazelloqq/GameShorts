@@ -59,16 +59,18 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             StartCallCount++;
         }
         
-        public void PauseGame()
+        public void Disable()
         {
             IsPaused = true;
             PauseCallCount++;
+            gameObject.SetActive(false);
         }
         
-        public void UnpauseGame()
+        public void Enable()
         {
             IsPaused = false;
             ResumeCallCount++;
+            gameObject.SetActive(true);
         }
         
         public void RestartGame()
@@ -144,14 +146,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
             IsPaused = false;
         }
         
-        public void PauseGame()
+        public void Disable()
         {
             IsPaused = true;
+            gameObject.SetActive(false);
         }
         
-        public void UnpauseGame()
+        public void Enable()
         {
             IsPaused = false;
+            gameObject.SetActive(true);
         }
         
         public void RestartGame()
@@ -257,14 +261,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         {
         }
 
-        public void PauseGame()
+        public void Disable()
         {
             IsPaused = true;
+            gameObject.SetActive(false);
         }
         
-        public void UnpauseGame()
+        public void Enable()
         {
             IsPaused = false;
+            gameObject.SetActive(true);
         }
         
         public void RestartGame()
@@ -336,14 +342,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         {
         }
 
-        public void PauseGame()
+        public void Disable()
         {
             IsPaused = true;
+            gameObject.SetActive(false);
         }
         
-        public void UnpauseGame()
+        public void Enable()
         {
             IsPaused = false;
+            gameObject.SetActive(true);
         }
         
         public void RestartGame()
@@ -415,14 +423,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         {
         }
 
-        public void PauseGame()
+        public void Disable()
         {
             IsPaused = true;
+            gameObject.SetActive(false);
         }
         
-        public void UnpauseGame()
+        public void Enable()
         {
             IsPaused = false;
+            gameObject.SetActive(true);
         }
         
         public void RestartGame()
@@ -497,14 +507,16 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         {
         }
 
-        public void PauseGame()
+        public void Disable()
         {
             IsPaused = true;
+            gameObject.SetActive(false);
         }
         
-        public void UnpauseGame()
+        public void Enable()
         {
             IsPaused = false;
+            gameObject.SetActive(true);
         }
         
         public void RestartGame()

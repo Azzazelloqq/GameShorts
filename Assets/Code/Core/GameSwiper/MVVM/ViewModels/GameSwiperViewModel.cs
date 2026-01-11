@@ -519,6 +519,11 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 	{
 		_swipeProgress.Value = 0f;
 		_lastSwipeDirection.Value = SwipeDirection.None;
+
+		// Important: ResetSwipeCommand is used when the swipe is cancelled/finished.
+		// Ensure we also reset the enabled-game preview state back to "current only".
+		_activePreviewDirection = SwipeDirection.None;
+		_gameServiceProvider.SetNeighbourRenderingEnabled(enableNext: false, enablePrevious: false);
 	}
 
 	public void HandleSwipeInput(float deltaY)

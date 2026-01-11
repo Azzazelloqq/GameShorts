@@ -45,15 +45,14 @@ namespace Lightseeker
             CreateRoot();
         }
 
-        public void PauseGame()
+        public void Disable()
         {
-            _isPaused.Value = true;
+            gameObject.SetActive(false);
         }
 
-        
-        public void UnpauseGame()
+        public void Enable()
         {
-            _isPaused.Value = false;
+            gameObject.SetActive(true);
         }
 
         public void RestartGame()
@@ -63,7 +62,7 @@ namespace Lightseeker
 
         public void StopGame()
         {
-            PauseGame();
+            Disable();
             DisableInput();
         }
 
