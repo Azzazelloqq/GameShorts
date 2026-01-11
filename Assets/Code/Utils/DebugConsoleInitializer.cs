@@ -35,40 +35,52 @@ namespace Code.Utils
 		[Tooltip( "If the debug console saved an invalid popup position (NaN/Infinity) in PlayerPrefs (IDGPPos), clear it on startup." )]
 		private bool _clearCorruptedPopupPosition = true;
 
-		private IEnumerator Start()
-		{
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-			if( !_consolePrefab )
-				yield break;
+        private IEnumerator Start()
+        {
+            #if DEVELOPMENT_BUILD || UNITY_EDITOR
+            if (!_consolePrefab)
+            {
+                yield break;
+            }
 
-			for( int i = 0; i < _instantiateAfterFrames; i++ )
-				yield return null;
+            for (var i = 0; i < _instantiateAfterFrames; i++)
+            {
+                yield return null;
+            }
 
-			if( _clearCorruptedPopupPosition )
-				ClearCorruptedPopupPositionPref();
+            if (_clearCorruptedPopupPosition)
+            {
+                ClearCorruptedPopupPositionPref();
+            }
 
-			GameObject consoleInstance = Instantiate( _consolePrefab );
+            var consoleInstance = Instantiate(_consolePrefab);
 
-			// The NaN issue happens when DebugLogManager.Start() triggers DebugLogPopup.UpdatePosition(true)
-			// before Canvas/Screen dimensions are initialized (common on first frame in Editor/Device Simulator).
-			// To avoid touching the AssetStore package, we simply delay DebugLogManager.Start().
-			DebugLogManager manager = consoleInstance.GetComponentInChildren<DebugLogManager>( true );
-			if( manager )
-			{
-				manager.enabled = false;
+            // The NaN issue happens when DebugLogManager.Start() triggers DebugLogPopup.UpdatePosition(true)
+            // before Canvas/Screen dimensions are initialized (common on first frame in Editor/Device Simulator).
+            // To avoid touching the AssetStore package, we simply delay DebugLogManager.Start().
+            var manager = consoleInstance.GetComponentInChildren<DebugLogManager>(true);
+            if (manager)
+            {
+                manager.enabled = false;
 
-				if( _waitForUiToBeReady )
-					yield return WaitForUiReady( manager, _maxWaitFrames );
-				else
-				{
-					for( int i = 0; i < _enableDebugLogManagerAfterFrames; i++ )
-						yield return null;
-				}
+                if (_waitForUiToBeReady)
+                {
+                    yield return WaitForUiReady(manager, _maxWaitFrames);
+                }
+                else
+                {
+                    for (var i = 0; i < _enableDebugLogManagerAfterFrames; i++)
+                    {
+                        yield return null;
+                    }
+                }
 
-				manager.enabled = true;
-			}
-#endif
-		}
+                manager.enabled = true;
+            }
+            #else
+            yield break;
+            #endif
+        }
 
 		private static IEnumerator WaitForUiReady( DebugLogManager manager, int maxWaitFrames )
 		{
