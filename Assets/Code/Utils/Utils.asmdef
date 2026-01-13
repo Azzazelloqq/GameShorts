@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "IngameDebugConsole.Runtime",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

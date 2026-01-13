@@ -1,9 +1,23 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Code.Utils
 {
 public static class RenderTextureUtils
 {
+	private static int GetMsaaSamples()
+	{
+		// Prefer SRP/URP pipeline setting (authoritative for runtime).
+		if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset)
+		{
+			return Mathf.Max(1, urpAsset.msaaSampleCount);
+		}
+
+		// Fallback to QualitySettings (0 means disabled; RenderTexture expects >= 1).
+		return Mathf.Max(1, QualitySettings.antiAliasing);
+	}
+
 	public static RenderTexture GetRenderTextureForShortGame(Camera mainGameCamera, Camera uiCamera = null)
 	{
 		if (mainGameCamera != null)
@@ -18,11 +32,12 @@ public static class RenderTextureUtils
 
 		var width = Screen.width;
 		var height = Screen.height;
+		var msaaSamples = GetMsaaSamples();
 
 		// Create RenderTexture matching screen resolution
 		var renderTexture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
 		{
-			antiAliasing = 2,
+			antiAliasing = msaaSamples,
 			useMipMap = false,
 			autoGenerateMips = false
 		};

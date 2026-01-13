@@ -48,6 +48,9 @@ public sealed class GameEntryPoint : MonoBehaviour
 	[SerializeField]
 	private GamePositioningConfig _gamePositioningConfig;
 
+    [SerializeField]
+    private int _applicationFps = 60;
+    
 	private IShortGameServiceProvider _shortGameServiceProvider;
 	private GameSwiperController _gameSwiperController;
 	private IGameStatsService _gameStatsService;
@@ -61,6 +64,8 @@ public sealed class GameEntryPoint : MonoBehaviour
 
 	private async void Start()
 	{
+        Application.targetFrameRate = _applicationFps;
+        
 		try
 		{
 			_cancellationTokenSource = new CancellationTokenSource();

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
+using Code.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,26 +50,7 @@ public class TestGame4 : MonoBehaviour, IShortGame2D
 	
 	public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
-		// Use actual screen dimensions to match device display
-		int width = Screen.width;
-		int height = Screen.height;
-		
-		// Create RenderTexture matching screen resolution
-		_rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
-		{
-			antiAliasing = 2,
-			useMipMap = false,
-			autoGenerateMips = false
-		};
-		_rt.Create();
-		
-		// Assign the RenderTexture to the camera
-		if (_camera != null)
-		{
-			_camera.targetTexture = _rt;
-			// Set camera aspect ratio to match screen
-			_camera.aspect = (float)width / height;
-		}
+		_rt = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
 		
 		await Task.Delay(100, cancellationToken);
 		
