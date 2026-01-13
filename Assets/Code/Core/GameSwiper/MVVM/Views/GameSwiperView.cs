@@ -89,7 +89,35 @@ internal class GameSwiperView : ViewMonoBehavior<GameSwiperViewModel>
 	private bool _isCommitFreezeActive;
 	private float _commitFreezeStartUnscaledTime;
 	
-	private float ActualImageSpacing => _useScreenHeight ? Screen.height : _imageSpacing;
+	/// <summary>
+	/// Vertical distance between adjacent slots in local UI units.
+	/// IMPORTANT: Must be based on actual RectTransform size (after SafeArea) rather than Screen.height,
+	/// otherwise slots will have gaps on devices where safe area is smaller than the full screen.
+	/// </summary>
+	private float ActualImageSpacing
+	{
+		get
+		{
+			if (!_useScreenHeight)
+			{
+				return _imageSpacing;
+			}
+
+			// Prefer the actual slot height (it already reflects safe area / canvas scaling).
+			var reference = _currentRect != null ? _currentRect : (_currentSlotRoot != null ? _currentSlotRoot : transform as RectTransform);
+			if (reference != null)
+			{
+				var h = reference.rect.height;
+				if (h > 0.1f)
+				{
+					return h;
+				}
+			}
+
+			// Fallback for early init/layout cases.
+			return Screen.height;
+		}
+	}
 
 	private RectTransform _previousRect;
 	private RectTransform _currentRect;
