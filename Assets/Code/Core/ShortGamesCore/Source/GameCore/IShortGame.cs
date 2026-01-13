@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
+#if PROJECT_SUPPORT_UNITASK
+using ShortGameValueTask = Cysharp.Threading.Tasks.UniTask;
+#else
+using ShortGameValueTask = System.Threading.Tasks.ValueTask;
+#endif
 using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Source.GameCore
@@ -17,7 +21,7 @@ namespace Code.Core.ShortGamesCore.Source.GameCore
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task representing the preload operation</returns>
-        public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default);
+        public ShortGameValueTask PreloadGameAsync(CancellationToken cancellationToken = default);
         
         /// <summary>
         /// Gets the render texture for this game

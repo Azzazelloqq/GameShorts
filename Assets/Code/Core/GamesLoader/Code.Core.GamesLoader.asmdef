@@ -4,7 +4,8 @@
     "references": [
         "Core.ShortGame",
         "Logger",
-        "LightDI"
+        "LightDI",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

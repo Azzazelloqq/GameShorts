@@ -6,9 +6,11 @@ using Code.Core.GamesLoader;
 using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.ShotGamesCore.Tests.Mocks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using UniTask = Cysharp.Threading.Tasks.UniTask;
 
 namespace Code.Core.ShotGamesCore.Tests.Performance
 {
@@ -258,12 +260,12 @@ namespace Code.Core.ShotGamesCore.Tests.Performance
             _queueService.Initialize(_registry.RegisteredGames);
             
             // Act - Load multiple games
-            var loadTasks = new List<Task>();
+            var loadTasks = new List<UniTask>();
             foreach (var gameType in gameTypes)
             {
-                loadTasks.Add(_loader.PreloadGameAsync(gameType).AsTask());
+                loadTasks.Add(_loader.PreloadGameAsync(gameType));
             }
-            await Task.WhenAll(loadTasks.ToArray());
+            await UniTask.WhenAll(loadTasks.ToArray());
             
             var afterLoadMemory = GC.GetTotalMemory(false);
             var memoryUsed = (afterLoadMemory - initialMemory) / 1024f / 1024f;

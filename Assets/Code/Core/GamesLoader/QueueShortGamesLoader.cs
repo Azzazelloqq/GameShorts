@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.Factory;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using InGameLogger;
@@ -19,6 +20,10 @@ public class QueueShortGamesLoader : IGamesLoader
 	private readonly IGameQueueService _queueService;
 	private readonly IInGameLogger _logger;
 	private static readonly TimeSpan PreloadPollDelay = TimeSpan.FromMilliseconds(50);
+	private readonly CancellationTokenSource _lifetimeCts = new();
+	private readonly object _backgroundLock = new();
+	private CancellationTokenSource _upcomingPreloadCts;
+	private Task _upcomingPreloadTask = Task.CompletedTask;
 
 	private readonly Dictionary<Type, IShortGame> _loadedGames = new();
 	private readonly Dictionary<Type, IShortGame> _preloadedGames = new();
@@ -84,8 +89,8 @@ public class QueueShortGamesLoader : IGamesLoader
 		// Load the current game
 		var game = await LoadCurrentGameAsync(cancellationToken);
 
-		// Preload upcoming games
-		_ = PreloadUpcomingGamesAsync(cancellationToken);
+		// Preload upcoming games (single-flight, cancellable)
+		StartPreloadUpcomingGames(cancellationToken);
 
 		return game;
 	}
@@ -107,8 +112,8 @@ public class QueueShortGamesLoader : IGamesLoader
 		// Load the current game
 		var game = await LoadCurrentGameAsync(cancellationToken);
 
-		// Preload upcoming games
-		_ = PreloadUpcomingGamesAsync(cancellationToken);
+		// Preload upcoming games (single-flight, cancellable)
+		StartPreloadUpcomingGames(cancellationToken);
 
 		return game;
 	}
@@ -126,12 +131,13 @@ public class QueueShortGamesLoader : IGamesLoader
 
 		var game = await LoadCurrentGameAsync(cancellationToken);
 
-		_ = PreloadUpcomingGamesAsync(cancellationToken);
+		// Preload upcoming games (single-flight, cancellable)
+		StartPreloadUpcomingGames(cancellationToken);
 
 		return game;
 	}
 
-	public async ValueTask<IShortGame> LoadGameAsync(Type gameType, CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<IShortGame> LoadGameAsync(Type gameType, CancellationToken cancellationToken = default)
 	{
 		ValidateGameType(gameType);
 
@@ -141,7 +147,9 @@ public class QueueShortGamesLoader : IGamesLoader
 			return null;
 		}
 
-		await _loadingSemaphore.WaitAsync(cancellationToken);
+		using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetimeCts.Token);
+		await _loadingSemaphore.WaitAsync(linkedCts.Token);
+		IShortGame createdGame = null;
 		try
 		{
 			_isLoading = true;
@@ -160,7 +168,23 @@ public class QueueShortGamesLoader : IGamesLoader
 			}
 			else
 			{
-				game = await _gameFactory.CreateShortGameAsync(gameType, cancellationToken);
+				// Ensure the prefab/resources are preloaded and kept in memory (addressables handles/prefabs).
+				// This makes instance creation and subsequent in-game resource loads much cheaper.
+				try
+				{
+					await _gameFactory.PreloadGameResourcesAsync(gameType, linkedCts.Token);
+				}
+				catch (OperationCanceledException)
+				{
+					throw;
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError($"Failed to preload resources for {gameType.Name}: {ex.Message}");
+				}
+
+				game = await _gameFactory.CreateShortGameAsync(gameType, linkedCts.Token);
+				createdGame = game;
 
 				if (game == null)
 				{
@@ -173,7 +197,7 @@ public class QueueShortGamesLoader : IGamesLoader
 				// Preload if not already preloaded
 				if (!game.IsPreloaded)
 				{
-					await game.PreloadGameAsync(cancellationToken);
+					await game.PreloadGameAsync(linkedCts.Token);
 				}
 			}
 
@@ -188,12 +212,20 @@ public class QueueShortGamesLoader : IGamesLoader
 		catch (OperationCanceledException)
 		{
 			_logger.Log($"Loading of {gameType.Name} was cancelled");
+			if (createdGame != null)
+			{
+				SafeDispose(gameType, createdGame, "load-cancelled");
+			}
 			throw;
 		}
 		catch (Exception ex)
 		{
 			_logger.LogError($"Error loading game {gameType.Name}: {ex.Message}");
 			OnGameLoadingFailed?.Invoke(gameType, ex);
+			if (createdGame != null)
+			{
+				SafeDispose(gameType, createdGame, "load-failed");
+			}
 			return null;
 		}
 		finally
@@ -203,7 +235,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	public async ValueTask<IShortGame> PreloadGameAsync(Type gameType, CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<IShortGame> PreloadGameAsync(Type gameType, CancellationToken cancellationToken = default)
 	{
 		ValidateGameType(gameType);
 
@@ -213,7 +245,9 @@ public class QueueShortGamesLoader : IGamesLoader
 			return null;
 		}
 
-		await _loadingSemaphore.WaitAsync(cancellationToken);
+		using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _lifetimeCts.Token);
+		await _loadingSemaphore.WaitAsync(linkedCts.Token);
+		IShortGame createdGame = null;
 		try
 		{
 			_logger.Log($"Starting to preload game: {gameType.Name}");
@@ -229,7 +263,12 @@ public class QueueShortGamesLoader : IGamesLoader
 				return preloadedGame;
 			}
 
-			var game = await _gameFactory.CreateShortGameAsync(gameType, cancellationToken);
+			// Preload and keep prefab/resources in memory before instantiation.
+			// This aligns with the "keep everything in memory" strategy for instant game start.
+			await _gameFactory.PreloadGameResourcesAsync(gameType, linkedCts.Token);
+
+			var game = await _gameFactory.CreateShortGameAsync(gameType, linkedCts.Token);
+			createdGame = game;
 
 			if (game == null)
 			{
@@ -240,7 +279,7 @@ public class QueueShortGamesLoader : IGamesLoader
 			}
 
 			// Preload the game
-			await game.PreloadGameAsync(cancellationToken);
+			await game.PreloadGameAsync(linkedCts.Token);
 
 			_preloadedGames[gameType] = game;
 
@@ -252,12 +291,20 @@ public class QueueShortGamesLoader : IGamesLoader
 		catch (OperationCanceledException)
 		{
 			_logger.Log($"Preloading of {gameType.Name} was cancelled");
+			if (createdGame != null)
+			{
+				SafeDispose(gameType, createdGame, "preload-cancelled");
+			}
 			throw;
 		}
 		catch (Exception ex)
 		{
 			_logger.LogError($"Error preloading game {gameType.Name}: {ex.Message}");
 			OnGamePreloadingFailed?.Invoke(gameType, ex);
+			if (createdGame != null)
+			{
+				SafeDispose(gameType, createdGame, "preload-failed");
+			}
 			return null;
 		}
 		finally
@@ -266,7 +313,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	public async ValueTask<IReadOnlyDictionary<Type, IShortGame>> PreloadGamesAsync(
+	public async Cysharp.Threading.Tasks.UniTask<IReadOnlyDictionary<Type, IShortGame>> PreloadGamesAsync(
 		IEnumerable<Type> gameTypes,
 		CancellationToken cancellationToken = default)
 	{
@@ -287,7 +334,7 @@ public class QueueShortGamesLoader : IGamesLoader
 			.Select(type => PreloadGameAsync(type, cancellationToken))
 			.ToList();
 
-		var results = await Task.WhenAll(preloadTasks.Select(t => t.AsTask()));
+		var results = await UniTask.WhenAll(preloadTasks);
 
 		var preloadedGames = new Dictionary<Type, IShortGame>();
 		for (var i = 0; i < gameTypesList.Count; i++)
@@ -302,7 +349,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		return preloadedGames;
 	}
 
-	public async ValueTask PreloadWindowAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadWindowAsync(CancellationToken cancellationToken = default)
 	{
 		if (_disposed)
 		{
@@ -356,7 +403,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		return true;
 	}
 
-	public async Task<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default)
 	{
 		await _activationSemaphore.WaitAsync(cancellationToken);
 		try
@@ -375,7 +422,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	public async Task<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default)
 	{
 		await _activationSemaphore.WaitAsync(cancellationToken);
 		try
@@ -405,7 +452,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	public async Task<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default)
 	{
 		await _activationSemaphore.WaitAsync(cancellationToken);
 		try
@@ -477,6 +524,17 @@ public class QueueShortGamesLoader : IGamesLoader
 		if (_activeGameType == gameType)
 		{
 			_activeGameType = null;
+		}
+
+		// Release cached factory resources (prefab/addressables handles) when this game leaves the window.
+		// Safe even if the game wasn't preloaded via factory (factory tracks ref-count internally).
+		try
+		{
+			_gameFactory.UnloadGameResources(gameType);
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to unload factory resources for {gameType.Name}: {ex.Message}");
 		}
 	}
 
@@ -550,12 +608,78 @@ public class QueueShortGamesLoader : IGamesLoader
 		_logger.Log("Disposing QueueShortGamesLoader");
 
 		_disposed = true;
+		try { _lifetimeCts.Cancel(); } catch { /* ignored */ }
+		lock (_backgroundLock)
+		{
+			try { _upcomingPreloadCts?.Cancel(); } catch { /* ignored */ }
+		}
 
 		UnloadAllGames();
 
 		_queueService?.Clear();
-	_loadingSemaphore?.Dispose();
-	_activationSemaphore?.Dispose();
+
+		// Don't block Unity main thread here. We finalize disposal asynchronously once background work stops.
+		ScheduleDisposeCleanup();
+	}
+
+	private void StartPreloadUpcomingGames(CancellationToken externalToken)
+	{
+		if (_disposed)
+		{
+			return;
+		}
+
+		lock (_backgroundLock)
+		{
+			try { _upcomingPreloadCts?.Cancel(); } catch { /* ignored */ }
+			try { _upcomingPreloadCts?.Dispose(); } catch { /* ignored */ }
+
+			_upcomingPreloadCts = CancellationTokenSource.CreateLinkedTokenSource(externalToken, _lifetimeCts.Token);
+			var token = _upcomingPreloadCts.Token;
+
+			// single-flight: replace the previous task reference
+			_upcomingPreloadTask = PreloadUpcomingGamesAsync(token);
+		}
+	}
+
+	private void ScheduleDisposeCleanup()
+	{
+		Task upcomingTask;
+		CancellationTokenSource upcomingCts;
+
+		lock (_backgroundLock)
+		{
+			upcomingTask = _upcomingPreloadTask ?? Task.CompletedTask;
+			upcomingCts = _upcomingPreloadCts;
+			_upcomingPreloadTask = Task.CompletedTask;
+			_upcomingPreloadCts = null;
+		}
+
+		DisposeCleanupAsync(upcomingTask, upcomingCts).Forget();
+	}
+
+	private async UniTask DisposeCleanupAsync(Task upcomingTask, CancellationTokenSource upcomingCts)
+	{
+		try
+		{
+			// Best-effort: ensure no background code touches semaphores after this point.
+			await upcomingTask;
+		}
+		catch (OperationCanceledException)
+		{
+			// Expected during shutdown.
+		}
+		catch (Exception ex)
+		{
+			_logger.LogWarning($"Background preload task failed during dispose: {ex.Message}");
+		}
+		finally
+		{
+			try { upcomingCts?.Dispose(); } catch { /* ignored */ }
+			try { _lifetimeCts.Dispose(); } catch { /* ignored */ }
+			try { _loadingSemaphore.Dispose(); } catch { /* ignored */ }
+			try { _activationSemaphore.Dispose(); } catch { /* ignored */ }
+		}
 	}
 
 	private async ValueTask<IShortGame> LoadCurrentGameAsync(CancellationToken cancellationToken)
@@ -583,10 +707,21 @@ public class QueueShortGamesLoader : IGamesLoader
 	{
 		try
 		{
+			if (_disposed)
+			{
+				return;
+			}
+
 			var gamesToPreload = _queueService.GetGamesToPreload();
 
 			foreach (var gameType in gamesToPreload)
 			{
+				cancellationToken.ThrowIfCancellationRequested();
+				if (_disposed)
+				{
+					return;
+				}
+
 				// Skip if already loaded or preloaded
 				if (IsGameLoaded(gameType))
 				{
@@ -595,6 +730,10 @@ public class QueueShortGamesLoader : IGamesLoader
 
 				await PreloadGameAsync(gameType, cancellationToken);
 			}
+		}
+		catch (OperationCanceledException)
+		{
+			// Expected during shutdown / rapid navigation.
 		}
 		catch (Exception ex)
 		{

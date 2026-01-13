@@ -6,6 +6,7 @@ using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -31,13 +32,28 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 
 	public bool IsPreloaded { get; private set; }
 
-	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
-		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		if (_isDisposed)
+		{
+			return;
+		}
 
+		if (_renderTexture == null)
+		{
+			_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		}
+
+		if (IsPreloaded)
+		{
+			return;
+		}
+
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 		IsPreloaded = true;
-		
-		return default;
 	}
 
 	public RenderTexture GetRenderTexture()
@@ -47,7 +63,10 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StartGame()
 	{
-		CreateRoot();
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 	}
 
 	public void Disable()

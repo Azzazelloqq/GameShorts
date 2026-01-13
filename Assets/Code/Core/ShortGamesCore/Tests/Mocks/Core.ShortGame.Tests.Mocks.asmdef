@@ -4,7 +4,8 @@
     "references": [
         "Core.ShortGame",
         "Logger",
-        "ResourceLoader"
+        "ResourceLoader",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"

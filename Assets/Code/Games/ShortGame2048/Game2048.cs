@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using R3;
 using UnityEngine;
@@ -28,13 +29,29 @@ namespace Code.Games
         private RenderTexture _renderTexture;
         private ReactiveProperty<bool> _isPaused = new ReactiveProperty<bool>();
 
-        public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (_renderTexture == null)
+            {
+                _renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+            }
+
+            if (IsPreloaded)
+            {
+                return;
+            }
+
+            // Warm up heavy init in preload, but keep the game paused so it won't tick gameplay during preload window.
+            if (_core == null)
+            {
+                CreateRoot(startPaused: true);
+            }
             IsPreloaded = true;
-
-            _renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-
-            return default;
         }
 
         public RenderTexture GetRenderTexture()
@@ -44,7 +61,13 @@ namespace Code.Games
 
         public void StartGame()
         {
-            CreateRoot();
+            if (_core == null)
+            {
+                CreateRoot(startPaused: false);
+                return;
+            }
+
+            _isPaused.Value = false;
         }
 
         public void Disable()
@@ -100,7 +123,7 @@ namespace Code.Games
             // Сбрасываем флаг disposed, чтобы можно было снова dispose при необходимости
             _isDisposed = false;
 
-            CreateRoot();
+            CreateRoot(false);
         }
 
         private void DisposeCore()
@@ -121,9 +144,9 @@ namespace Code.Games
             _core = null;
         }
 
-        private void CreateRoot()
+        private void CreateRoot(bool startPaused)
         {
-            _isPaused.Value = false;
+            _isPaused.Value = startPaused;
             _cancellationTokenSource = new CancellationTokenSource();
             var rootCtx = new Game2048CorePm.Ctx
             {

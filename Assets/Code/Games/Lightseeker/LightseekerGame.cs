@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using R3;
 using UnityEngine;
@@ -27,12 +28,28 @@ namespace Lightseeker
         private RenderTexture _renderTexture;
         private ReactiveProperty<bool> _isPaused = new ReactiveProperty<bool>();
 
-        public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
-            IsPreloaded = true;
+            if (_isDisposed)
+            {
+                return;
+            }
 
-            _renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera, _cameraUI);
-            return default;
+            if (_renderTexture == null)
+            {
+                _renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera, _cameraUI);
+            }
+
+            if (IsPreloaded)
+            {
+                return;
+            }
+
+            if (_core == null)
+            {
+                CreateRoot(startPaused: true);
+            }
+            IsPreloaded = true;
         }
 
         public RenderTexture GetRenderTexture()
@@ -42,7 +59,13 @@ namespace Lightseeker
 
         public void StartGame()
         {
-            CreateRoot();
+            if (_core == null)
+            {
+                CreateRoot(startPaused: false);
+                return;
+            }
+
+            _isPaused.Value = false;
         }
 
         public void Disable()
@@ -101,7 +124,7 @@ namespace Lightseeker
             
             _isDisposed = false;
 
-            CreateRoot();
+            CreateRoot(false);
         }
 
         private void DisposeCore()
@@ -122,9 +145,9 @@ namespace Lightseeker
             _core = null;
         }
 
-        private void CreateRoot()
+        private void CreateRoot(bool startPaused)
         {
-            _isPaused.Value = false;
+            _isPaused.Value = startPaused;
             _cancellationTokenSource = new CancellationTokenSource();
             var rootCtx = new LightseekerCorePm.Ctx
             {

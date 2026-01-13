@@ -9,6 +9,8 @@ using LightDI.Runtime;
 using ResourceLoader;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 
 namespace Code.Core.ShortGamesCore.Source.Factory
@@ -22,6 +24,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 	private readonly Dictionary<Type, string> _resourcesInfo;
 
 	private readonly Dictionary<Type, GameObject> _preloadedPrefabs = new();
+	private readonly Dictionary<Type, AsyncOperationHandle<GameObject>> _preloadedPrefabHandles = new();
 	private readonly Dictionary<Type, int> _preloadRefCount = new();
 	private readonly GamePositioningConfig _positioningConfig;
 	private readonly Dictionary<GameType, int> _gameTypeCounters = new();
@@ -260,15 +263,38 @@ public class AddressableShortGameFactory : IShortGameFactory
 			throw new InvalidOperationException(errorMsg);
 		}
 
+		// IMPORTANT: keep the AsyncOperationHandle and release by handle, not by GameObject.
+		// Releasing by GameObject (Addressables.Release(object)) can produce "invalid operation handle" spam.
+		var handle = Addressables.LoadAssetAsync<GameObject>(resourceId);
 		try
 		{
-			var prefab = await _resourceLoader.LoadResourceAsync<GameObject>(resourceId, linkedCts.Token);
-			_preloadedPrefabs[gameType] = prefab;
+			await handle.Task;
+
+			if (linkedCts.IsCancellationRequested)
+			{
+				if (handle.IsValid())
+				{
+					Addressables.Release(handle);
+				}
+				return;
+			}
+
+			if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
+			{
+				throw new Exception($"Failed to preload prefab for {gameType.Name} (resourceId={resourceId}, status={handle.Status})");
+			}
+
+			_preloadedPrefabs[gameType] = handle.Result;
+			_preloadedPrefabHandles[gameType] = handle;
 			_preloadRefCount[gameType] = 1;
 			_logger.Log($"Preloaded prefab for {gameType.Name}");
 		}
 		catch (Exception e)
 		{
+			if (handle.IsValid())
+			{
+				Addressables.Release(handle);
+			}
 			_logger.LogError($"Failed to preload {gameType.Name}: {e.Message}");
 			throw;
 		}
@@ -283,7 +309,7 @@ public class AddressableShortGameFactory : IShortGameFactory
 	{
 		if (!_preloadedPrefabs.ContainsKey(gameType))
 		{
-			_logger.LogWarning($"No preloaded resources for {gameType.Name} to unload");
+			// Not preloaded (or already unloaded) — nothing to do.
 			return;
 		}
 
@@ -291,20 +317,27 @@ public class AddressableShortGameFactory : IShortGameFactory
 
 		if (_preloadRefCount[gameType] <= 0)
 		{
-			if (_preloadedPrefabs.TryGetValue(gameType, out var prefab))
+			try
 			{
-				try
+				if (_preloadedPrefabHandles.TryGetValue(gameType, out var handle) && handle.IsValid())
 				{
-					_resourceLoader.ReleaseResource(prefab);
+					Addressables.Release(handle);
 					_logger.Log($"Unloaded resources for {gameType.Name}");
 				}
-				catch (Exception ex)
+				else
 				{
-					_logger.LogError($"Failed to unload resources for {gameType.Name}: {ex.Message}");
+					// Fallback: handle missing/invalid (shouldn't normally happen). Just drop our references.
+					_logger.LogWarning($"Unload requested for {gameType.Name} but handle is missing/invalid. Dropping cached prefab reference.");
 				}
+			}
+			catch (Exception ex)
+			{
+				// Don't spam console: unload is best-effort.
+				_logger.LogWarning($"Failed to unload resources for {gameType.Name}: {ex.Message}");
 			}
 
 			_preloadedPrefabs.Remove(gameType);
+			_preloadedPrefabHandles.Remove(gameType);
 			_preloadRefCount.Remove(gameType);
 		}
 		else
@@ -320,13 +353,26 @@ public class AddressableShortGameFactory : IShortGameFactory
 			return;
 		}
 
-		// Note: We don't call ReleaseResource for individual prefabs here because
-		// the AddressableResourceLoader tracks handles internally and will release them
-		// when it's disposed. Calling ReleaseResource with GameObject causes
-		// "invalid operation handle" errors.
 		_logger.Log($"Clearing {_preloadedPrefabs.Count} preloaded prefabs");
+
+		// Release by handle (safe) to avoid "invalid operation handle" errors.
+		foreach (var kvp in _preloadedPrefabHandles.ToList())
+		{
+			try
+			{
+				if (kvp.Value.IsValid())
+				{
+					Addressables.Release(kvp.Value);
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogWarning($"Failed to release preloaded prefab handle for {kvp.Key?.Name}: {ex.Message}");
+			}
+		}
 		
 		_preloadedPrefabs.Clear();
+		_preloadedPrefabHandles.Clear();
 		_preloadRefCount.Clear();
 	}
 

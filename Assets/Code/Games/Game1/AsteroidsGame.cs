@@ -6,6 +6,7 @@ using Disposable;
 using Code.Core.ShortGamesCore.Game1.Scripts.Core;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,13 +31,29 @@ public class AsteroidsGame : MonoBehaviourDisposable, IShortGame2D
 	private bool _isDisposed;
 	private RenderTexture _renderTexture;
 
-	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		if (_renderTexture == null)
+		{
+			_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		}
+
+		if (IsPreloaded)
+		{
+			return;
+		}
+
+		// Warm up UI/start screen creation so first entry doesn't hitch.
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 		IsPreloaded = true;
-
-		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-
-		return default;
 	}
 
 	public RenderTexture GetRenderTexture()
@@ -46,7 +63,10 @@ public class AsteroidsGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StartGame()
 	{
-		CreateRoot();
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 	}
 
 	public void Disable()

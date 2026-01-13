@@ -12,7 +12,8 @@
         "GUID:d5865b1239714ae091a54b2c63aa876d",
         "GUID:4190320b639141cd9b32d4d3f06a8e13",
         "GUID:f3a29d15daa5e9345ab71de7276cd04b",
-        "GUID:46c1b1a211bf42728edab5729490cbb4"
+        "GUID:46c1b1a211bf42728edab5729490cbb4",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

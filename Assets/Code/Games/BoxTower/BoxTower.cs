@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,11 +29,29 @@ public class BoxTower : MonoBehaviourDisposable, IShortGame2D
 	private BoxTowerCorePm _core;
 	private CancellationTokenSource _cancellationTokenSource;
 
-	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		if (_renderTexture == null)
+		{
+			_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		}
+
+		if (IsPreloaded)
+		{
+			return;
+		}
+
+		// Warm up presenters/models so StartGame becomes instant.
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 		IsPreloaded = true;
-		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-		return default;
 	}
 
 	public RenderTexture GetRenderTexture()

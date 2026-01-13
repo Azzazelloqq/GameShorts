@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Code.Games.AngryHumans
@@ -45,7 +46,7 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public bool IsPreloaded { get; private set; }
 
-	public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
 		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera, _uiCamera);
 
@@ -54,6 +55,14 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 			await _humanFactory.PreloadHumansAsync(cancellationToken);
 		}
 
+		// Preload current level addressable asset so StartGame doesn't hitch on first load.
+		if (_levelManager != null)
+		{
+			await _levelManager.PreloadCurrentLevelAssetAsync(cancellationToken);
+		}
+
+		await LoadLevel();
+        
 		IsPreloaded = true;
 	}
 
@@ -104,7 +113,6 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 		_currentScore = 0;
 
 		InitializeScoreController();
-		await LoadLevel();
 		if (_disposed)
 		{
 			_isStarting = false;

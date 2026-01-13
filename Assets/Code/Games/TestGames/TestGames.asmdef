@@ -1,4 +1,7 @@
 ﻿{
   "name": "TestGames",
-  "references":[ "GUID:97970e3b002e4b58b19827dcfb9b8064", "GUID:4190320b639141cd9b32d4d3f06a8e13" ]
+  "references":[
+      "GUID:97970e3b002e4b58b19827dcfb9b8064",
+      "GUID:4190320b639141cd9b32d4d3f06a8e13", 
+      "UniTask"]
 }

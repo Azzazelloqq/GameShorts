@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Code.Core.ShotGamesCore.Tests.Mocks
@@ -24,7 +25,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         private RenderTexture _renderTexture;
         
-        public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
             IsPreloaded = true;
@@ -125,7 +126,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         private RenderTexture _renderTexture;
         
-        public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
             IsPreloaded = true;
@@ -226,7 +227,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         private RenderTexture _renderTexture;
         
-        public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
             IsPreloaded = true;
@@ -306,7 +307,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         private RenderTexture _renderTexture;
         
-        public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
             IsPreloaded = true;
@@ -387,7 +388,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         private RenderTexture _renderTexture;
         
-        public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
             IsPreloaded = true;
@@ -471,7 +472,7 @@ namespace Code.Core.ShotGamesCore.Tests.Mocks
         
         private RenderTexture _renderTexture;
         
-        public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+        public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
             IsPreloaded = true;

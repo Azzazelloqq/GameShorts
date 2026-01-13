@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -31,6 +33,7 @@ internal class LevelManager : MonoBehaviour
 	private LevelConfig _currentLevelConfig;
 	private GameObject _currentLevelInstance;
 	private readonly List<AsyncOperationHandle<GameObject>> _loadedAssets = new();
+	private GameObject _preloadedLevelPrefab;
 	private bool _isLoading = false;
 
 	public event Action<LevelConfig> OnLevelLoadStarted;
@@ -141,15 +144,50 @@ internal class LevelManager : MonoBehaviour
 			return;
 		}
 
-		var handle = Addressables.LoadAssetAsync<GameObject>(_currentLevelConfig.LevelPrefabReference);
-		_loadedAssets.Add(handle);
+		var prefab = _preloadedLevelPrefab;
+		if (prefab == null)
+		{
+			var handle = Addressables.LoadAssetAsync<GameObject>(_currentLevelConfig.LevelPrefabReference);
+			_loadedAssets.Add(handle);
+			prefab = await handle.Task;
+			_preloadedLevelPrefab = prefab;
+		}
 
-		var prefab = await handle.Task;
 		if (prefab != null)
 		{
 			var parent = _environmentRoot != null ? _environmentRoot : transform;
 			_currentLevelInstance = Instantiate(prefab, parent);
 		}
+	}
+
+	public async UniTask PreloadCurrentLevelAssetAsync(CancellationToken cancellationToken = default)
+	{
+		if (_currentLevelConfig == null)
+		{
+			if (_levelConfigs == null || _levelConfigs.Length == 0)
+			{
+				return;
+			}
+
+			_currentLevelIndex = Mathf.Clamp(_currentLevelIndex, 0, _levelConfigs.Length - 1);
+			_currentLevelConfig = _levelConfigs[_currentLevelIndex];
+		}
+
+		if (_currentLevelConfig == null ||
+			_currentLevelConfig.LevelPrefabReference == null ||
+			!_currentLevelConfig.LevelPrefabReference.RuntimeKeyIsValid())
+		{
+			return;
+		}
+
+		if (_preloadedLevelPrefab != null)
+		{
+			return;
+		}
+
+		var handle = Addressables.LoadAssetAsync<GameObject>(_currentLevelConfig.LevelPrefabReference);
+		_loadedAssets.Add(handle);
+		_preloadedLevelPrefab = await handle.Task.AsUniTask().AttachExternalCancellation(cancellationToken);
 	}
 
 	private void RegisterLevelStructures()
@@ -189,6 +227,7 @@ internal class LevelManager : MonoBehaviour
 		}
 
 		_loadedAssets.Clear();
+		_preloadedLevelPrefab = null;
 	}
 
 	public void CompleteLevel(int score)

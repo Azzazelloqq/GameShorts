@@ -2,8 +2,11 @@
   "name": "Core.ShortGame",
   "references": 
   [
-    "GUID:c9f76ac6b5b2484789d93f0d3960dc33",
-    "GUID:a649dfdd7ec849148a9a050cb8705d74",
-    "GUID:e03d2d67472051a4e8982e8a5bebc561"
+      "GUID:c9f76ac6b5b2484789d93f0d3960dc33",
+      "GUID:a649dfdd7ec849148a9a050cb8705d74",
+      "GUID:e03d2d67472051a4e8982e8a5bebc561", 
+      "UniTask",
+      "Unity.Addressables",
+      "Unity.ResourceManager"
   ]
 }

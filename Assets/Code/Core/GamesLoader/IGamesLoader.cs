@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
+using Cysharp.Threading.Tasks;
 
 namespace Code.Core.GamesLoader
 {
@@ -72,7 +72,7 @@ public interface IGamesLoader : IDisposable
 	/// <param name="gameType">Type of the game to load</param>
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>The loaded game instance or null if unable to load</returns>
-	ValueTask<IShortGame> LoadGameAsync(Type gameType, CancellationToken cancellationToken = default);
+    UniTask<IShortGame> LoadGameAsync(Type gameType, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Preloads a specific game by type without starting it
@@ -80,7 +80,7 @@ public interface IGamesLoader : IDisposable
 	/// <param name="gameType">Type of the game to preload</param>
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>The preloaded game instance or null if unable to preload</returns>
-	ValueTask<IShortGame> PreloadGameAsync(Type gameType, CancellationToken cancellationToken = default);
+    UniTask<IShortGame> PreloadGameAsync(Type gameType, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Preloads multiple games
@@ -88,14 +88,14 @@ public interface IGamesLoader : IDisposable
 	/// <param name="gameTypes">Collection of game types to preload</param>
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>Dictionary of preloaded games</returns>
-	ValueTask<IReadOnlyDictionary<Type, IShortGame>> PreloadGamesAsync(
+    UniTask<IReadOnlyDictionary<Type, IShortGame>> PreloadGamesAsync(
 		IEnumerable<Type> gameTypes,
 		CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Ensures the configured preload window is populated around the current queue cursor.
 	/// </summary>
-	ValueTask PreloadWindowAsync(CancellationToken cancellationToken = default);
+    UniTask PreloadWindowAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Starts a preloaded game
@@ -132,16 +132,16 @@ public interface IGamesLoader : IDisposable
 	/// <summary>
 	/// Activates (starts) the current queue entry without moving the cursor.
 	/// </summary>
-	Task<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default);
+    UniTask<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Moves the cursor forward and activates the new current game.
 	/// </summary>
-	Task<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default);
+    UniTask<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Moves the cursor backward and activates the new current game.
 	/// </summary>
-	Task<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default);
+    UniTask<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default);
 }
 }

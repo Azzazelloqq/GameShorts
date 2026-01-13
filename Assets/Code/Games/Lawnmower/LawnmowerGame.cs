@@ -5,6 +5,7 @@ using Code.Core.ShortGamesCore.Lawnmower.Scripts.Core;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -32,12 +33,29 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 	private bool _isDisposed;
 	private RenderTexture _renderTexture;
 
-	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
-		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		if (_renderTexture == null)
+		{
+			_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		}
+
+		if (IsPreloaded)
+		{
+			return;
+		}
+
+		// Warm up start screen and level manager creation.
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 		IsPreloaded = true;
-		
-		return default;
 	}
 
 	public RenderTexture GetRenderTexture()
@@ -47,7 +65,10 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StartGame()
 	{
-		CreateRoot();
+		if (_core == null)
+		{
+			CreateRoot();
+		}
 	}
 
 	public void Disable()

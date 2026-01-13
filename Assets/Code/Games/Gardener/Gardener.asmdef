@@ -9,7 +9,8 @@
         "GUID:0e6e4a9ef4644d21a397a36906ffc8e9",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:77221876cc6b8244180b96e320b1bcd4",
-        "GUID:f3a29d15daa5e9345ab71de7276cd04b"
+        "GUID:f3a29d15daa5e9345ab71de7276cd04b",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

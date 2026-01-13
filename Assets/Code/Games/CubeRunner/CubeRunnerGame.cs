@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using GameShorts.CubeRunner.Core;
 using GameShorts.CubeRunner.View;
@@ -31,11 +32,28 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 	private RenderTexture _renderTexture;
 	private readonly ReactiveProperty<bool> _isPaused = new();
 
-	public ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		if (_renderTexture == null)
+		{
+			_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+		}
+
+		if (IsPreloaded)
+		{
+			return;
+		}
+
+		if (_core == null)
+		{
+			CreateRoot(startPaused: true);
+		}
 		IsPreloaded = true;
-		_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-		return default;
 	}
 
 	public RenderTexture GetRenderTexture()
@@ -45,7 +63,13 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 
 	public void StartGame()
 	{
-		CreateRoot();
+		if (_core == null)
+		{
+			CreateRoot(startPaused: false);
+			return;
+		}
+
+		_isPaused.Value = false;
 	}
 
 	public void Disable()
@@ -85,8 +109,9 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 		}
 	}
 
-	public void Dispose()
+	public override void Dispose()
 	{
+        base.Dispose();
 		if (_isDisposed)
 		{
 			return;
@@ -102,7 +127,7 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 	private void RecreateRoot()
 	{
 		DisposeCore();
-		CreateRoot();
+		CreateRoot(false);
 	}
 
 	private void DisposeCore()
@@ -122,10 +147,10 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 		_core = null;
 	}
 
-	private void CreateRoot()
+	private void CreateRoot(bool startPaused)
 	{
 		_isDisposed = false;
-		_isPaused.Value = false;
+		_isPaused.Value = startPaused;
 		_cancellationTokenSource = new CancellationTokenSource();
 		var rootCtx = new CubeRunnerCorePm.Ctx
 		{

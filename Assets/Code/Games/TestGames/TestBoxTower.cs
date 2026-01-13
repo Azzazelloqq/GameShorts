@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,7 +50,7 @@ public class TestBoxTower : MonoBehaviour, IShortGame3D
 		IsPreloaded = false;
 	}
 	
-	public async ValueTask PreloadGameAsync(CancellationToken cancellationToken = default)
+	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
 		_rt = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
 		
