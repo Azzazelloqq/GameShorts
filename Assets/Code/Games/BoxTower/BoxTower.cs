@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
 using Cysharp.Threading.Tasks;
@@ -12,150 +11,161 @@ namespace Code.Core.ShortGamesCore.Game2
 {
 public class BoxTower : MonoBehaviourDisposable, IShortGame2D
 {
-	[SerializeField]
-	private Camera _camera;
+    [SerializeField]
+    private Camera _camera;
 
-	[SerializeField]
-	private BoxTowerSceneContextView _sceneContext;
+    [SerializeField]
+    private BoxTowerSceneContextView _sceneContext;
 
-	[SerializeField]
-	private GraphicRaycaster _graphicRaycaster;
-	
-	public bool IsPreloaded { get; private set; }
+    [SerializeField]
+    private GraphicRaycaster _graphicRaycaster;
 
-	private bool _isDisposed;
-	private IDisposable _root;
-	private RenderTexture _renderTexture;
-	private BoxTowerCorePm _core;
-	private CancellationTokenSource _cancellationTokenSource;
+    public bool IsPreloaded { get; private set; }
 
-	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
-	{
-		if (_isDisposed)
-		{
-			return;
-		}
+    private bool _isDisposed;
+    private IDisposable _root;
+    private RenderTexture _renderTexture;
+    private BoxTowerCorePm _core;
+    private CancellationTokenSource _cancellationTokenSource;
 
-		if (_renderTexture == null)
-		{
-			_renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
-		}
+    public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
 
-		if (IsPreloaded)
-		{
-			return;
-		}
+        if (_renderTexture == null)
+        {
+            _renderTexture = RenderTextureUtils.GetRenderTextureForShortGame(_camera);
+        }
 
-		// Warm up presenters/models so StartGame becomes instant.
-		if (_core == null)
-		{
-			CreateRoot();
-		}
-		IsPreloaded = true;
-	}
+        if (IsPreloaded)
+        {
+            return;
+        }
 
-	public RenderTexture GetRenderTexture()
-	{
-		return _renderTexture;
-	}
+        // Warm up presenters/models/pools so StartGame becomes instant.
+        EnsureCoreCreated();
+        await _core.PreloadAsync(cancellationToken);
+        IsPreloaded = true;
+    }
 
-	public void StartGame()
-	{
-		if (_core == null)
-		{
-			CreateRoot();
-		}
-		else
-		{
-			_core.ResetForNewSession();
-		}
-	}
+    public RenderTexture GetRenderTexture()
+    {
+        return _renderTexture;
+    }
 
-	public void Disable()
-	{
-		gameObject.SetActive(false);
-	}
+    public void StartGame()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
 
-	public void Enable()
-	{
-		gameObject.SetActive(true);
-	}
+        EnsureCoreCreated();
+        _core.EnsureInitialized();
+        IsPreloaded = true;
+        _core.ResetForNewSession();
+    }
 
-	public void ResumeGame()
-	{
-	}
+    public void Disable()
+    {
+        gameObject.SetActive(false);
+    }
 
-	public void RestartGame()
-	{
-		if (_core == null)
-		{
-			CreateRoot();
-		}
-		else
-		{
-			_core.ResetForNewSession();
-		}
-	}
+    public void Enable()
+    {
+        gameObject.SetActive(true);
+    }
 
-	public void StopGame()
-	{
-		Disable();
-		DisableInput();
-	}
+    public void ResumeGame()
+    {
+    }
 
-	public void EnableInput()
-	{
-		_graphicRaycaster.enabled = true;
-	}
+    public void RestartGame()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
 
-	public void DisableInput()
-	{
-		_graphicRaycaster.enabled = false;
-	}
+        EnsureCoreCreated();
+        _core.EnsureInitialized();
+        IsPreloaded = true;
+        _core.ResetForNewSession();
+    }
 
-	public void Dispose()
-	{
-		if (_isDisposed)
-		{
-			return;
-		}
+    public void StopGame()
+    {
+        Disable();
+        DisableInput();
+    }
 
-		DisposeCore();
-		RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera);
-		IsPreloaded = false;
+    public void EnableInput()
+    {
+        _graphicRaycaster.enabled = true;
+    }
 
-		_isDisposed = true;
-		Destroy(gameObject);
-	}
+    public void DisableInput()
+    {
+        _graphicRaycaster.enabled = false;
+    }
 
-	private void DisposeCore()
-	{
-		if (_cancellationTokenSource != null)
-		{
-			if (!_cancellationTokenSource.IsCancellationRequested)
-			{
-				_cancellationTokenSource.Cancel();
-			}
+    public override void Dispose()
+    {
+        base.Dispose();
 
-			_cancellationTokenSource.Dispose();
+        if (_isDisposed)
+        {
+            return;
+        }
 
-			_cancellationTokenSource = null;
-		}
+        DisposeCore();
+        RenderTextureUtils.ReleaseAndDestroy(ref _renderTexture, _camera);
+        IsPreloaded = false;
 
-		_core?.Dispose();
-		_core = null;
-	}
+        _isDisposed = true;
+        Destroy(gameObject);
+    }
 
-	private void CreateRoot()
-	{
-		_cancellationTokenSource = new CancellationTokenSource();
-		var rootCtx = new BoxTowerCorePm.Ctx
-		{
-			sceneContextView = _sceneContext,
-			cancellationToken = _cancellationTokenSource.Token,
-			restartGame = RestartGame
-		};
-		_core = BoxTowerCorePmFactory.CreateBoxTowerCorePm(rootCtx);
-	}
+    private void DisposeCore()
+    {
+        if (_cancellationTokenSource != null)
+        {
+            if (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                _cancellationTokenSource.Cancel();
+            }
+
+            _cancellationTokenSource.Dispose();
+
+            _cancellationTokenSource = null;
+        }
+
+        _core?.Dispose();
+        _core = null;
+    }
+
+    private void EnsureCoreCreated()
+    {
+        if (_core != null)
+        {
+            return;
+        }
+
+        if (_cancellationTokenSource == null)
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        var rootCtx = new BoxTowerCorePm.Ctx
+        {
+            sceneContextView = _sceneContext,
+            cancellationToken = _cancellationTokenSource.Token,
+            restartGame = RestartGame
+        };
+        _core = BoxTowerCorePmFactory.CreateBoxTowerCorePm(rootCtx);
+    }
 }
 }

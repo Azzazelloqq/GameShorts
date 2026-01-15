@@ -5,6 +5,7 @@ using LightDI.Runtime;
 using UnityEngine;
 using R3;
 using TickHandler;
+using Cysharp.Threading.Tasks;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -23,41 +24,79 @@ namespace Code.Core.ShortGamesCore.Game2
         private readonly float _followSpeed = 2f;
         private readonly float _verticalOffset = 5f;
         private readonly ITickHandler _tickHandler;
+        private bool _initialized;
+        private bool _subscriptionsSet;
 
         public BoxTowerCameraPm(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _tickHandler = tickHandler;
-            
+        }
+
+        public void Initialize()
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            SetupCamera();
+            SetupSubscriptions();
+            _initialized = true;
+        }
+
+        public async UniTask InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Initialize();
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+        }
+
+        private void SetupCamera()
+        {
             // Store initial camera position and setup 45-degree view
             if (_ctx.sceneContextView.MainCamera != null)
             {
                 // Position camera at an angle to view tower at 45 degrees
                 var camera = _ctx.sceneContextView.MainCamera;
-                
+
                 // Get tower root position to properly center the camera on it
                 Vector3 towerPosition = _ctx.sceneContextView.TowerRoot.position;
-                
+
                 // Set camera position for 45-degree diagonal view relative to tower
                 Vector3 cameraOffset = new Vector3(4f, 6f, 4f); // Diagonal position, a bit further and higher
                 camera.transform.position = towerPosition + cameraOffset;
-                
+
                 // Look at a point slightly below tower center to see the tower better
                 Vector3 lookAtPoint = towerPosition + new Vector3(0f, -1f, 0f);
                 camera.transform.LookAt(lookAtPoint);
-                
+
                 _initialCameraPosition = camera.transform.position;
                 _initialCameraRotation = camera.transform.rotation;
             }
-            
+        }
+
+        private void SetupSubscriptions()
+        {
+            if (_subscriptionsSet)
+            {
+                return;
+            }
+            _subscriptionsSet = true;
+
             // Subscribe to tower height changes
             AddDisposable(_ctx.towerModel.TowerHeight.Subscribe(OnTowerHeightChanged));
-            
-            // Subscribe to game state changes to reset camera
-            // We'll need access to game model for this, for now just reset on tower height 0
+
+            // Reset camera when tower is cleared
             AddDisposable(_ctx.towerModel.TowerHeight.Where(height => height == 0f)
                 .Subscribe(_ => ResetCameraPosition()));
-            
+
             // Subscribe to scene updates for smooth camera movement
             _tickHandler.FrameLateUpdate += UpdateCamera;
         }

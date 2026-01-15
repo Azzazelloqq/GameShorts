@@ -5,75 +5,48 @@ namespace Code.Core.ShortGamesCore.Game2
 {
 public class CameraFollow : MonoBehaviourDisposable
 {
-	[Header("Follow Settings")]
-	[SerializeField]
-	private Transform target; // Tower root or spawner
+    [Header("Follow Settings")]
+    [SerializeField]
+    private Transform target; // Tower root or spawner
 
-	[SerializeField]
-	private float followSpeed = 2f;
+    [SerializeField]
+    private float followSpeed = 2f;
 
-	[SerializeField]
-	private float verticalOffset = 5f;
+    [SerializeField]
+    private float verticalOffset = 5f;
 
-	[SerializeField]
-	private float targetHeightRatio = 0.7f; // Keep tower in upper 30% of screen
+    [SerializeField]
+    private float targetHeightRatio = 0.7f; // Keep tower in upper 30% of screen
 
-	private Camera cam;
-	private Vector3 initialPosition;
-	private BlockSpawner spawner;
+    private Camera cam;
+    private Vector3 initialPosition;
+    private BlockSpawner spawner;
 
-	private void Awake()
-	{
-		cam = GetComponent<Camera>();
-		if (cam == null)
-		{
-			cam = Camera.main;
-		}
+    private void Awake()
+    {
+        cam = GetComponent<Camera>();
+        if (cam == null)
+        {
+            cam = Camera.main;
+        }
 
-		initialPosition = transform.position;
-	}
+        initialPosition = transform.position;
+    }
 
-	public void SetTarget(Transform newTarget)
-	{
-		target = newTarget;
-		if (target != null && target.TryGetComponent<BlockSpawner>(out var blockSpawner))
-		{
-			spawner = blockSpawner;
-		}
-	}
+    private void LateUpdate()
+    {
+        if (target == null)
+        {
+            return;
+        }
 
-	public void ResetPosition()
-	{
-		transform.position = initialPosition;
-	}
+        var towerHeight = spawner != null ? spawner.GetTowerHeight() : target.position.y;
 
-	private void LateUpdate()
-	{
-		if (target == null)
-		{
-			return;
-		}
+        var targetY = towerHeight + verticalOffset;
 
-		// Get tower height
-		var towerHeight = 0f;
-		if (spawner != null)
-		{
-			towerHeight = spawner.GetTowerHeight();
-		}
-		else
-		{
-			// Fallback: use target position
-			towerHeight = target.position.y;
-		}
+        var targetPosition = new Vector3(initialPosition.x, targetY, initialPosition.z);
 
-		// Calculate desired camera position
-		var targetY = towerHeight + verticalOffset;
-
-		// Keep the camera's X and Z at initial position, only follow Y
-		var targetPosition = new Vector3(initialPosition.x, targetY, initialPosition.z);
-
-		// Smooth follow
-		transform.position = Vector3.Lerp(transform.position, targetPosition, followSpeed * Time.deltaTime);
-	}
+        transform.position = Vector3.Lerp(transform.position, targetPosition, followSpeed * Time.deltaTime);
+    }
 }
 }

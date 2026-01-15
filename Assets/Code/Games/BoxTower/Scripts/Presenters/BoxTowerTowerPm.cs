@@ -8,6 +8,7 @@ using LightDI.Runtime;
 using UnityEngine;
 using R3;
 using TickHandler;
+using Cysharp.Threading.Tasks;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -33,6 +34,9 @@ namespace Code.Core.ShortGamesCore.Game2
         private bool _isPaused;
 
         private readonly Dictionary<Rigidbody, RigidbodyState> _pausedRigidbodies = new Dictionary<Rigidbody, RigidbodyState>();
+        private bool _initialized;
+        private bool _preloaded;
+        private bool _subscriptionsSet;
 
         private struct RigidbodyState
         {
@@ -47,13 +51,94 @@ namespace Code.Core.ShortGamesCore.Game2
             _ctx = ctx;
             _tickHandler = tickHandler;
             _poolManager = poolManager;
+        }
+
+        public void Initialize()
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            SetupSubscriptions();
+            _initialized = true;
+        }
+
+        public async UniTask InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Initialize();
+
+            // Ensure we yield at least once so preload/init doesn't do everything in a single frame.
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+        }
+
+        private void SetupSubscriptions()
+        {
+            if (_subscriptionsSet)
+            {
+                return;
+            }
+            _subscriptionsSet = true;
+
             // Subscribe to model events
             AddDisposable(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
             AddDisposable(_ctx.gameModel.IsPaused.Subscribe(SetPauseState));
             _ctx.towerModel.OnChunkCreated += CreateChunk;
-            
+
             // Subscribe to scene updates
             _tickHandler.FrameUpdate += OnSceneUpdate;
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_preloaded)
+            {
+                return;
+            }
+            _preloaded = true;
+
+            // Warm up pool instantiation cost. Keep objects inactive to avoid flicker.
+            const int blocksToWarm = 10;
+            const int chunksToWarm = 6;
+
+            var blockPrefab = _ctx.sceneContextView != null ? _ctx.sceneContextView.BlockPrefab : null;
+            var chunkPrefab = _ctx.sceneContextView != null ? _ctx.sceneContextView.ChunkPrefab : null;
+
+            if (blockPrefab != null)
+            {
+                for (int i = 0; i < blocksToWarm; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var obj = _poolManager.Get(blockPrefab);
+                    if (obj != null)
+                    {
+                        obj.SetActive(false);
+                        _poolManager.Return(blockPrefab, obj);
+                    }
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+            }
+
+            if (chunkPrefab != null)
+            {
+                for (int i = 0; i < chunksToWarm; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var obj = _poolManager.Get(chunkPrefab);
+                    if (obj != null)
+                    {
+                        obj.SetActive(false);
+                        _poolManager.Return(chunkPrefab, obj);
+                    }
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+            }
         }
 
         private void OnGameStateChanged(GameState state)

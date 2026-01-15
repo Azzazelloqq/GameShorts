@@ -3,6 +3,7 @@ using System.Threading;
 using Disposable;
 using Code.Games.Game2.Scripts.Core;
 using R3;
+using Cysharp.Threading.Tasks;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -17,16 +18,39 @@ namespace Code.Core.ShortGamesCore.Game2
 
         private readonly Ctx _ctx;
         private BoxTowerTowerPm _towerPresenter; // We need reference to tower presenter for placing blocks
+        private bool _initialized;
 
         public BoxTowerInputPm(Ctx ctx)
         {
             _ctx = ctx;
-            
+        }
+
+        public void Initialize()
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
             // Setup tap input
             if (_ctx.sceneContextView.FullScreenTapButton != null)
             {
                 _ctx.sceneContextView.FullScreenTapButton.onClick.AddListener(OnScreenTap);
             }
+            _initialized = true;
+        }
+
+        public async UniTask InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Initialize();
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
 
         // This method should be called by the main scene presenter to inject tower presenter reference

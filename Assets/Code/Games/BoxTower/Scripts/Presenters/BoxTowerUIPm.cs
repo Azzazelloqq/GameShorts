@@ -3,6 +3,7 @@ using System.Threading;
 using Disposable;
 using Code.Games.Game2.Scripts.Core;
 using R3;
+using Cysharp.Threading.Tasks;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -17,23 +18,46 @@ namespace Code.Core.ShortGamesCore.Game2
         }
 
         private readonly Ctx _ctx;
+        private bool _initialized;
 
         public BoxTowerUIPm(Ctx ctx)
         {
             _ctx = ctx;
-            
+        }
+
+        public void Initialize()
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
             // Subscribe to model changes
             AddDisposable(_ctx.gameModel.Score.Subscribe(OnScoreChanged));
             AddDisposable(_ctx.gameModel.BestScore.Subscribe(OnBestScoreChanged));
             AddDisposable(_ctx.gameModel.CurrentState.Subscribe(OnGameStateChanged));
             AddDisposable(_ctx.gameModel.IsFirstPlay.Subscribe(OnFirstPlayChanged));
             AddDisposable(_ctx.gameModel.IsPaused.Subscribe(OnPauseStateChanged));
-            
+
             // Setup button listeners
             SetupButtonListeners();
-            
+
             // Initialize UI state
             UpdateUI();
+            _initialized = true;
+        }
+
+        public async UniTask InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Initialize();
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
 
         private void SetupButtonListeners()

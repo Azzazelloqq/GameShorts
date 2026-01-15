@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Disposable;
 using R3;
+using Cysharp.Threading.Tasks;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
@@ -19,34 +20,125 @@ namespace Code.Core.ShortGamesCore.Game2
         private TowerModel _towerModel;
         
         private BoxTowerTowerPm _towerPresenter;
-        private IDisposable _uiPresenter;
-        private IDisposable _cameraPresenter;
+        private BoxTowerUIPm _uiPresenter;
+        private BoxTowerCameraPm _cameraPresenter;
         private BoxTowerInputPm _inputPresenter;
+        private bool _initialized;
+        private bool _subscriptionsSet;
 
         public BoxTowerGameScenePm(Ctx ctx)
         {
             _ctx = ctx;
-            
-            // Initialize models
-            _gameModel = new GameModel();
-            _towerModel = new TowerModel();
-            
-            // Initialize models
-            _gameModel.Initialize();
-            _towerModel.Initialize();
-            
-            // Create presenters
-            CreateTowerPresenter();
-            CreateUIPresenter();
-            CreateCameraPresenter();
-            CreateInputPresenter();
-            
-            // Setup model subscriptions
-            SetupModelSubscriptions();
         }
 
-        private void CreateTowerPresenter()
+        public void Initialize()
         {
+            if (_initialized)
+            {
+                return;
+            }
+
+            EnsureModels();
+
+            EnsureTowerPresenter();
+            _towerPresenter?.Initialize();
+
+            EnsureUIPresenter();
+            _uiPresenter?.Initialize();
+
+            EnsureCameraPresenter();
+            _cameraPresenter?.Initialize();
+
+            EnsureInputPresenter();
+            _inputPresenter?.Initialize();
+
+            SetupModelSubscriptions();
+            _initialized = true;
+        }
+
+        public async UniTask InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            EnsureModels();
+
+            // Spread across frames to keep preload smooth.
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            if (_initialized) return;
+
+            EnsureTowerPresenter();
+            if (_towerPresenter != null)
+            {
+                await _towerPresenter.InitializeAsync(cancellationToken);
+            }
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            if (_initialized) return;
+
+            EnsureUIPresenter();
+            if (_uiPresenter != null)
+            {
+                await _uiPresenter.InitializeAsync(cancellationToken);
+            }
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            if (_initialized) return;
+
+            EnsureCameraPresenter();
+            if (_cameraPresenter != null)
+            {
+                await _cameraPresenter.InitializeAsync(cancellationToken);
+            }
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            if (_initialized) return;
+
+            EnsureInputPresenter();
+            if (_inputPresenter != null)
+            {
+                await _inputPresenter.InitializeAsync(cancellationToken);
+            }
+
+            SetupModelSubscriptions();
+            _initialized = true;
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            // Prewarm pools for instant first spawn (Instantiate is the expensive part).
+            if (_towerPresenter != null)
+            {
+                await _towerPresenter.PreloadAsync(cancellationToken);
+            }
+        }
+
+        private void EnsureModels()
+        {
+            if (_gameModel == null)
+            {
+                _gameModel = new GameModel();
+                _gameModel.Initialize();
+            }
+
+            if (_towerModel == null)
+            {
+                _towerModel = new TowerModel();
+                _towerModel.Initialize();
+            }
+        }
+
+        private void EnsureTowerPresenter()
+        {
+            if (_towerPresenter != null)
+            {
+                return;
+            }
+
             BoxTowerTowerPm.Ctx towerCtx = new BoxTowerTowerPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
@@ -58,8 +150,13 @@ namespace Code.Core.ShortGamesCore.Game2
             AddDisposable(_towerPresenter);
         }
 
-        private void CreateUIPresenter()
+        private void EnsureUIPresenter()
         {
+            if (_uiPresenter != null)
+            {
+                return;
+            }
+
             BoxTowerUIPm.Ctx uiCtx = new BoxTowerUIPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
@@ -71,8 +168,13 @@ namespace Code.Core.ShortGamesCore.Game2
             AddDisposable(_uiPresenter);
         }
 
-        private void CreateCameraPresenter()
+        private void EnsureCameraPresenter()
         {
+            if (_cameraPresenter != null)
+            {
+                return;
+            }
+
             BoxTowerCameraPm.Ctx cameraCtx = new BoxTowerCameraPm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
@@ -83,24 +185,35 @@ namespace Code.Core.ShortGamesCore.Game2
             AddDisposable(_cameraPresenter);
         }
 
-        private void CreateInputPresenter()
+        private void EnsureInputPresenter()
         {
-            BoxTowerInputPm.Ctx inputCtx = new BoxTowerInputPm.Ctx
+            if (_inputPresenter == null)
             {
-                sceneContextView = _ctx.sceneContextView,
-                gameModel = _gameModel,
-                cancellationToken = _ctx.cancellationToken
-            };
-            _inputPresenter = new BoxTowerInputPm(inputCtx);
-            
+                BoxTowerInputPm.Ctx inputCtx = new BoxTowerInputPm.Ctx
+                {
+                    sceneContextView = _ctx.sceneContextView,
+                    gameModel = _gameModel,
+                    cancellationToken = _ctx.cancellationToken
+                };
+                _inputPresenter = new BoxTowerInputPm(inputCtx);
+                AddDisposable(_inputPresenter);
+            }
+
             // Set tower presenter reference for input handling
-            _inputPresenter.SetTowerPresenter(_towerPresenter);
-            
-            AddDisposable(_inputPresenter);
+            if (_towerPresenter != null)
+            {
+                _inputPresenter.SetTowerPresenter(_towerPresenter);
+            }
         }
 
         private void SetupModelSubscriptions()
         {
+            if (_subscriptionsSet)
+            {
+                return;
+            }
+            _subscriptionsSet = true;
+
             // Subscribe to game model events
             _gameModel.OnGameRestarted += OnGameRestarted;
             

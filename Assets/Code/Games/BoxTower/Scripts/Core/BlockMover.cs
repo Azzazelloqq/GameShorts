@@ -4,98 +4,107 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    internal class BlockMover : MonoBehaviourDisposable
+internal class BlockMover : MonoBehaviourDisposable
+{
+    [Header("Movement Settings")]
+    [SerializeField]
+    private float speed = 2f;
+
+    [SerializeField]
+    private float limit = 5f;
+
+    private Axis axis;
+    private float direction = 1f;
+    private bool isPaused;
+    private Vector3 startPosition;
+
+    public bool IsMoving { get; private set; }
+
+    public void StartMoving(Axis movementAxis, float moveSpeed, float moveLimit)
     {
-        [Header("Movement Settings")]
-        [SerializeField] private float speed = 2f;
-        [SerializeField] private float limit = 5f;
-        
-        private Axis axis;
-        private float direction = 1f;
-        private bool isMoving = false;
-        private bool isPaused = false;
-        private Vector3 startPosition;
+        axis = movementAxis;
+        speed = moveSpeed;
+        limit = moveLimit;
+        direction = 1f;
+        IsMoving = true;
+        isPaused = false;
+        startPosition = transform.position;
+    }
 
-        public bool IsMoving => isMoving;
-        public Vector3 Position => transform.position;
+    public void StopMoving()
+    {
+        IsMoving = false;
+        isPaused = false;
+    }
 
-        public void StartMoving(Axis movementAxis, float moveSpeed, float moveLimit)
+    public BlockData GetBlockData()
+    {
+        var bounds = GetComponent<Renderer>().bounds;
+        return new BlockData(transform.position, bounds.size, axis);
+    }
+
+    public void PauseMoving()
+    {
+        if (!IsMoving)
         {
-            axis = movementAxis;
-            speed = moveSpeed;
-            limit = moveLimit;
-            direction = 1f;
-            isMoving = true;
-            isPaused = false;
-            startPosition = transform.position;
+            return;
         }
 
-        public void StopMoving()
+        isPaused = true;
+        IsMoving = false;
+    }
+
+    public void ResumeMoving()
+    {
+        if (!isPaused)
         {
-            isMoving = false;
-            isPaused = false;
+            return;
         }
 
-        public BlockData GetBlockData()
+        isPaused = false;
+        IsMoving = true;
+    }
+
+    private void Update()
+    {
+        if (!IsMoving)
         {
-            var bounds = GetComponent<Renderer>().bounds;
-            return new BlockData(transform.position, bounds.size, axis);
+            return;
         }
 
-        public void PauseMoving()
-        {
-            if (!isMoving)
-                return;
+        var deltaTime = Time.deltaTime * speed * direction;
 
-            isPaused = true;
-            isMoving = false;
+        if (axis == Axis.X)
+        {
+            transform.position += new Vector3(deltaTime, 0, 0);
+        }
+        else
+        {
+            transform.position += new Vector3(0, 0, deltaTime);
         }
 
-        public void ResumeMoving()
-        {
-            if (!isPaused)
-                return;
+        var currentPosition = axis == Axis.X ? transform.position.x : transform.position.z;
+        var startPos = axis == Axis.X ? startPosition.x : startPosition.z;
+        var distance = currentPosition - startPos;
 
-            isPaused = false;
-            isMoving = true;
+        if (Mathf.Abs(distance) < limit)
+        {
+            return;
         }
 
-        private void Update()
+        direction *= -1f;
+
+        var clampedDistance = Mathf.Sign(distance) * limit;
+        if (axis == Axis.X)
         {
-            if (!isMoving) return;
-
-            float deltaTime = Time.deltaTime * speed * direction;
-            
-            if (axis == Axis.X)
-            {
-                transform.position += new Vector3(deltaTime, 0, 0);
-            }
-            else
-            {
-                transform.position += new Vector3(0, 0, deltaTime);
-            }
-
-            // Check boundaries and reverse direction
-            float currentPosition = (axis == Axis.X) ? transform.position.x : transform.position.z;
-            float startPos = (axis == Axis.X) ? startPosition.x : startPosition.z;
-            float distance = currentPosition - startPos;
-            
-            if (Mathf.Abs(distance) >= limit)
-            {
-                // Reverse direction
-                direction *= -1f;
-                
-                // Clamp position to stay within bounds
-                float clampedDistance = Mathf.Sign(distance) * limit;
-                if (axis == Axis.X)
-                {
-                    transform.position = new Vector3(startPos + clampedDistance, transform.position.y, transform.position.z);
-                }
-                else
-                {
-                    transform.position = new Vector3(transform.position.x, transform.position.y, startPos + clampedDistance);
-                }
-            }
+            transform.position =
+                new Vector3(startPos + clampedDistance, transform.position.y, transform.position.z);
+        }
+        else
+        {
+            transform.position =
+                new Vector3(transform.position.x, transform.position.y, startPos + clampedDistance);
         }
     }
+}
 }

@@ -451,10 +451,24 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 
 		_logger.Log($"Starting {slot} game via loader");
 
-		if (!_gamesLoader.StartPreloadedGame(gameType))
+		if (_gamesLoader?.PreloadedGames != null && _gamesLoader.PreloadedGames.ContainsKey(gameType))
 		{
-			GetGameForType(gameType)?.StartGame();
+			if (_gamesLoader.StartPreloadedGame(gameType))
+			{
+				return;
+			}
+
+			_logger.LogWarning($"Failed to start preloaded game {gameType.Name}, falling back to loaded instance.");
 		}
+
+		var game = GetGameForType(gameType);
+		if (game == null)
+		{
+			_logger.LogWarning($"Game {gameType.Name} is not loaded; start skipped.");
+			return;
+		}
+
+		game.StartGame();
 	}
 
 	private void FocusCurrentGameInput()
