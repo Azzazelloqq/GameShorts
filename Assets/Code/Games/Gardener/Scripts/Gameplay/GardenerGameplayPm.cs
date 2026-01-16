@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Disposable;
 using Code.Core.Tools.Pool;
+using Cysharp.Threading.Tasks;
 using GameShorts.Gardener.Core;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.View;
@@ -33,6 +34,7 @@ namespace GameShorts.Gardener.Gameplay
         private readonly PlotUIBarManager _plotUIBarManager;
         private readonly GardenerInputHandler _inputHandler;
         private readonly InventoryManager _inventoryManager;
+        private bool _preloaded;
 
         public ReactiveProperty<int> Money => _money;
         public GardenerModeManager ModeManager => _modeManager;
@@ -93,6 +95,44 @@ namespace GameShorts.Gardener.Gameplay
                     camera = _ctx.sceneContextView.MainCamera
                 });
                 AddDisposable(rotationPm);
+            }
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_preloaded)
+            {
+                return;
+            }
+
+            _preloaded = true;
+
+            var sceneContext = _ctx.sceneContextView;
+            var plotPrefab = _ctx.gameSettings?.PlotSettings?.PlotPrefab;
+            if (plotPrefab != null && sceneContext != null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var plotObject = _poolManager.Get(plotPrefab, sceneContext.GardenGrid);
+                if (plotObject != null)
+                {
+                    plotObject.SetActive(false);
+                    _poolManager.Return(plotPrefab, plotObject);
+                }
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            var barPrefab = sceneContext != null ? sceneContext.PlotUIBarPrefab : null;
+            var barParent = sceneContext != null ? sceneContext.PlotUiPlacer : null;
+            if (barPrefab != null && barParent != null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var barObject = _poolManager.Get(barPrefab, barParent);
+                if (barObject != null)
+                {
+                    barObject.SetActive(false);
+                    _poolManager.Return(barPrefab, barObject);
+                }
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
             }
         }
 

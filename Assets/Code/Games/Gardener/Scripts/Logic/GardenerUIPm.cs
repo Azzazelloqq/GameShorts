@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Disposable;
+using Cysharp.Threading.Tasks;
 using GameShorts.Gardener.Data;
 using GameShorts.Gardener.UI;
 using GameShorts.Gardener.Core;
@@ -33,6 +34,7 @@ internal class GardenerUIPm : DisposableBase
 	private readonly Ctx _ctx;
 	private readonly CompositeDisposable _disposable = new();
 	private IDisposable _currentModeSubscription; // Подписка на текущий режим
+	private bool _preloaded;
 
 	public GardenerUIPm(Ctx ctx)
 	{
@@ -216,6 +218,37 @@ internal class GardenerUIPm : DisposableBase
 		if (_ctx.ShopUIView.CloseButton != null)
 		{
 			_ctx.ShopUIView.CloseButton.onClick.RemoveAllListeners();
+		}
+	}
+
+	public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+	{
+		if (_preloaded)
+		{
+			return;
+		}
+
+		_preloaded = true;
+
+		if (_ctx.PlaceableItemsPanel != null && _ctx.ModeManager != null)
+		{
+			var harveyMode = _ctx.ModeManager.GetMode("Harvey");
+			var placeableItems = harveyMode?.GetPlaceableItems();
+			if (placeableItems != null && placeableItems.Length > 0)
+			{
+				_ctx.PlaceableItemsPanel.PopulateItems(placeableItems, (_, _) => { });
+				_ctx.PlaceableItemsPanel.Hide();
+				_ctx.PlaceableItemsPanel.PopulateItems(Array.Empty<PlaceableItem>(), (_, _) => { });
+				await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+			}
+		}
+
+		if (_ctx.ShopUIView != null && _ctx.AvailablePlants != null && _ctx.AvailablePlants.Length > 0)
+		{
+			_ctx.ShopUIView.PopulateShop(_ctx.AvailablePlants, _ => { });
+			_ctx.ShopUIView.Hide();
+			_ctx.ShopUIView.PopulateShop(Array.Empty<PlantSettings>(), null);
+			await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
 		}
 	}
 }

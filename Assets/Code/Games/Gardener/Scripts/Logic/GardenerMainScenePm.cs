@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Disposable;
+using Cysharp.Threading.Tasks;
 using GameShorts.Gardener.Core;
 using GameShorts.Gardener.Gameplay;
 using GameShorts.Gardener.View;
@@ -59,6 +60,19 @@ namespace GameShorts.Gardener.Logic
         {
             _uiPm?.Dispose();
             _gameplayPm?.Dispose();
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_gameplayPm != null)
+            {
+                await _gameplayPm.PreloadAsync(cancellationToken);
+            }
+
+            if (_uiPm != null)
+            {
+                await _uiPm.PreloadAsync(cancellationToken);
+            }
         }
     }
 }

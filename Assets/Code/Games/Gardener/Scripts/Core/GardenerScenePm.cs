@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Disposable;
+using Cysharp.Threading.Tasks;
 using GameShorts.Gardener.Logic;
 using GameShorts.Gardener.View;
 using R3;
@@ -33,6 +34,14 @@ namespace GameShorts.Gardener.Core
             };
             _mainScenePm = new GardenerMainScenePm(mainSceneCtx);
             AddDisposable(_mainScenePm);
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_mainScenePm != null)
+            {
+                await _mainScenePm.PreloadAsync(cancellationToken);
+            }
         }
     }
 }

@@ -26,11 +26,14 @@ namespace GameShorts.Gardener
 
         public bool IsPreloaded { get; private set; }
 
-        private IDisposable _core;
+        private GardenerCorePm _core;
         private CancellationTokenSource _cancellationTokenSource;
         private bool _isDisposed;
         private RenderTexture _renderTexture;
         private ReactiveProperty<bool> _isPaused = new ReactiveProperty<bool>();
+        private UniTask _preloadTask;
+        private bool _isPreloading;
+        private bool _startQueued;
 
         public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
@@ -49,11 +52,32 @@ namespace GameShorts.Gardener
                 return;
             }
 
+            if (_isPreloading)
+            {
+                await _preloadTask;
+                return;
+            }
+
             if (_core == null)
             {
                 CreateRoot(startPaused: true);
             }
-            IsPreloaded = true;
+
+            _isPreloading = true;
+            _preloadTask = PreloadInternalAsync(cancellationToken).Preserve();
+            try
+            {
+                await _preloadTask;
+                if (_isDisposed)
+                {
+                    return;
+                }
+                IsPreloaded = true;
+            }
+            finally
+            {
+                _isPreloading = false;
+            }
         }
 
         public RenderTexture GetRenderTexture()
@@ -66,6 +90,12 @@ namespace GameShorts.Gardener
             if (_core == null)
             {
                 CreateRoot(startPaused: false);
+                return;
+            }
+
+            if (_isPreloading)
+            {
+                QueueStartAfterPreload();
                 return;
             }
 
@@ -109,8 +139,10 @@ namespace GameShorts.Gardener
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
+            
             if (_isDisposed)
             {
                 return;
@@ -159,6 +191,57 @@ namespace GameShorts.Gardener
                 isPaused = _isPaused
             };
             _core =  GardenerCorePmFactory.CreateGardenerCorePm(rootCtx);
+        }
+
+        private async UniTask PreloadInternalAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Allow Unity to run initialization steps between phases.
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (_core != null)
+            {
+                await _core.PreloadAsync(cancellationToken);
+            }
+        }
+
+        private void QueueStartAfterPreload()
+        {
+            if (_startQueued)
+            {
+                return;
+            }
+
+            _startQueued = true;
+            StartAfterPreloadAsync().Forget();
+        }
+
+        private async UniTaskVoid StartAfterPreloadAsync()
+        {
+            try
+            {
+                await _preloadTask;
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                _startQueued = false;
+            }
+
+            if (_isDisposed || _core == null)
+            {
+                return;
+            }
+
+            _isPaused.Value = false;
         }
     }
 }

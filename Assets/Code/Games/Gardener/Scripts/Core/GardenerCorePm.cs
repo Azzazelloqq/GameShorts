@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Disposable;
 using Code.Core.Tools.Pool;
+using Cysharp.Threading.Tasks;
 using GameShorts.Gardener.View;
 using LightDI.Runtime;
 using R3;
@@ -35,6 +36,14 @@ namespace GameShorts.Gardener.Core
             };
             _scene = new GardenerScenePm(sceneCtx);
             AddDisposable(_scene);
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_scene is GardenerScenePm scenePm)
+            {
+                await scenePm.PreloadAsync(cancellationToken);
+            }
         }
 
         protected override void OnDispose()
