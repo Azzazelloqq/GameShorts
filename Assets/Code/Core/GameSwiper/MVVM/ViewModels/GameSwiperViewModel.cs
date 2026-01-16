@@ -500,6 +500,11 @@ internal class GameSwiperViewModel : ViewModelBase<GameSwiperModel>
 		}
 
 		_activePreviewDirection = direction;
+		if (direction != SwipeDirection.None)
+		{
+			// Pre-warm the preload window as soon as the user hints a swipe direction.
+			_ = _gameServiceProvider.UpdatePreloadedGamesAsync();
+		}
 
 		switch (direction)
 		{

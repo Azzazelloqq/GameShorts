@@ -411,7 +411,7 @@ public class QueueShortGamesLoader : IGamesLoader
 			var activated = await ActivateCurrentSlotAsync("current", cancellationToken);
 			if (activated)
 			{
-				await PreloadWindowAsync(cancellationToken);
+				StartPreloadWindow(cancellationToken);
 			}
 
 			return activated;
@@ -441,7 +441,7 @@ public class QueueShortGamesLoader : IGamesLoader
 			var activated = await ActivateCurrentSlotAsync("next", cancellationToken);
 			if (activated)
 			{
-				await PreloadWindowAsync(cancellationToken);
+				StartPreloadWindow(cancellationToken);
 			}
 
 			return activated;
@@ -471,7 +471,7 @@ public class QueueShortGamesLoader : IGamesLoader
 			var activated = await ActivateCurrentSlotAsync("previous", cancellationToken);
 			if (activated)
 			{
-				await PreloadWindowAsync(cancellationToken);
+				StartPreloadWindow(cancellationToken);
 			}
 
 			return activated;
@@ -642,6 +642,26 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
+	private void StartPreloadWindow(CancellationToken externalToken)
+	{
+		if (_disposed)
+		{
+			return;
+		}
+
+		lock (_backgroundLock)
+		{
+			try { _upcomingPreloadCts?.Cancel(); } catch { /* ignored */ }
+			try { _upcomingPreloadCts?.Dispose(); } catch { /* ignored */ }
+
+			_upcomingPreloadCts = CancellationTokenSource.CreateLinkedTokenSource(externalToken, _lifetimeCts.Token);
+			var token = _upcomingPreloadCts.Token;
+
+			// single-flight: replace the previous task reference
+			_upcomingPreloadTask = RunPreloadWindowSafeAsync(token);
+		}
+	}
+
 	private void ScheduleDisposeCleanup()
 	{
 		Task upcomingTask;
@@ -738,6 +758,22 @@ public class QueueShortGamesLoader : IGamesLoader
 		catch (Exception ex)
 		{
 			_logger.LogError($"Error preloading upcoming games: {ex.Message}");
+		}
+	}
+
+	private async Task RunPreloadWindowSafeAsync(CancellationToken cancellationToken)
+	{
+		try
+		{
+			await PreloadWindowAsync(cancellationToken);
+		}
+		catch (OperationCanceledException)
+		{
+			// Expected during shutdown / rapid navigation.
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Error preloading games window: {ex.Message}");
 		}
 	}
 

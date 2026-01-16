@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Core;
+using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
@@ -32,6 +33,8 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 
 	private bool _isDisposed;
 	private RenderTexture _renderTexture;
+	private UniTask _preloadTask;
+	private bool _isPreloading;
 
 	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
@@ -50,12 +53,34 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 			return;
 		}
 
+		if (_isPreloading)
+		{
+			await _preloadTask;
+			return;
+		}
+
 		// Warm up start screen and level manager creation.
 		if (_core == null)
 		{
 			CreateRoot();
 		}
-		IsPreloaded = true;
+
+		_isPreloading = true;
+		_preloadTask = PreloadInternalAsync(cancellationToken).Preserve();
+		try
+		{
+			await _preloadTask;
+			if (_isDisposed)
+			{
+				return;
+			}
+
+			IsPreloaded = true;
+		}
+		finally
+		{
+			_isPreloading = false;
+		}
 	}
 
 	public RenderTexture GetRenderTexture()
@@ -145,6 +170,57 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 
 		_core?.Dispose();
 		_core = null;
+	}
+
+	private async UniTask PreloadInternalAsync(CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		// Allow Unity to run Start/OnEnable to initialize heavy scene components.
+		await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		WarmUpCurrentLevelGrass();
+	}
+
+	private void WarmUpCurrentLevelGrass()
+	{
+		if (_sceneContextView == null)
+		{
+			return;
+		}
+
+		var currentLevel = _sceneContextView.CurrentLevel;
+		if (currentLevel == null)
+		{
+			return;
+		}
+
+		var grassFields = currentLevel.GrassFields;
+		if (grassFields == null || grassFields.Length == 0)
+		{
+			grassFields = currentLevel.GetComponentsInChildren<GrassFieldView>(true);
+		}
+
+		foreach (var grassField in grassFields)
+		{
+			if (grassField == null)
+			{
+				continue;
+			}
+
+			var grid = grassField.GrassGrid;
+			if (grid == null)
+			{
+				continue;
+			}
+
+			grid.EnsureInitialized();
+		}
 	}
 
 	private void CreateRoot()

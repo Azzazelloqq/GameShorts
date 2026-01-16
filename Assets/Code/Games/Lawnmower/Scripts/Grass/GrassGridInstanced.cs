@@ -67,6 +67,16 @@ namespace Code.Games.Lawnmower.Scripts.Grass
 
         private void Start()
         {
+            EnsureInitialized();
+        }
+
+        public void EnsureInitialized()
+        {
+            if (isInitialized)
+            {
+                return;
+            }
+
             InitializeGrid();
         }
 

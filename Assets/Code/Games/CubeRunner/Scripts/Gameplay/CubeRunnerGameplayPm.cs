@@ -38,11 +38,32 @@ namespace GameShorts.CubeRunner.Gameplay
         private bool _checkDead = true;
         private bool _newLevel;
         private float _newLevelTimer = 0;
+        private bool _preloaded;
 
         public CubeRunnerGameplayPm(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
             _tickHandler = tickHandler;
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_preloaded)
+            {
+                return;
+            }
+
+            _preloaded = true;
+
+            if (_ctx.levelManager != null)
+            {
+                await _ctx.levelManager.PreloadAsync(cancellationToken);
+            }
+
+            if (_ctx.cubeManager != null)
+            {
+                await _ctx.cubeManager.PreloadAsync(cancellationToken);
+            }
         }
 
         private void OnUpdate(float deltaTime)

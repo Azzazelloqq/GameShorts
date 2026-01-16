@@ -26,11 +26,14 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 
 	public bool IsPreloaded { get; private set; }
 
-	private IDisposable _core;
+	private CubeRunnerCorePm _core;
 	private CancellationTokenSource _cancellationTokenSource;
 	private bool _isDisposed;
 	private RenderTexture _renderTexture;
 	private readonly ReactiveProperty<bool> _isPaused = new();
+	private UniTask _preloadTask;
+	private bool _isPreloading;
+	private bool _startQueued;
 
 	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
@@ -49,11 +52,32 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 			return;
 		}
 
+		if (_isPreloading)
+		{
+			await _preloadTask;
+			return;
+		}
+
 		if (_core == null)
 		{
 			CreateRoot(startPaused: true);
 		}
-		IsPreloaded = true;
+
+		_isPreloading = true;
+		_preloadTask = PreloadInternalAsync(cancellationToken).Preserve();
+		try
+		{
+			await _preloadTask;
+			if (_isDisposed)
+			{
+				return;
+			}
+			IsPreloaded = true;
+		}
+		finally
+		{
+			_isPreloading = false;
+		}
 	}
 
 	public RenderTexture GetRenderTexture()
@@ -66,6 +90,12 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 		if (_core == null)
 		{
 			CreateRoot(startPaused: false);
+			return;
+		}
+
+		if (_isPreloading)
+		{
+			QueueStartAfterPreload();
 			return;
 		}
 
@@ -160,6 +190,57 @@ public class CubeRunnerGame : MonoBehaviourDisposable, IShortGame3D
 			isPaused = _isPaused
 		};
 		_core = new CubeRunnerCorePm(rootCtx);
+	}
+
+	private async UniTask PreloadInternalAsync(CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		// Allow Unity to run initialization steps between phases.
+		await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+
+		if (_isDisposed)
+		{
+			return;
+		}
+
+		if (_core != null)
+		{
+			await _core.PreloadAsync(cancellationToken);
+		}
+	}
+
+	private void QueueStartAfterPreload()
+	{
+		if (_startQueued)
+		{
+			return;
+		}
+
+		_startQueued = true;
+		StartAfterPreloadAsync().Forget();
+	}
+
+	private async UniTaskVoid StartAfterPreloadAsync()
+	{
+		try
+		{
+			await _preloadTask;
+		}
+		catch (Exception)
+		{
+		}
+		finally
+		{
+			_startQueued = false;
+		}
+
+		if (_isDisposed || _core == null)
+		{
+			return;
+		}
+
+		_isPaused.Value = false;
 	}
 }
 }

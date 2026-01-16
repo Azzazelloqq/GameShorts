@@ -1,4 +1,6 @@
-﻿using Code.Core.Tools.Pool;
+using System.Threading;
+using Code.Core.Tools.Pool;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using GameShorts.CubeRunner.Data;
 using GameShorts.CubeRunner.View;
@@ -28,6 +30,7 @@ internal class CubeManager : DisposableBase
 	private Vector2Int _currentDirection;
 	private bool _isEnable = true;
 	private Vector3 _spawnPosition;
+	private bool _preloaded;
 
 	public CubeView CurrentCubeView => _spawnedCubeView;
 
@@ -44,6 +47,42 @@ internal class CubeManager : DisposableBase
 		_settings = _ctx.sceneContextView.GameSettings;
 		_poolManager = poolManager;
 		_tickHandler = tickHandler;
+	}
+
+	public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+	{
+		if (_preloaded)
+		{
+			return;
+		}
+
+		_preloaded = true;
+
+		var cubePrefab = _settings != null ? _settings.CubePrefab : null;
+		if (cubePrefab == null)
+		{
+			return;
+		}
+
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var parent = _ctx.sceneContextView != null
+			? _ctx.sceneContextView.WorldRoot != null
+				? _ctx.sceneContextView.WorldRoot
+				: _ctx.sceneContextView.transform
+			: null;
+
+		var cubeObject = parent != null
+			? _poolManager.Get(cubePrefab, Vector3.zero, parent, Quaternion.identity)
+			: _poolManager.Get(cubePrefab);
+
+		if (cubeObject != null)
+		{
+			cubeObject.SetActive(false);
+			_poolManager.Return(cubePrefab, cubeObject);
+		}
+
+		await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
 	}
 
 	private void OnPhysicUpdate(float deltaTime)

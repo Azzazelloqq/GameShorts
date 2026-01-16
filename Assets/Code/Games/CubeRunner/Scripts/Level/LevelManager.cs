@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Code.Core.Tools.Pool;
+using Cysharp.Threading.Tasks;
 using Disposable;
 using GameShorts.CubeRunner.Data;
 using GameShorts.CubeRunner.View;
@@ -37,6 +39,7 @@ namespace GameShorts.CubeRunner.Level
 
         private readonly Random _random = new Random();
         private readonly IPoolManager _poolManager;
+        private bool _preloaded;
 
         private int[,] _levelGrid;
         private List<Direction> _winPath;
@@ -70,6 +73,56 @@ namespace GameShorts.CubeRunner.Level
         {
             ClearLevel();
             base.OnDispose();
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_preloaded)
+            {
+                return;
+            }
+
+            _preloaded = true;
+
+            const int tilesToWarm = 20;
+            const int bordersToWarm = 8;
+
+            var tilePrefab = _settings != null ? _settings.TilePrefab : null;
+            var borderPrefab = _settings != null ? _settings.BorderPrefab : null;
+
+            if (tilePrefab != null)
+            {
+                for (int i = 0; i < tilesToWarm; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var tileObject = _ctx.tilesRoot != null
+                        ? _poolManager.Get(tilePrefab, Vector3.zero, _ctx.tilesRoot, Quaternion.identity)
+                        : _poolManager.Get(tilePrefab);
+                    if (tileObject != null)
+                    {
+                        tileObject.SetActive(false);
+                        _poolManager.Return(tilePrefab, tileObject);
+                    }
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+            }
+
+            if (borderPrefab != null)
+            {
+                for (int i = 0; i < bordersToWarm; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var borderObject = _ctx.tilesRoot != null
+                        ? _poolManager.Get(borderPrefab, Vector3.zero, _ctx.tilesRoot, Quaternion.identity)
+                        : _poolManager.Get(borderPrefab);
+                    if (borderObject != null)
+                    {
+                        borderObject.SetActive(false);
+                        _poolManager.Return(borderPrefab, borderObject);
+                    }
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+            }
         }
 
         public void GenerateLevel(Vector3 currentCubeDimensions)

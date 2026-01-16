@@ -27,6 +27,9 @@ namespace Lightseeker
         private bool _isDisposed;
         private RenderTexture _renderTexture;
         private ReactiveProperty<bool> _isPaused = new ReactiveProperty<bool>();
+        private UniTask _preloadTask;
+        private bool _isPreloading;
+        private bool _startQueued;
 
         public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
         {
@@ -45,11 +48,33 @@ namespace Lightseeker
                 return;
             }
 
+            if (_isPreloading)
+            {
+                await _preloadTask;
+                return;
+            }
+
             if (_core == null)
             {
                 CreateRoot(startPaused: true);
             }
-            IsPreloaded = true;
+
+            _isPreloading = true;
+            _preloadTask = PreloadInternalAsync(cancellationToken).Preserve();
+            try
+            {
+                await _preloadTask;
+                if (_isDisposed)
+                {
+                    return;
+                }
+
+                IsPreloaded = true;
+            }
+            finally
+            {
+                _isPreloading = false;
+            }
         }
 
         public RenderTexture GetRenderTexture()
@@ -62,6 +87,12 @@ namespace Lightseeker
             if (_core == null)
             {
                 CreateRoot(startPaused: false);
+                return;
+            }
+
+            if (_isPreloading)
+            {
+                QueueStartAfterPreload();
                 return;
             }
 
@@ -157,6 +188,47 @@ namespace Lightseeker
                 isPaused = _isPaused
             };
             _core = LightseekerCorePmFactory.CreateLightseekerCorePm(rootCtx);
+        }
+
+        private async UniTask PreloadInternalAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Allow Unity to process initialization between preload steps.
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+        }
+
+        private void QueueStartAfterPreload()
+        {
+            if (_startQueued)
+            {
+                return;
+            }
+
+            _startQueued = true;
+            StartAfterPreloadAsync().Forget();
+        }
+
+        private async UniTaskVoid StartAfterPreloadAsync()
+        {
+            try
+            {
+                await _preloadTask;
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                _startQueued = false;
+            }
+
+            if (_isDisposed || _core == null)
+            {
+                return;
+            }
+
+            _isPaused.Value = false;
         }
     }
 }

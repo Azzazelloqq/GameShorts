@@ -34,6 +34,16 @@ public class GrassGrid : MonoBehaviour, IGrassGrid
     
     private void Start()
     {
+        EnsureInitialized();
+    }
+
+    public void EnsureInitialized()
+    {
+        if (isInitialized)
+        {
+            return;
+        }
+
         InitializeGrid();
     }
     

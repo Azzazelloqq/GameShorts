@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Disposable;
+using Cysharp.Threading.Tasks;
 using GameShorts.CubeRunner.Logic;
 using GameShorts.CubeRunner.View;
 using R3;
@@ -31,6 +32,14 @@ namespace GameShorts.CubeRunner.Core
 
             _mainScenePm = new CubeRunnerMainScenePm(mainSceneCtx);
             AddDisposable(_mainScenePm);
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_mainScenePm != null)
+            {
+                await _mainScenePm.PreloadAsync(cancellationToken);
+            }
         }
     }
 }

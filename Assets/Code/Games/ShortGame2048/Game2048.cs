@@ -23,7 +23,7 @@ namespace Code.Games
         private GraphicRaycaster _graphicRaycaster;
         public bool IsPreloaded { get; private set; }
 
-        private IDisposable _core;
+        private Game2048CorePm _core;
         private CancellationTokenSource _cancellationTokenSource;
         private bool _isDisposed;
         private RenderTexture _renderTexture;
@@ -50,6 +50,10 @@ namespace Code.Games
             if (_core == null)
             {
                 CreateRoot(startPaused: true);
+            }
+            if (_core != null)
+            {
+                await _core.PreloadAsync(cancellationToken);
             }
             IsPreloaded = true;
         }

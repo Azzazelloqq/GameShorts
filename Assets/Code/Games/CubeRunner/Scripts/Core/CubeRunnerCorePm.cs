@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using Disposable;
 using Code.Core.Tools.Pool;
-using Disposable;
+using Cysharp.Threading.Tasks;
 using GameShorts.CubeRunner.View;
 using R3;
 
@@ -32,6 +32,14 @@ namespace GameShorts.CubeRunner.Core
 
             _scene = new CubeRunnerScenePm(sceneCtx);
             AddDisposable(_scene);
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_scene != null)
+            {
+                await _scene.PreloadAsync(cancellationToken);
+            }
         }
     }
 }

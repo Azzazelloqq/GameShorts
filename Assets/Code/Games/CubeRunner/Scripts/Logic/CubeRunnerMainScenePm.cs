@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Disposable;
+using Cysharp.Threading.Tasks;
 using Code.Core.Tools.Pool;
 using GameShorts.CubeRunner.Data;
 using GameShorts.CubeRunner.Gameplay;
@@ -86,6 +87,14 @@ namespace GameShorts.CubeRunner.Logic
         private void HandleGameOver()
         {
             _ctx.restartGame?.Invoke();
+        }
+
+        public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
+        {
+            if (_gameplayPm != null)
+            {
+                await _gameplayPm.PreloadAsync(cancellationToken);
+            }
         }
 
         protected override void OnDispose()
