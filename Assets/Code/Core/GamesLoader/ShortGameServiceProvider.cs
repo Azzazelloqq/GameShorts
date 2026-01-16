@@ -32,6 +32,9 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 	public bool IsCurrentGameReady => CurrentGame?.IsPreloaded ?? false;
 	public bool IsNextGameReady => NextGame?.IsPreloaded ?? false;
 	public bool IsPreviousGameReady => PreviousGame?.IsPreloaded ?? false;
+	public TimeSpan ReadinessTimeout => _settings.ReadinessTimeout;
+	public int FallbackLoadAttempts => _settings.FallbackLoadAttempts;
+	public event Action<Type> OnGamePreloadingCompleted;
 
 	private readonly IInGameLogger _logger;
 	private readonly IGameRegistry _gameRegistry;
@@ -40,6 +43,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 	private readonly ShortGameLoaderSettings _settings;
 	private bool _initialized;
 	private bool _disposed;
+	private bool _eventsSubscribed;
 	
 	internal ShortGameServiceProvider(
 		[Inject] IInGameLogger logger,
@@ -75,6 +79,8 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 			return;
 		}
 
+		SubscribeToLoaderEvents();
+
 		_logger.Log(
 			$"Preloading short games window (radius={_settings.PreloadRadius}, timeout={_settings.ReadinessTimeout.TotalSeconds:0.#}s)");
 		await _gamesLoader.PreloadWindowAsync(cancellationToken);
@@ -101,9 +107,43 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 
 		StopAllGames();
 
+		UnsubscribeFromLoaderEvents();
+
 		_gameRegistry.Dispose();
 		_queueService.Dispose();
 		_gamesLoader.Dispose();
+	}
+
+	private void SubscribeToLoaderEvents()
+	{
+		if (_eventsSubscribed || _gamesLoader == null)
+		{
+			return;
+		}
+
+		_gamesLoader.OnGamePreloadingCompleted += HandleGamePreloadingCompleted;
+		_eventsSubscribed = true;
+	}
+
+	private void UnsubscribeFromLoaderEvents()
+	{
+		if (!_eventsSubscribed || _gamesLoader == null)
+		{
+			return;
+		}
+
+		_gamesLoader.OnGamePreloadingCompleted -= HandleGamePreloadingCompleted;
+		_eventsSubscribed = false;
+	}
+
+	private void HandleGamePreloadingCompleted(Type gameType, IShortGame game)
+	{
+		if (_disposed)
+		{
+			return;
+		}
+
+		OnGamePreloadingCompleted?.Invoke(gameType);
 	}
 
 	public void StartCurrentGame()
@@ -308,11 +348,45 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 		await _gamesLoader.PreloadWindowAsync(cancellationToken);
 	}
 
+	public async ValueTask<bool> EnsureCurrentGamePreloadedAsync(CancellationToken cancellationToken = default)
+	{
+		if (_disposed || _gamesLoader == null || _queueService == null)
+		{
+			return false;
+		}
+
+		var currentType = _queueService.CurrentGameType;
+		if (currentType == null)
+		{
+			return false;
+		}
+
+		if (_gamesLoader.IsGameLoaded(currentType))
+		{
+			return true;
+		}
+
+		try
+		{
+			var preloaded = await _gamesLoader.PreloadGameAsync(currentType, cancellationToken);
+			return preloaded != null && preloaded.IsPreloaded;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to preload current game {currentType.Name}: {ex.Message}");
+			return false;
+		}
+	}
+
 	public async Task<bool> SwipeToNextGameAsync(CancellationToken cancellationToken = default)
 	{
 		try
 		{
-			if (!HasNextGame)
+			if (NextGameType == null)
 			{
 				_logger.LogWarning("No next game available");
 				return false;
@@ -320,7 +394,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 
 			DisableAllGamesInput();
 
-			var result = await _gamesLoader.ActivateNextGameAsync(cancellationToken);
+			var result = await _gamesLoader.ActivateNextGameAsync(cancellationToken, waitForReady: false);
 			if (!result)
 			{
 				_logger.LogError("Failed to activate next game through loader");
@@ -349,7 +423,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 	{
 		try
 		{
-			if (!HasPreviousGame)
+			if (PreviousGameType == null)
 			{
 				_logger.LogWarning("No previous game available");
 				return false;
@@ -357,7 +431,7 @@ public class ShortGameServiceProvider : IShortGameServiceProvider
 
 			DisableAllGamesInput();
 
-			var result = await _gamesLoader.ActivatePreviousGameAsync(cancellationToken);
+			var result = await _gamesLoader.ActivatePreviousGameAsync(cancellationToken, waitForReady: false);
 			if (!result)
 			{
 				_logger.LogError("Failed to activate previous game through loader");

@@ -33,6 +33,9 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 	[SerializeField]
 	private Image _loadingSpinner;
 
+    [SerializeField]
+    private CanvasGroup _loadingParent;
+
 	[Header("Animation Settings")]
 	[SerializeField]
 	private float _fadeDuration = 0.3f;
@@ -41,6 +44,7 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 	private float _scaleDuration = 0.2f;
 
 	private Tween _loadingTween;
+	private Tween _loadingFadeTween;
 
 	protected override void OnInitialize()
 	{
@@ -57,11 +61,13 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 	protected override void OnDispose()
 	{
 		_loadingTween?.Kill();
+		_loadingFadeTween?.Kill();
 	}
 
 	protected override ValueTask OnDisposeAsync(CancellationToken token)
 	{
 		_loadingTween?.Kill();
+		_loadingFadeTween?.Kill();
 		return default;
 	}
 
@@ -76,8 +82,32 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 			}
 		}
 
+		ConfigureLoadingSpinner();
 		BindProperties();
 		SetupInitialUIState();
+	}
+
+	private void ConfigureLoadingSpinner()
+	{
+		if (_loadingSpinner == null)
+		{
+			return;
+		}
+
+		if (_loadingParent == null)
+		{
+			_loadingParent = _loadingSpinner.GetComponentInParent<CanvasGroup>();
+			if (_loadingParent == null)
+			{
+				_loadingParent = _loadingSpinner.gameObject.AddComponent<CanvasGroup>();
+			}
+		}
+
+		_loadingParent.ignoreParentGroups = true;
+		_loadingParent.interactable = false;
+		_loadingParent.blocksRaycasts = false;
+		_loadingParent.alpha = 0f;
+		_loadingParent.gameObject.SetActive(false);
 	}
 
 	private void BindProperties()
@@ -91,8 +121,21 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 
 	private void SetupInitialUIState()
 	{
-		_loadingSpinner.gameObject.SetActive(false);
-		_overlayCanvasGroup.alpha = 0f;
+		if (_loadingSpinner != null)
+		{
+			_loadingSpinner.gameObject.SetActive(false);
+		}
+
+		if (_loadingParent != null)
+		{
+			_loadingParent.alpha = 0f;
+			_loadingParent.gameObject.SetActive(false);
+		}
+
+		if (_overlayCanvasGroup != null)
+		{
+			_overlayCanvasGroup.alpha = 0f;
+		}
 	}
 
 	private void OnRenderTextureChanged(RenderTexture texture)
@@ -104,8 +147,43 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 
 	private void OnLoadingIndicatorStateChanged(bool isVisible)
 	{
-		_loadingSpinner.gameObject.SetActive(isVisible);
+		if (_loadingSpinner == null)
+		{
+			return;
+		}
+
 		_loadingTween?.Kill();
+		_loadingFadeTween?.Kill();
+
+		if (_loadingParent != null)
+		{
+			if (isVisible)
+			{
+				_loadingParent.gameObject.SetActive(true);
+				_loadingParent.alpha = 0f;
+				_loadingFadeTween = _loadingParent
+					.DOFade(1f, _fadeDuration)
+					.SetEase(Ease.OutQuad);
+			}
+			else
+			{
+				_loadingFadeTween = _loadingParent
+					.DOFade(0f, _fadeDuration)
+					.SetEase(Ease.OutQuad)
+					.OnComplete(() =>
+					{
+						if (_loadingParent != null)
+						{
+							_loadingParent.gameObject.SetActive(false);
+						}
+					});
+			}
+		}
+
+		if (_loadingSpinner != null)
+		{
+			_loadingSpinner.gameObject.SetActive(isVisible);
+		}
 
 		if (isVisible)
 		{

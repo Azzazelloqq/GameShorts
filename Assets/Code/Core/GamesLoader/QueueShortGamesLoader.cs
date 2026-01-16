@@ -31,6 +31,8 @@ public class QueueShortGamesLoader : IGamesLoader
 	private readonly SemaphoreSlim _activationSemaphore = new(1, 1);
 	private readonly ShortGameLoaderSettings _settings;
 	private Type _activeGameType;
+	private Type _pendingActiveGameType;
+	private CancellationTokenSource _preloadWindowCts;
 
 	private bool _isLoading;
 	private bool _disposed;
@@ -201,8 +203,10 @@ public class QueueShortGamesLoader : IGamesLoader
 				}
 			}
 
+			SafeEnableGame(gameType, game, "load-start");
 			game.StartGame();
 			_loadedGames[gameType] = game;
+			MarkGameActive(gameType);
 
 			_logger.Log($"Successfully loaded and started game: {gameType.Name}");
 			OnGameLoadingCompleted?.Invoke(gameType, game);
@@ -277,6 +281,9 @@ public class QueueShortGamesLoader : IGamesLoader
 				OnGamePreloadingFailed?.Invoke(gameType, error);
 				return null;
 			}
+
+			// Ensure preloading happens while the game is disabled to avoid affecting other running games.
+			SafeDisableGame(gameType, game, "preload");
 
 			// Preload the game
 			await game.PreloadGameAsync(linkedCts.Token);
@@ -395,7 +402,9 @@ public class QueueShortGamesLoader : IGamesLoader
 		_loadedGames[gameType] = game;
 
 		// Start the game
+		SafeEnableGame(gameType, game, "start-preloaded");
 		game.StartGame();
+		MarkGameActive(gameType);
 
 		_logger.Log($"Started preloaded game: {gameType.Name}");
 		OnGameLoadingCompleted?.Invoke(gameType, game);
@@ -403,15 +412,24 @@ public class QueueShortGamesLoader : IGamesLoader
 		return true;
 	}
 
-	public async Cysharp.Threading.Tasks.UniTask<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<bool> ActivateCurrentGameAsync(
+		CancellationToken cancellationToken = default,
+		bool waitForReady = true)
 	{
 		await _activationSemaphore.WaitAsync(cancellationToken);
 		try
 		{
-			var activated = await ActivateCurrentSlotAsync("current", cancellationToken);
+			var activated = await ActivateCurrentSlotAsync("current", cancellationToken, waitForReady);
 			if (activated)
 			{
-				StartPreloadWindow(cancellationToken);
+				if (waitForReady)
+				{
+					await PreloadWindowAsync(cancellationToken);
+				}
+				else
+				{
+					StartPreloadWindowInBackground();
+				}
 			}
 
 			return activated;
@@ -422,7 +440,9 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	public async Cysharp.Threading.Tasks.UniTask<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<bool> ActivateNextGameAsync(
+		CancellationToken cancellationToken = default,
+		bool waitForReady = true)
 	{
 		await _activationSemaphore.WaitAsync(cancellationToken);
 		try
@@ -438,10 +458,17 @@ public class QueueShortGamesLoader : IGamesLoader
 				return false;
 			}
 
-			var activated = await ActivateCurrentSlotAsync("next", cancellationToken);
+			var activated = await ActivateCurrentSlotAsync("next", cancellationToken, waitForReady);
 			if (activated)
 			{
-				StartPreloadWindow(cancellationToken);
+				if (waitForReady)
+				{
+					await PreloadWindowAsync(cancellationToken);
+				}
+				else
+				{
+					StartPreloadWindowInBackground();
+				}
 			}
 
 			return activated;
@@ -452,7 +479,9 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	public async Cysharp.Threading.Tasks.UniTask<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default)
+	public async Cysharp.Threading.Tasks.UniTask<bool> ActivatePreviousGameAsync(
+		CancellationToken cancellationToken = default,
+		bool waitForReady = true)
 	{
 		await _activationSemaphore.WaitAsync(cancellationToken);
 		try
@@ -468,10 +497,17 @@ public class QueueShortGamesLoader : IGamesLoader
 				return false;
 			}
 
-			var activated = await ActivateCurrentSlotAsync("previous", cancellationToken);
+			var activated = await ActivateCurrentSlotAsync("previous", cancellationToken, waitForReady);
 			if (activated)
 			{
-				StartPreloadWindow(cancellationToken);
+				if (waitForReady)
+				{
+					await PreloadWindowAsync(cancellationToken);
+				}
+				else
+				{
+					StartPreloadWindowInBackground();
+				}
 			}
 
 			return activated;
@@ -556,6 +592,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		_loadedGames.Clear();
 		_preloadedGames.Clear();
 		_activeGameType = null;
+		_pendingActiveGameType = null;
 	}
 
 	public IShortGame GetGame(Type gameType)
@@ -612,6 +649,9 @@ public class QueueShortGamesLoader : IGamesLoader
 		lock (_backgroundLock)
 		{
 			try { _upcomingPreloadCts?.Cancel(); } catch { /* ignored */ }
+			try { _preloadWindowCts?.Cancel(); } catch { /* ignored */ }
+			try { _preloadWindowCts?.Dispose(); } catch { /* ignored */ }
+			_preloadWindowCts = null;
 		}
 
 		UnloadAllGames();
@@ -642,7 +682,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	private void StartPreloadWindow(CancellationToken externalToken)
+	private void StartPreloadWindowInBackground()
 	{
 		if (_disposed)
 		{
@@ -651,14 +691,28 @@ public class QueueShortGamesLoader : IGamesLoader
 
 		lock (_backgroundLock)
 		{
-			try { _upcomingPreloadCts?.Cancel(); } catch { /* ignored */ }
-			try { _upcomingPreloadCts?.Dispose(); } catch { /* ignored */ }
+			try { _preloadWindowCts?.Cancel(); } catch { /* ignored */ }
+			try { _preloadWindowCts?.Dispose(); } catch { /* ignored */ }
 
-			_upcomingPreloadCts = CancellationTokenSource.CreateLinkedTokenSource(externalToken, _lifetimeCts.Token);
-			var token = _upcomingPreloadCts.Token;
+			_preloadWindowCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+			var token = _preloadWindowCts.Token;
+			PreloadWindowInBackgroundAsync(token).Forget();
+		}
+	}
 
-			// single-flight: replace the previous task reference
-			_upcomingPreloadTask = RunPreloadWindowSafeAsync(token);
+	private async UniTask PreloadWindowInBackgroundAsync(CancellationToken token)
+	{
+		try
+		{
+			await PreloadWindowAsync(token);
+		}
+		catch (OperationCanceledException)
+		{
+			// Expected during shutdown / rapid navigation.
+		}
+		catch (Exception ex)
+		{
+			_logger.LogWarning($"Background preload window failed: {ex.Message}");
 		}
 	}
 
@@ -761,22 +815,6 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	private async Task RunPreloadWindowSafeAsync(CancellationToken cancellationToken)
-	{
-		try
-		{
-			await PreloadWindowAsync(cancellationToken);
-		}
-		catch (OperationCanceledException)
-		{
-			// Expected during shutdown / rapid navigation.
-		}
-		catch (Exception ex)
-		{
-			_logger.LogError($"Error preloading games window: {ex.Message}");
-		}
-	}
-
 	private void ValidateGameType(Type gameType)
 	{
 		if (gameType == null)
@@ -790,7 +828,10 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
-	private async Task<bool> ActivateCurrentSlotAsync(string direction, CancellationToken cancellationToken)
+	private async Task<bool> ActivateCurrentSlotAsync(
+		string direction,
+		CancellationToken cancellationToken,
+		bool waitForReady)
 	{
 		var currentType = _queueService.CurrentGameType;
 		if (currentType == null)
@@ -801,19 +842,29 @@ public class QueueShortGamesLoader : IGamesLoader
 
 		_logger.Log($"Activating {direction} game {currentType.Name} at index {_queueService.CurrentIndex}");
 
-		var game = await EnsureGameReadyAsync(currentType, cancellationToken);
-		if (game == null)
-		{
-			_logger.LogError($"Failed to activate {currentType.Name} - game could not be prepared.");
-			return false;
-		}
-
 		var previousActive = _activeGameType;
-		_activeGameType = currentType;
 
-		if (!_loadedGames.ContainsKey(currentType))
+		if (waitForReady)
 		{
-			_loadedGames[currentType] = game;
+			var game = await EnsureGameReadyAsync(currentType, cancellationToken);
+			if (game == null)
+			{
+				_logger.LogError($"Failed to activate {currentType.Name} - game could not be prepared.");
+				return false;
+			}
+
+			if (!_loadedGames.ContainsKey(currentType))
+			{
+				_loadedGames[currentType] = game;
+			}
+
+			_pendingActiveGameType = null;
+			MarkGameActive(currentType);
+		}
+		else
+		{
+			_pendingActiveGameType = currentType;
+			_activeGameType = null;
 		}
 
 		if (previousActive != null && previousActive != currentType)
@@ -903,12 +954,41 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 	}
 
+	private void MarkGameActive(Type gameType)
+	{
+		if (gameType == null)
+		{
+			return;
+		}
+
+		if (_queueService.CurrentGameType != gameType && _pendingActiveGameType != gameType)
+		{
+			return;
+		}
+
+		_activeGameType = gameType;
+
+		if (_pendingActiveGameType == gameType)
+		{
+			_pendingActiveGameType = null;
+		}
+
+		if (_loadedGames.ContainsKey(gameType))
+		{
+			TrimLoadedGames();
+		}
+	}
+
 	private void TrimPreloadedGames(ICollection<Type> windowTypes)
 	{
 		var allowed = new HashSet<Type>(windowTypes);
 		if (_activeGameType != null)
 		{
 			allowed.Add(_activeGameType);
+		}
+		if (_pendingActiveGameType != null)
+		{
+			allowed.Add(_pendingActiveGameType);
 		}
 
 		var toRemove = _preloadedGames.Keys
@@ -936,6 +1016,40 @@ public class QueueShortGamesLoader : IGamesLoader
 		catch (Exception ex)
 		{
 			_logger.LogError($"Failed to stop game {gameType?.Name} ({reason}): {ex.Message}");
+		}
+	}
+
+	private void SafeDisableGame(Type gameType, IShortGame game, string reason)
+	{
+		if (game == null)
+		{
+			return;
+		}
+
+		try
+		{
+			game.Disable();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to disable game {gameType?.Name} ({reason}): {ex.Message}");
+		}
+	}
+
+	private void SafeEnableGame(Type gameType, IShortGame game, string reason)
+	{
+		if (game == null)
+		{
+			return;
+		}
+
+		try
+		{
+			game.Enable();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError($"Failed to enable game {gameType?.Name} ({reason}): {ex.Message}");
 		}
 	}
 

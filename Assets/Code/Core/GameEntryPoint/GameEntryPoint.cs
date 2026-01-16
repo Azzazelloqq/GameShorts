@@ -176,6 +176,7 @@ public sealed class GameEntryPoint : MonoBehaviour
 		{
 			typeof(CubeRunnerGame),
 			typeof(GardenerGame),
+			typeof(BoxTower),
 			typeof(LawnmowerGame),
 			typeof(EscapeFromDarkGame),
 			typeof(Game2048),

@@ -132,16 +132,16 @@ public interface IGamesLoader : IDisposable
 	/// <summary>
 	/// Activates (starts) the current queue entry without moving the cursor.
 	/// </summary>
-    UniTask<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default);
+    UniTask<bool> ActivateCurrentGameAsync(CancellationToken cancellationToken = default, bool waitForReady = true);
 
 	/// <summary>
 	/// Moves the cursor forward and activates the new current game.
 	/// </summary>
-    UniTask<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default);
+    UniTask<bool> ActivateNextGameAsync(CancellationToken cancellationToken = default, bool waitForReady = true);
 
 	/// <summary>
 	/// Moves the cursor backward and activates the new current game.
 	/// </summary>
-    UniTask<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default);
+    UniTask<bool> ActivatePreviousGameAsync(CancellationToken cancellationToken = default, bool waitForReady = true);
 }
 }
