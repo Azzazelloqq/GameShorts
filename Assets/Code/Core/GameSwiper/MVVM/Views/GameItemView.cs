@@ -83,8 +83,8 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 		}
 
 		ConfigureLoadingSpinner();
-		BindProperties();
 		SetupInitialUIState();
+		BindProperties();
 	}
 
 	private void ConfigureLoadingSpinner()
@@ -121,11 +121,6 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 
 	private void SetupInitialUIState()
 	{
-		if (_loadingSpinner != null)
-		{
-			_loadingSpinner.gameObject.SetActive(false);
-		}
-
 		if (_loadingParent != null)
 		{
 			_loadingParent.alpha = 0f;
@@ -178,11 +173,6 @@ internal class GameItemView : ViewMonoBehavior<GameItemViewModel>
 						}
 					});
 			}
-		}
-
-		if (_loadingSpinner != null)
-		{
-			_loadingSpinner.gameObject.SetActive(isVisible);
 		}
 
 		if (isVisible)
