@@ -60,6 +60,14 @@ namespace GameShorts.Gardener.Gameplay
             // Если игра на паузе, не обрабатываем ввод
             if (!_isInputEnabled)
                 return;
+
+            // Камера могла быть уничтожена при выгрузке сцены
+            if (_ctx.mainCamera == null)
+            {
+                _isHolding = false;
+                _currentPlot = null;
+                return;
+            }
             
             // Поддержка сенсорного ввода для мобильных устройств
             if (Input.touchCount > 0)
@@ -108,6 +116,9 @@ namespace GameShorts.Gardener.Gameplay
             if (IsPointerOverUI(screenPosition))
                 return;
             
+            if (_ctx.mainCamera == null)
+                return;
+
             Ray ray = _ctx.mainCamera.ScreenPointToRay(screenPosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f))
             {

@@ -96,7 +96,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public Vector2Int GetMazePosition(Vector3 worldPosition)
         {
-            return _levelView?.GetMazePosition(worldPosition) ?? Vector2Int.zero;
+            return _levelView?.GetMazePosition(worldPosition) ?? new Vector2Int(-1, -1);
         }
 
         public bool IsValidMazePosition(int mazeX, int mazeY)
@@ -106,6 +106,9 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public bool IsExitPosition(int mazeX, int mazeY)
         {
+            if (mazeX < 0 || mazeY < 0)
+                return false;
+
             Vector2Int exitPos = GetExitPosition();
             return mazeX == exitPos.x && mazeY == exitPos.y;
         }

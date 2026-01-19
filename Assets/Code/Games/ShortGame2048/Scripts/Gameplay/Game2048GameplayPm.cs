@@ -181,10 +181,15 @@ namespace Code.Games
                 return;
             
             var isGameOver = false;
-            float spawnZ = _ctx.sceneContextView.FinishGamePoint.position.z;
-            float gameOverThreshold = spawnZ;//- 1f; // Offset в 1 единицу назад от точки спавна
+            var finishPoint = _ctx.sceneContextView != null ? _ctx.sceneContextView.FinishGamePoint : null;
+            if (finishPoint == null)
+                return;
 
-            if (_currentCube != null && _currentCube.View.transform.position.z > gameOverThreshold)
+            float spawnZ = finishPoint.position.z;
+            float gameOverThreshold = spawnZ;//- 1f; // Offset в 1 единицу назад от точки спавна
+            
+            if (_currentCube != null && _currentCube.View != null &&
+                _currentCube.View.transform.position.z > gameOverThreshold)
             {
                 _cubes.Add(_currentCube.Id, _currentCube);
                 _currentCube = null;

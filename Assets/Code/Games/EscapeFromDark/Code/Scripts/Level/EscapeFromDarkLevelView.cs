@@ -118,6 +118,9 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public Vector3 GetWorldPosition(int mazeX, int mazeY)
         {
+            if (_tilemap == null)
+                return Vector3.zero;
+
             // Конвертируем координаты лабиринта в мировые координаты
             Vector3Int tilePosition = new Vector3Int(
                 origin.x + mazeX, 
@@ -130,6 +133,9 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public Vector2Int GetMazePosition(Vector3 worldPosition)
         {
+            if (_tilemap == null)
+                return new Vector2Int(-1, -1);
+
             // Конвертируем мировые координаты в координаты лабиринта
             Vector3Int cellPosition = _tilemap.WorldToCell(worldPosition);
             
@@ -141,6 +147,9 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 
         public bool IsValidMazePosition(int mazeX, int mazeY)
         {
+            if (_currentMaze == null)
+                return false;
+
             return mazeX >= 0 && mazeX < _mazeWidth && 
                    mazeY >= 0 && mazeY < _mazeHeight &&
                    _currentMaze[mazeY, mazeX] == 0; // Можно ходить только по проходам
