@@ -96,11 +96,6 @@ namespace GameShorts.CubeRunner.Logic
                 await _gameplayPm.PreloadAsync(cancellationToken);
             }
         }
-
-        protected override void OnDispose()
-        {
-            _gameplayPm?.Dispose();
-        }
     }
 }
 

@@ -169,6 +169,7 @@ namespace GameShorts.CubeRunner.Gameplay
             _swipeStream.OnCompleted();
             _swipeStream.Dispose();
             ResetPointerState();
+            base.OnDispose();
         }
     }
 }

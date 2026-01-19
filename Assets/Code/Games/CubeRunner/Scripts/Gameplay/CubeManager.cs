@@ -87,6 +87,12 @@ internal class CubeManager : DisposableBase
 
 	private void OnPhysicUpdate(float deltaTime)
 	{
+		if (_spawnedCubeView == null)
+		{
+			_isRotating = false;
+			return;
+		}
+
 		if (_isRotating)
 		{
 			_rotationTime += deltaTime;
@@ -141,7 +147,8 @@ internal class CubeManager : DisposableBase
 			spawnPos.y += _settings.SpawnHeight;
 			spawnPos.x = 0.5f * (scale.x - 1);
 			spawnPos.z = 0.5f * (scale.z - 1);
-			var cubeObject = _poolManager.Get(cubePrefabObject, spawnPos, parent, Quaternion.identity);
+			var cubeObject = _poolManager.Get(cubePrefabObject, parent);
+            cubeObject.transform.localPosition = spawnPos;
 			if (cubeObject != null)
 			{
 				cubeView = cubeObject.GetComponent<CubeView>();
@@ -182,6 +189,12 @@ internal class CubeManager : DisposableBase
 	{
 		if (!_isEnable)
 		{
+			return;
+		}
+
+		if (_spawnedCubeView == null)
+		{
+			_isEnable = false;
 			return;
 		}
 

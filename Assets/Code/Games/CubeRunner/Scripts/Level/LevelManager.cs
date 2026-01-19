@@ -45,14 +45,9 @@ namespace GameShorts.CubeRunner.Level
         private List<Direction> _winPath;
         private int _currentLevelNumber;
         private Vector2Int _startCellPosition;
-        private Vector2Int _targetFootprintMin;
-        private Vector2Int _targetFootprintMax;
         private Vector2Int _targetFootprintMinRaw;
         private Vector2Int _targetFootprintMaxRaw;
         private readonly List<BorderView> _levelBorderTiles;
-
-        private const float AxisAlignmentThreshold = 0.985f;
-        private const float GridSnapEpsilon = 0.0001f;
 
         public int[,] LevelGrid => _levelGrid;
         public List<Direction> WinPath => _winPath;
@@ -72,7 +67,6 @@ namespace GameShorts.CubeRunner.Level
         protected override void OnDispose()
         {
             ClearLevel();
-            base.OnDispose();
         }
 
         public async UniTask PreloadAsync(CancellationToken cancellationToken = default)
@@ -143,15 +137,15 @@ namespace GameShorts.CubeRunner.Level
             {
                 for (int x = 0; x < _levelGrid.GetLength(1); x++)
                 {
-                    var spawnPos = new Vector3(
+                    var spawnLocalPos = new Vector3(
                         x - _startCellPosition.x,
                         0f,
                         z - _startCellPosition.y);
                     
                     if (_levelGrid[z, x] == -1)
                     {
-                        var tileBorderObject = _poolManager.Get(_ctx.gameSettings.BorderPrefab, spawnPos, _ctx.tilesRoot,
-                            Quaternion.identity);
+                        var tileBorderObject = _poolManager.Get(_ctx.gameSettings.BorderPrefab, _ctx.tilesRoot);
+                        tileBorderObject.transform.localPosition = spawnLocalPos;
                         var borderView = tileBorderObject.GetComponent<BorderView>();
                         borderView.PlayerDetected += PlayerDetected;
                         _levelBorderTiles.Add(borderView);
@@ -159,8 +153,8 @@ namespace GameShorts.CubeRunner.Level
                     }
                     var cellValue = _levelGrid[z, x];
 
-                    var tileObject = _poolManager.Get(_ctx.gameSettings.TilePrefab, spawnPos, _ctx.tilesRoot,
-                        Quaternion.identity);
+                    var tileObject = _poolManager.Get(_ctx.gameSettings.TilePrefab, _ctx.tilesRoot);
+                    tileObject.transform.localPosition = spawnLocalPos;
                     var tileView = tileObject.GetComponent<TileView>();
                     tileView.IsExitTile = cellValue == 1;
 
@@ -438,9 +432,6 @@ namespace GameShorts.CubeRunner.Level
                 _targetFootprintMinRaw.y + lastFootprint.SizeZ - 1);
 
             grid = AddBorderAroundPath(grid);
-            _targetFootprintMin = _targetFootprintMinRaw + Vector2Int.one;
-            _targetFootprintMax = _targetFootprintMaxRaw + Vector2Int.one;
-          
             Vector2Int startAnchor = footprints[0].Anchor;
             _startCellPosition = new Vector2Int(startAnchor.x + offsetX + 2, startAnchor.y + offsetZ + 2);
             return grid;

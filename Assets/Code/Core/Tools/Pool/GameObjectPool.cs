@@ -122,6 +122,9 @@ namespace Code.Core.Tools.Pool
 				return;
 				
 			element.transform.SetParent(_ctx.parrent);
+            element.transform.localPosition = Vector3.zero;
+            element.transform.position = Vector3.zero;
+            element.transform.localRotation = Quaternion.identity;
 			_pool.Release(element);
 		}
 

@@ -23,6 +23,7 @@ namespace GameShorts.CubeRunner.Gameplay
         private Vector3 _offsetXZ;
         private float _initialHeight;
         private bool _offsetInitialized;
+        private CubeView _trackedCubeView;
 
         public CubeRunnerCameraPm(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
@@ -54,7 +55,13 @@ namespace GameShorts.CubeRunner.Gameplay
             if (cubeView == null)
                 return;
 
-            Vector3 cubePosition = cubeView.VisualRoot.localPosition;
+            if (_trackedCubeView != cubeView)
+            {
+                _trackedCubeView = cubeView;
+                _offsetInitialized = false;
+            }
+
+            Vector3 cubePosition = cubeView.VisualRoot.position;
             EnsureOffsetInitialized(cubePosition);
 
             Vector3 desiredPosition = new Vector3(
@@ -62,7 +69,7 @@ namespace GameShorts.CubeRunner.Gameplay
                 _initialHeight,
                 cubePosition.z + _offsetXZ.z);
 
-            _cameraTransform.localPosition = desiredPosition;
+            _cameraTransform.position = desiredPosition;
             _cameraTransform.LookAt(cubePosition);
         }
 
@@ -71,7 +78,7 @@ namespace GameShorts.CubeRunner.Gameplay
             if (_offsetInitialized || _cameraTransform == null)
                 return;
 
-            Vector3 offset = _cameraTransform.localPosition - cubePosition;
+            Vector3 offset = _cameraTransform.position - cubePosition;
             offset.y = 0f;
 
             if (offset.sqrMagnitude <= Mathf.Epsilon)
@@ -109,6 +116,7 @@ namespace GameShorts.CubeRunner.Gameplay
         }
     }
 }
+
 
 
 
