@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Asteroids.Code.Games.Game1.Scripts.View;
@@ -90,6 +90,7 @@ public class AsteroidsGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void StopGame()
 	{
+		DisposeCore();
 		Disable();
 		DisableInput();
 	}

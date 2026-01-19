@@ -60,9 +60,10 @@ internal class StartScreenPm : DisposableBase
 
 	protected override void OnDispose()
 	{
-		base.OnDispose();
-		
-		Object.Destroy(_view);
+		if (_view != null)
+		{
+			GameObject.Destroy(_view.gameObject);
+		}
 	}
 
 	private async Task LoadBaseUI()
