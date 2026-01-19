@@ -33,6 +33,8 @@ public class QueueShortGamesLoader : IGamesLoader
 	private Type _activeGameType;
 	private Type _pendingActiveGameType;
 	private CancellationTokenSource _preloadWindowCts;
+	private UniTask _preloadWindowTask = UniTask.CompletedTask;
+	private int _preloadWindowRequestId;
 
 	private bool _isLoading;
 	private bool _disposed;
@@ -358,6 +360,11 @@ public class QueueShortGamesLoader : IGamesLoader
 
 	public async UniTask PreloadWindowAsync(CancellationToken cancellationToken = default)
 	{
+		await PreloadWindowInternalAsync(cancellationToken, () => true);
+	}
+
+	private async UniTask PreloadWindowInternalAsync(CancellationToken cancellationToken, Func<bool> shouldTrim)
+	{
 		if (_disposed)
 		{
 			_logger.LogWarning("Skipping preload window - loader already disposed");
@@ -385,7 +392,10 @@ public class QueueShortGamesLoader : IGamesLoader
 			await PreloadGamesAsync(toPreload, cancellationToken);
 		}
 
-		TrimPreloadedGames(windowTypes);
+		if (shouldTrim == null || shouldTrim())
+		{
+			TrimPreloadedGames(windowTypes);
+		}
 	}
 
 	public bool StartPreloadedGame(Type gameType)
@@ -650,8 +660,6 @@ public class QueueShortGamesLoader : IGamesLoader
 		{
 			try { _upcomingPreloadCts?.Cancel(); } catch { /* ignored */ }
 			try { _preloadWindowCts?.Cancel(); } catch { /* ignored */ }
-			try { _preloadWindowCts?.Dispose(); } catch { /* ignored */ }
-			_preloadWindowCts = null;
 		}
 
 		UnloadAllGames();
@@ -691,35 +699,69 @@ public class QueueShortGamesLoader : IGamesLoader
 
 		lock (_backgroundLock)
 		{
-			try { _preloadWindowCts?.Cancel(); } catch { /* ignored */ }
-			try { _preloadWindowCts?.Dispose(); } catch { /* ignored */ }
+			_preloadWindowRequestId++;
 
-			_preloadWindowCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+			if (_preloadWindowTask.Status == UniTaskStatus.Pending)
+			{
+				return;
+			}
+
+			if (_preloadWindowCts == null)
+			{
+				_preloadWindowCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+			}
+
 			var token = _preloadWindowCts.Token;
-			PreloadWindowInBackgroundAsync(token).Forget();
+			var requestId = _preloadWindowRequestId;
+			_preloadWindowTask = PreloadWindowInBackgroundLoopAsync(requestId, token).Preserve();
 		}
 	}
 
-	private async UniTask PreloadWindowInBackgroundAsync(CancellationToken token)
+	private async UniTask PreloadWindowInBackgroundLoopAsync(int requestId, CancellationToken token)
 	{
-		try
+		var currentRequestId = requestId;
+
+		while (!token.IsCancellationRequested)
 		{
-			await PreloadWindowAsync(token);
+			try
+			{
+				await PreloadWindowInternalAsync(token, () => IsLatestPreloadWindowRequest(currentRequestId));
+			}
+			catch (OperationCanceledException)
+			{
+				return;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogWarning($"Background preload window failed: {ex.Message}");
+			}
+
+			lock (_backgroundLock)
+			{
+				if (_preloadWindowRequestId == currentRequestId)
+				{
+					return;
+				}
+
+				currentRequestId = _preloadWindowRequestId;
+			}
 		}
-		catch (OperationCanceledException)
+	}
+
+	private bool IsLatestPreloadWindowRequest(int requestId)
+	{
+		lock (_backgroundLock)
 		{
-			// Expected during shutdown / rapid navigation.
-		}
-		catch (Exception ex)
-		{
-			_logger.LogWarning($"Background preload window failed: {ex.Message}");
+			return _preloadWindowRequestId == requestId;
 		}
 	}
 
 	private void ScheduleDisposeCleanup()
 	{
 		Task upcomingTask;
+		UniTask preloadWindowTask;
 		CancellationTokenSource upcomingCts;
+		CancellationTokenSource preloadWindowCts;
 
 		lock (_backgroundLock)
 		{
@@ -727,17 +769,30 @@ public class QueueShortGamesLoader : IGamesLoader
 			upcomingCts = _upcomingPreloadCts;
 			_upcomingPreloadTask = Task.CompletedTask;
 			_upcomingPreloadCts = null;
+
+			preloadWindowTask = _preloadWindowTask;
+			preloadWindowCts = _preloadWindowCts;
+			_preloadWindowTask = UniTask.CompletedTask;
+			_preloadWindowCts = null;
 		}
 
-		DisposeCleanupAsync(upcomingTask, upcomingCts).Forget();
+		DisposeCleanupAsync(upcomingTask, upcomingCts, preloadWindowTask, preloadWindowCts).Forget();
 	}
 
-	private async UniTask DisposeCleanupAsync(Task upcomingTask, CancellationTokenSource upcomingCts)
+	private async UniTask DisposeCleanupAsync(
+		Task upcomingTask,
+		CancellationTokenSource upcomingCts,
+		UniTask preloadWindowTask,
+		CancellationTokenSource preloadWindowCts)
 	{
 		try
 		{
 			// Best-effort: ensure no background code touches semaphores after this point.
-			await upcomingTask;
+			if (upcomingTask != null)
+			{
+				await upcomingTask;
+			}
+			await preloadWindowTask;
 		}
 		catch (OperationCanceledException)
 		{
@@ -750,6 +805,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		finally
 		{
 			try { upcomingCts?.Dispose(); } catch { /* ignored */ }
+			try { preloadWindowCts?.Dispose(); } catch { /* ignored */ }
 			try { _lifetimeCts.Dispose(); } catch { /* ignored */ }
 			try { _loadingSemaphore.Dispose(); } catch { /* ignored */ }
 			try { _activationSemaphore.Dispose(); } catch { /* ignored */ }
