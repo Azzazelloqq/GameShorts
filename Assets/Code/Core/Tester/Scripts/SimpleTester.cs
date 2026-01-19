@@ -252,8 +252,7 @@ namespace Code.Core.Tester
             if (_currentGame != null)
             {
                 // Перезапускаем игру
-                _currentGame.StopGame();
-                _currentGame.StartGame();
+                _currentGame.RestartGame();
                 _logger.Log("Game restarted successfully");
 
                 // Сбрасываем видимость функциональных кнопок при рестарте
