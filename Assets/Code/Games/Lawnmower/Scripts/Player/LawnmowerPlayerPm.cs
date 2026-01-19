@@ -14,7 +14,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 {
     internal class LawnmowerPlayerPm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public LawnmowerSceneContextView sceneContextView;
             public LawnmowerLevelManager levelManager;

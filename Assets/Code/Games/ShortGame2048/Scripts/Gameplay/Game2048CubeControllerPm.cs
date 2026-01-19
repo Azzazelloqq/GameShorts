@@ -11,7 +11,7 @@ namespace Code.Games
 {
     internal class Game2048CubeControllerPm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public Game2048InputPm inputPm;
             public float launchForce;

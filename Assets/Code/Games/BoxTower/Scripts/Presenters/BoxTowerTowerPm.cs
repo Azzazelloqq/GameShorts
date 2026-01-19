@@ -14,7 +14,7 @@ namespace Code.Core.ShortGamesCore.Game2
 {
     internal class BoxTowerTowerPm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public BoxTowerSceneContextView sceneContextView;

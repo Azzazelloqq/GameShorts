@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 {
-    public class PlayerView : MonoBehaviour
+    internal class PlayerView : MonoBehaviour
     {
         [SerializeField] private Transform cuttingCenter;
 

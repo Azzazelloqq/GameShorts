@@ -38,7 +38,7 @@ namespace Lightseeker
         /// <summary>
         /// Сбрасывает статическое состояние для полного перезапуска игры
         /// </summary>
-        public static void ResetStaticState()
+        internal static void ResetStaticState()
         {
             _hasInitialPositionBeenSaved = false;
             _savedInitialPosition = Vector3.zero;

@@ -14,7 +14,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// </summary>
     internal class HarveyMode : DisposableBase, IGardenerMode
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public PlaceableItem[] placeableItems;
             public HarvestProgressBar harvestProgressBar;

@@ -10,7 +10,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Camera
 {
     internal class EscapeFromDarkCameraController : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public UnityEngine.Camera camera;
             public EscapeFromDarkPlayerPm playerPm;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level
 {
-    public class MazeGenerator
+    internal class MazeGenerator
     {
         private int[,] _maze;
         private int _width;

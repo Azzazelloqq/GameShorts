@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Code.Games.TestGames
 {
-public class TestGame4 : MonoBehaviour, IShortGame2D
+internal class TestGame4 : MonoBehaviour, IShortGame2D
 {
 	[SerializeField]
 	private Camera _camera;

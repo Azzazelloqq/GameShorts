@@ -6,7 +6,7 @@ namespace GameShorts.Gardener.Data
     /// Настройки для растения
     /// </summary>
     [CreateAssetMenu(fileName = "PlantSettings", menuName = "Gardener/Plant Settings")]
-    public class PlantSettings : ScriptableObject
+    internal class PlantSettings : ScriptableObject
     {
         [Header("Основные настройки")]
         [SerializeField] private string _plantName;

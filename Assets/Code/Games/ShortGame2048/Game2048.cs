@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Code.Games
 {
-    public class Game2048 : MonoBehaviourDisposable, IShortGame3D
+public class Game2048 : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private Game2048SceneContextView _sceneContextView;

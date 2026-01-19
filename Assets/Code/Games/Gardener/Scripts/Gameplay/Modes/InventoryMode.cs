@@ -14,7 +14,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// </summary>
     internal class InventoryMode : DisposableBase, IGardenerMode
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public InventoryManager inventoryManager;
             public Func<Vector3, PlotPm> findPlotAtPosition;

@@ -6,9 +6,9 @@ using Cysharp.Threading.Tasks;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-    public class BoxTowerGameScenePm : DisposableBase
+    internal class BoxTowerGameScenePm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CancellationToken cancellationToken;
             public BoxTowerSceneContextView sceneContextView;

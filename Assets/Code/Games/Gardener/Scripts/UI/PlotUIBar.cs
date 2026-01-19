@@ -8,7 +8,7 @@ namespace GameShorts.Gardener.UI
 /// UI бар, отображающий прогресс роста и уровень воды над грядкой
 /// Позиционируется в screen-space через WorldToScreenPoint
 /// </summary>
-public class PlotUIBar : MonoBehaviourDisposable
+internal class PlotUIBar : MonoBehaviourDisposable
 {
 	[SerializeField]
 	private Slider _growthProgressBar;

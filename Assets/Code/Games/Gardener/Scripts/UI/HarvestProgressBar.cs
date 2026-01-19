@@ -9,7 +9,7 @@ namespace GameShorts.Gardener.UI
 /// Появляется под пальцем/курсором во время удержания
 /// Использует шейдер RadialFill с параметром _Arc2
 /// </summary>
-public class HarvestProgressBar : MonoBehaviourDisposable
+internal class HarvestProgressBar : MonoBehaviourDisposable
 {
 	[SerializeField]
 	private GameObject _rootPanel;

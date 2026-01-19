@@ -1,6 +1,6 @@
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Core
 {
-    public enum LawnmowerGameState
+    internal enum LawnmowerGameState
     {
         WaitingToStart,
         Playing,

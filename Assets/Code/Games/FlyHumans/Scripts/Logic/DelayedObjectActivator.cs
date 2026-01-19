@@ -5,7 +5,7 @@ namespace GameShorts.FlyHumans
     /// <summary>
     /// Включает целевой игровой объект через заданное количество секунд
     /// </summary>
-    public class DelayedObjectActivator : MonoBehaviour
+    internal class DelayedObjectActivator : MonoBehaviour
     {
         [Header("Настройки активации")]
         [SerializeField] 

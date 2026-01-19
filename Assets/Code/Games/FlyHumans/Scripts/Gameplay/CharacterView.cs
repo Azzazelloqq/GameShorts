@@ -5,7 +5,7 @@ namespace GameShorts.FlyHumans.Gameplay
     /// <summary>
     /// View компонент персонажа - только визуализация и данные
     /// </summary>
-    public class CharacterView : MonoBehaviour
+    internal class CharacterView : MonoBehaviour
     {
         [SerializeField] private Transform _characterTransform;
         [SerializeField] private RagdollRoot _ragdollRoot;

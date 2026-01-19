@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GameShorts.CubeRunner.View
 {
-    public class TileView : MonoBehaviourDisposable
+    internal class TileView : MonoBehaviourDisposable
     {
         [SerializeField]
         private MeshRenderer _meshRenderer;

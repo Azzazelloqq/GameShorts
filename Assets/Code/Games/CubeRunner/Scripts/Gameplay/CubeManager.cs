@@ -36,7 +36,7 @@ internal class CubeManager : DisposableBase
 
 	public bool IsRotating => _isRotating;
 
-	public struct Ctx
+	internal struct Ctx
 	{
 		public CubeRunnerSceneContextView sceneContextView;
 	}

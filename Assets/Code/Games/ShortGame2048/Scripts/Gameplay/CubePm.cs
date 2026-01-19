@@ -1,4 +1,4 @@
-п»їusing System;
+using System;
 using Disposable;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
@@ -8,7 +8,7 @@ namespace Code.Games
 {
     internal class CubePm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public CubeModel model;
             public Vector3 spawnPoint;
@@ -48,14 +48,14 @@ namespace Code.Games
                 return;
             }
             
-            // РЈР±РµР¶РґР°РµРјСЃСЏ С‡С‚Рѕ GameObject Р°РєС‚РёРІРµРЅ
+            // Убеждаемся что GameObject активен
             if (!cubeObject.activeSelf)
             {
                 Debug.LogWarning("CubePm.LoadView: GameObject is not active, activating...");
                 cubeObject.SetActive(true);
             }
             
-            // РЎР±СЂР°СЃС‹РІР°РµРј СЃРєРѕСЂРѕСЃС‚СЊ РєСѓР±Р° СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ РїРѕР»СѓС‡РµРЅРёСЏ РёР· РїСѓР»Р°
+            // Сбрасываем скорость куба сразу после получения из пула
             _view.ResetVelocity();
             
             _view.SetCtx(new Game2048CubeView.Ctx()
@@ -70,7 +70,7 @@ namespace Code.Games
 
         private void OnCubeCollision( Guid otherId)
         {
-            // РџРµСЂРµРґР°РµРј СЃРѕР±С‹С‚РёРµ РєРѕР»Р»РёР·РёРё РґР°Р»СЊС€Рµ РІ РјРµРЅРµРґР¶РµСЂ РјРµСЂР¶Р°
+            // Передаем событие коллизии дальше в менеджер мержа
             _ctx.onCubeCollision?.Invoke(_ctx.model.id, otherId);
         }
 

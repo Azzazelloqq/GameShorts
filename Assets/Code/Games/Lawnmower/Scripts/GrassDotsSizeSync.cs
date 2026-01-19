@@ -1,11 +1,11 @@
-п»їusing UnityEngine;
+using UnityEngine;
 
 namespace Code.Games.Lawnmower.Scripts
 {
-    public class GrassDotsSizeSync : MonoBehaviour
+    internal class GrassDotsSizeSync : MonoBehaviour
     {
         [SerializeField] private string quadPxProp = "_QuadPx";
-        [SerializeField] private Camera cam; // РјРѕР¶РЅРѕ РЅРµ Р·Р°РґР°РІР°С‚СЊ вЂ” РІРѕР·СЊРјС‘Рј main
+        [SerializeField] private Camera cam; // можно не задавать — возьмём main
         private SpriteRenderer sr;
         private MaterialPropertyBlock mpb;
 
@@ -20,7 +20,7 @@ namespace Code.Games.Lawnmower.Scripts
         {
             if (!cam) return;
 
-            // РњРµСЂСЏРµРј СЌРєСЂР°РЅРЅС‹Р№ СЂР°Р·РјРµСЂ СЂРµРЅРґРµСЂР° РІ РїРёРєСЃРµР»СЏС…
+            // Меряем экранный размер рендера в пикселях
             var b = sr.bounds;
             Vector3 c = b.center;
             float wWorld = b.size.x;
@@ -33,7 +33,7 @@ namespace Code.Games.Lawnmower.Scripts
             float wPx = Mathf.Abs(pW.x - pC.x);
             float hPx = Mathf.Abs(pH.y - pC.y);
 
-            // С€РёСЂРёРЅР°/РІС‹СЃРѕС‚Р° РІСЃРµРіРѕ СЃРїСЂР°Р№С‚Р° (СѓРјРЅРѕР¶Р°РµРј РЅР° 2, С‚.Рє. РјРµСЂРёР»Рё РѕС‚ С†РµРЅС‚СЂР° РґРѕ РєСЂР°СЏ)
+            // ширина/высота всего спрайта (умножаем на 2, т.к. мерили от центра до края)
             wPx *= 2f;
             hPx *= 2f;
 

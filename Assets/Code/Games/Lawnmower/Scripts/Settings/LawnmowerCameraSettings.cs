@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LawnmowerCameraSettings", menuName = "Lawnmower/Settings/Create Camera Settings")]
-public class LawnmowerCameraSettings : ScriptableObject
+internal class LawnmowerCameraSettings : ScriptableObject
 {
     [Header("Follow Settings")]
     [SerializeField] private float followSpeed = 5f; // Скорость следования за игроком

@@ -5,7 +5,7 @@ namespace GameShorts.FlyHumans.View
     /// <summary>
     /// Определяет путь для движения машин (View компонент)
     /// </summary>
-    public class TrafficPath : MonoBehaviour
+    internal class TrafficPath : MonoBehaviour
     {
         [Header("Path Settings")]
         [Tooltip("Точки пути. Машины будут двигаться от первой к последней")]

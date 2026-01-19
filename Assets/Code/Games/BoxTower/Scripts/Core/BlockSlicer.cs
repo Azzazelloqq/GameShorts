@@ -5,7 +5,7 @@ namespace Code.Core.ShortGamesCore.Game2
 {
 internal static class BlockSlicer
 {
-    public static PlaceResult TryPlace(BlockData prev, BlockData curr)
+    internal static PlaceResult TryPlace(BlockData prev, BlockData curr)
     {
         var prevMin = curr.axis == Axis.X ? prev.center.x - prev.size.x * 0.5f : prev.center.z - prev.size.z * 0.5f;
         var prevMax = curr.axis == Axis.X ? prev.center.x + prev.size.x * 0.5f : prev.center.z + prev.size.z * 0.5f;

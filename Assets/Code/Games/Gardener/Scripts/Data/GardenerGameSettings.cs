@@ -6,7 +6,7 @@ namespace GameShorts.Gardener.Data
     /// Общие настройки игры Gardener
     /// </summary>
     [CreateAssetMenu(fileName = "GardenerGameSettings", menuName = "Gardener/Game Settings")]
-    public class GardenerGameSettings : ScriptableObject
+    internal class GardenerGameSettings : ScriptableObject
     {
         [Header("Economy")]
         [SerializeField] private int _startingCapital = 100;

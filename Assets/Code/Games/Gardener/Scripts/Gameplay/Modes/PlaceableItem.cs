@@ -8,7 +8,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// Описывает элемент, который можно разместить на сцене через drag-and-drop
     /// </summary>
     [Serializable]
-    public class PlaceableItem
+    internal class PlaceableItem
     {
         [SerializeField] private string _itemName;
         [SerializeField] private Sprite _icon;

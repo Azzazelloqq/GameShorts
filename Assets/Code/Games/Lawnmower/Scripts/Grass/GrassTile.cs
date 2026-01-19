@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class GrassTile : MonoBehaviour
+internal class GrassTile : MonoBehaviour
 {
     [Header("Grass Settings")]
     [SerializeField] private SpriteRenderer spriteRenderer;

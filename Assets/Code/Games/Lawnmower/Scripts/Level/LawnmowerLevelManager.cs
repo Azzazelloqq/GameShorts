@@ -7,7 +7,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
 {
     internal class LawnmowerLevelManager : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public LawnmowerSceneContextView sceneContextView;
             public CancellationToken cancellationToken;

@@ -3,7 +3,7 @@ namespace GameShorts.Gardener.Data
     /// <summary>
     /// Состояния растения
     /// </summary>
-    public enum PlantState
+    internal enum PlantState
     {
         Seed,       // Семя
         Sprout,     // Саженец

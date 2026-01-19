@@ -13,7 +13,7 @@ namespace GameShorts.Gardener.UI
     /// </summary>
     internal class PlaceableItemPm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public PlaceableItem item;
             public PlaceableItemView view;

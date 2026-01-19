@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace GameShorts.CubeRunner.Core
 {
-    public static class Extensions
+    internal static class Extensions
     {
-        public static Vector3 ToVector3(this Vector2Int vector)
+        internal static Vector3 ToVector3(this Vector2Int vector)
         {
             return new Vector3(vector.x, 0, vector.y);
         } 

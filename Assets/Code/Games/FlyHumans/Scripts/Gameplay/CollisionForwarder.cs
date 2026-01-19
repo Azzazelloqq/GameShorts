@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace GameShorts.FlyHumans.Gameplay
 {
-    public class CollisionForwarder: MonoBehaviour
+    internal class CollisionForwarder: MonoBehaviour
     {
         private RagdollRoot _root;
 

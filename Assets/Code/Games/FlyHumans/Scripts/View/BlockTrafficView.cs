@@ -8,7 +8,7 @@ namespace GameShorts.FlyHumans.View
     /// Добавляется на префаб WorldBlock
     /// Поддерживает машины и самолеты
     /// </summary>
-    public class BlockTrafficView : MonoBehaviour
+    internal class BlockTrafficView : MonoBehaviour
     {
         [Header("Ground Vehicles (Машины)")]
         [Tooltip("Список префабов машин для этого блока")]

@@ -16,7 +16,7 @@ namespace GameShorts.Gardener.Logic
 {
 internal class GardenerUIPm : DisposableBase
 {
-	public class Ctx
+	internal class Ctx
 	{
 		public GardenerMainUIView MainUIView { get; set; }
 		public GardenerShopUIView ShopUIView { get; set; }

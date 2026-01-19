@@ -9,7 +9,7 @@ namespace Code.Games
     internal class CubeColorManager : ScriptableObject
     {
         [System.Serializable]
-        public struct CubeColorScheme
+        internal struct CubeColorScheme
         {
             public int number;
             public Color baseColor;

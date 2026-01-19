@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-public class CameraFollow : MonoBehaviourDisposable
+internal class CameraFollow : MonoBehaviourDisposable
 {
     [Header("Follow Settings")]
     [SerializeField]

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Lightseeker
 {
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : MonoBehaviour
+    internal class PlayerController : MonoBehaviour
     {
         [SerializeField] private Transform _viewPlayer;
         [Header("Movement Settings")]

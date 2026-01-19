@@ -10,7 +10,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 {
     internal class LawnmowerCameraPm : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public LawnmowerSceneContextView sceneContextView;
             public LawnmowerPlayerPm playerPm;

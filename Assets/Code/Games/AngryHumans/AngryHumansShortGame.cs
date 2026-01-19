@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Code.Core.ShortGamesCore.Source.GameCore;
 using Code.Utils;
@@ -161,17 +161,30 @@ public class AngryHumansShortGame : MonoBehaviour, IShortGame3D
 
 	public void EnableInput()
 	{
-		if (_inputHandler != null)
-		{
-			_inputHandler.enabled = true;
-		}
+		SetInputHandlersEnabled(true);
 	}
 
 	public void DisableInput()
 	{
+		SetInputHandlersEnabled(false);
+	}
+
+	private void SetInputHandlersEnabled(bool isEnabled)
+	{
 		if (_inputHandler != null)
 		{
-			_inputHandler.enabled = false;
+			_inputHandler.enabled = isEnabled;
+		}
+
+		var handlers = GetComponentsInChildren<InputHandler>(true);
+		foreach (var handler in handlers)
+		{
+			if (handler == null || handler == _inputHandler)
+			{
+				continue;
+			}
+
+			handler.enabled = isEnabled;
 		}
 	}
 

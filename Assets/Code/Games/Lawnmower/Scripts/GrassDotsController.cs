@@ -1,15 +1,15 @@
-п»їusing System.Collections;
+using System.Collections;
 using UnityEngine;
 
 namespace Code.Games.Lawnmower.Scripts
 {
-    public class GrassDotsController : MonoBehaviour
+    internal class GrassDotsController : MonoBehaviour
     {
         [SerializeField] private string shrinkProp = "_Shrink";
         [SerializeField] private string quadPxProp = "_QuadPx";
-        [SerializeField] private Vector2 quadSizePx = new Vector2(10, 10); // РїРѕРґРіРѕРЅСЏРµС€СЊ РїРѕРґ СЃРІРѕР№ СЂРµРЅРґРµСЂ
+        [SerializeField] private Vector2 quadSizePx = new Vector2(10, 10); // подгоняешь под свой рендер
         [SerializeField] private float collapseDuration = 1.0f;
-        [SerializeField] private float seed = 1f; // РјРѕР¶РЅРѕ РІР°СЂСЊРёСЂРѕРІР°С‚СЊ, РµСЃР»Рё С…РѕС‡РµС€СЊ СЂР°Р·РЅС‹Рµ СѓР·РѕСЂС‹
+        [SerializeField] private float seed = 1f; // можно варьировать, если хочешь разные узоры
 
         private SpriteRenderer sr;
         private MaterialPropertyBlock mpb;
@@ -28,7 +28,7 @@ namespace Code.Games.Lawnmower.Scripts
 
         void OnMouseDown()
         {
-            // РґР»СЏ 2D РїРѕРґС…РѕРґРёС‚ РїСЂРё РЅР°Р»РёС‡РёРё Collider2D
+            // для 2D подходит при наличии Collider2D
             StopAllCoroutines();
             StartCoroutine(AnimateShrink(collapsed ? 1f : 0f, collapsed ? 0f : 1f, collapseDuration));
             collapsed = !collapsed;

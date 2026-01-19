@@ -3,7 +3,7 @@ using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level;
 
 namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Testing
 {
-    public class MazeTester : MonoBehaviour
+    internal class MazeTester : MonoBehaviour
     {
         [Header("Maze Settings")]
         [SerializeField] private int mazeWidth = 9;

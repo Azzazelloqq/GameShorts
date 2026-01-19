@@ -12,7 +12,7 @@ namespace Code.Games.AngryHumans
 internal class HumanFactory : MonoBehaviour
 {
 	[Serializable]
-	public struct HumanTypeData
+	internal struct HumanTypeData
 	{
 		[SerializeField]
 		private string _name;

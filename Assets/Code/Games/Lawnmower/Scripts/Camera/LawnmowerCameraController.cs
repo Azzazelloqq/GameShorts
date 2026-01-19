@@ -10,7 +10,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 {
     internal class LawnmowerCameraController : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public UnityEngine.Camera camera;
             public LawnmowerPlayerPm playerPm;

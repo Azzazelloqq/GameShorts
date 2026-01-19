@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace GameShorts.Gardener
 {
-    public class GardenerGame : MonoBehaviourDisposable, IShortGame3D
+public class GardenerGame : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private GardenerSceneContextView _sceneContextView;

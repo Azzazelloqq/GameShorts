@@ -1,7 +1,7 @@
 using Code.Games.Lawnmower.Scripts.Grass;
 using UnityEngine;
 
-public class GrassGrid : MonoBehaviour, IGrassGrid
+internal class GrassGrid : MonoBehaviour, IGrassGrid
 {
     [Header("Grid Settings")]
     [SerializeField] private GameObject grassTilePrefab;

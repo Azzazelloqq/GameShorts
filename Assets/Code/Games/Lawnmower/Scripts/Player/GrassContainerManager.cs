@@ -11,7 +11,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
     /// </summary>
     internal class GrassContainerManager : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public LawnmowerPlayerModel playerModel;
             public LawnmowerPlayerSettings settings;

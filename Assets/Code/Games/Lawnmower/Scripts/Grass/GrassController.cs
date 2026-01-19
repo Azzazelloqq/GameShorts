@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Дополнительный контроллер для управления травой с расширенным функционалом
 /// </summary>
-public class GrassController : MonoBehaviour
+internal class GrassController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private MonoBehaviour grassGridComponent;

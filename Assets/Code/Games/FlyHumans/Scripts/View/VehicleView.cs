@@ -5,7 +5,7 @@ namespace GameShorts.FlyHumans.View
     /// <summary>
     /// View компонент для одной машины (только визуализация)
     /// </summary>
-    public class VehicleView : MonoBehaviour
+    internal class VehicleView : MonoBehaviour
     {
         [Header("Movement Settings")]
         [Tooltip("Минимальное расстояние до точки для перехода к следующей")]

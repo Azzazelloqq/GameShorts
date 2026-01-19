@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GameShorts.FlyHumans.Gameplay
 {
-    public class BaseCollisionHandler : MonoBehaviour
+    internal class BaseCollisionHandler : MonoBehaviour
     {
         public Action OnCollision;
 

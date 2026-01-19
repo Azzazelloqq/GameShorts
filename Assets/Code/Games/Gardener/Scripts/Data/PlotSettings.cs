@@ -6,7 +6,7 @@ namespace GameShorts.Gardener.Data
     /// Настройки для грядок
     /// </summary>
     [CreateAssetMenu(fileName = "PlotSettings", menuName = "Gardener/Plot Settings")]
-    public class PlotSettings : ScriptableObject
+    internal class PlotSettings : ScriptableObject
     {
         [Header("Префаб")]
         [SerializeField] private GameObject _plotPrefab;

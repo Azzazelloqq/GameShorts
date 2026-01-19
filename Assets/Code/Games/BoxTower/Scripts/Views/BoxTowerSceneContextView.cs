@@ -6,7 +6,7 @@ using System;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-public class BoxTowerSceneContextView : MonoBehaviourDisposable
+internal class BoxTowerSceneContextView : MonoBehaviourDisposable
 {
 	[Header("Game Objects")]
 	[SerializeField]

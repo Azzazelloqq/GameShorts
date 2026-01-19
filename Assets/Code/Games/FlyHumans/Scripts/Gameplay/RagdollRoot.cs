@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace GameShorts.FlyHumans.Gameplay
 {
-    public class RagdollRoot: MonoBehaviour
+    internal class RagdollRoot: MonoBehaviour
     {
         public Action CollisionEnter;
         public void HandleCollisionEnter(Collision c, Component fromPart)

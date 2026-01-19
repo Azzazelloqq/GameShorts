@@ -8,7 +8,7 @@ namespace GameShorts.CubeRunner.View
 {
     internal class CubeView : MonoBehaviourDisposable
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public Vector3 scale;
         }

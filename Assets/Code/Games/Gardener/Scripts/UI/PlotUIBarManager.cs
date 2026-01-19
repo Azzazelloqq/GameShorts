@@ -15,7 +15,7 @@ namespace GameShorts.Gardener.UI
     /// </summary>
     internal class PlotUIBarManager : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public Canvas uiCanvas;
             public GameObject barPrefab;

@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
@@ -12,7 +12,7 @@ namespace Code.Games
             {  2, 108 }, {  4, 32 }, {  8,  4 }, { 16,  2 }, { 32,  1 }, { 64,  1 },
         };
 
-        public struct Table
+        internal struct Table
         {
             public int[] values;
             public int[] cum;
@@ -20,7 +20,7 @@ namespace Code.Games
             public bool IsValid => values != null && cum != null && total > 0;
         }
 
-        public static Table BuildTable(IEnumerable<int> values)
+        internal static Table BuildTable(IEnumerable<int> values)
         {
             var vals = new List<int>();
             var cum  = new List<int>();
@@ -35,13 +35,13 @@ namespace Code.Games
                     cum.Add(total);
                 }
             }
-            if (total <= 0) throw new System.InvalidOperationException("ÐÐµÑ‚ Ð´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ñ‹Ñ… Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹.");
+            if (total <= 0) throw new System.InvalidOperationException("Íåò äîïóñòèìûõ çíà÷åíèé.");
             return new Table { values = vals.ToArray(), cum = cum.ToArray(), total = total };
         }
 
-        public static int Pick(ref Table table)
+        internal static int Pick(ref Table table)
         {
-            if (!table.IsValid) throw new System.ArgumentException("Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° Ð½ÐµÐ²Ð°Ð»Ð¸Ð´Ð½Ð°.", nameof(table));
+            if (!table.IsValid) throw new System.ArgumentException("Òàáëèöà íåâàëèäíà.", nameof(table));
 
             int r = Random.Range(0, table.total); // [0, total)
             int idx = System.Array.BinarySearch(table.cum, r);

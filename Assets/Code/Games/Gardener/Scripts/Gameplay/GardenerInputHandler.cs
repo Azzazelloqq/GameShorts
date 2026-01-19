@@ -15,7 +15,7 @@ namespace GameShorts.Gardener.Gameplay
     /// </summary>
     internal class GardenerInputHandler : DisposableBase
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public Camera mainCamera;
             public GardenerModeManager modeManager;

@@ -6,7 +6,7 @@ namespace GameShorts.FlyHumans.View
     /// <summary>
     /// View компонент для блоков мира - только визуализация и данные
     /// </summary>
-    public class WorldBlocksView : MonoBehaviour
+    internal class WorldBlocksView : MonoBehaviour
     {
         [Header("Block Settings")]
         [SerializeField] private WorldBlock _startBlock;

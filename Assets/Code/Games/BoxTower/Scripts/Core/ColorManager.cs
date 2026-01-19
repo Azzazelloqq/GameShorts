@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Code.Core.ShortGamesCore.Game2
 {
-public class ColorManager : MonoBehaviour
+internal class ColorManager : MonoBehaviour
 {
     [Header("Block Colors")]
     [SerializeField]

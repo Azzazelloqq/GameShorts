@@ -6,7 +6,7 @@ namespace GameShorts.FlyHumans.View
     /// <summary>
     /// View компонент для камеры - только визуализация, без логики
     /// </summary>
-    public class CameraView : MonoBehaviour
+    internal class CameraView : MonoBehaviour
     {
         [Header("Camera")]
         [SerializeField] private Transform _cameraTransform;

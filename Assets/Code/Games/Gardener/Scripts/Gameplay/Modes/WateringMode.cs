@@ -9,7 +9,7 @@ namespace GameShorts.Gardener.Gameplay.Modes
     /// </summary>
     internal class WateringMode : IGardenerMode
     {
-        public struct Ctx
+        internal struct Ctx
         {
             public Action<PlotPm, Vector3> onPlotInteraction;
         }

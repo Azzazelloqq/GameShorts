@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LawnmowerPlayerSettings", menuName = "Lawnmower/Settings/Create Player Settings")]
-public class LawnmowerPlayerSettings : ScriptableObject
+internal class LawnmowerPlayerSettings : ScriptableObject
 {
     [Header("Movement")]
     [SerializeField] private float maxSpeed = 8f;

@@ -35,7 +35,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View
         public UnityEngine.Camera MainCamera => mainCamera;
         public EscapeFromDarkLevelView LevelView => _levelView;
         
-        public struct Ctx
+        internal struct Ctx
         {
             // Контекст для инициализации View, если потребуется
         }

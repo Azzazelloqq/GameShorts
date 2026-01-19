@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace GameShorts.FlyHumans
 {
-    public class FlyHumansGame : MonoBehaviourDisposable, IShortGame3D
+public class FlyHumansGame : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private FlyHumansSceneContextView _sceneContextView;

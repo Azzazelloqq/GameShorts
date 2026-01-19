@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Lightseeker
 {
-    public class LightseekerGame : MonoBehaviourDisposable, IShortGame3D
+public class LightseekerGame : MonoBehaviourDisposable, IShortGame3D
     {
         [SerializeField]
         private LightseekerSceneContextView _sceneContextView;

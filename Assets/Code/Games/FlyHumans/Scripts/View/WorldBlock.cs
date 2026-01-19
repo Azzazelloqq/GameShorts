@@ -5,7 +5,7 @@ namespace GameShorts.FlyHumans.View
     /// <summary>
     /// Представляет блок мира с точками сцепки (View компонент)
     /// </summary>
-    public class WorldBlock : MonoBehaviour
+    internal class WorldBlock : MonoBehaviour
     {
         [Header("Attachment Points")]
         [SerializeField] private Transform _startPoint;  // Точка сцепки в начале блока
