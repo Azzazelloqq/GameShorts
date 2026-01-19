@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 195, y: 202}
+  m_AnchoredPosition: {x: 195, y: 371}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &9205531070952551618
@@ -690,6 +690,10 @@ MonoBehaviour:
   _imageSpacing: 1920
   _gameTitleText: {fileID: 0}
   _maxSwipeVisualOffsetRatio: 0.33
+  _useSwipeSmoothing: 1
+  _swipeSmoothingTime: 0.05
+  _freezeProgressOnCommit: 1
+  _commitFreezeTimeoutSeconds: 0.75
 --- !u!1 &8973957117205393542
 GameObject:
   m_ObjectHideFlags: 0
