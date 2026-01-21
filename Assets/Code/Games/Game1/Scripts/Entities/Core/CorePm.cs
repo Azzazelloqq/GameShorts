@@ -27,7 +27,7 @@ internal class CorePm : DisposableBase
 	{
 		_ctx = ctx;
 		_poolManager = poolManager;
-		_diContainer = DiContainerFactory.CreateContainer();
+		_diContainer = DiContainerFactory.CreateLocalContainer();
 		AddDisposable(_diContainer);
 		_inputManager = new InputManager.InputManager();
 		_diContainer.RegisterAsSingleton<IInputManager>(_inputManager);

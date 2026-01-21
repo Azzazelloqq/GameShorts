@@ -308,7 +308,7 @@ public class QueueShortGamesLoader : IGamesLoader
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError($"Error preloading game {gameType.Name}: {ex.Message}");
+			_logger.LogError($"Error preloading game {gameType.Name}: {ex.Message} \n {ex.StackTrace}");
 			OnGamePreloadingFailed?.Invoke(gameType, ex);
 			if (createdGame != null)
 			{

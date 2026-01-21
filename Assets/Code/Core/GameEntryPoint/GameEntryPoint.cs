@@ -83,7 +83,7 @@ public sealed class GameEntryPoint : MonoBehaviour
 				_uiParent.SetParent(transform);
 			}
 
-			_globalGameDiContainer = DiContainerFactory.CreateContainer();
+			_globalGameDiContainer = DiContainerFactory.CreateGlobalContainer();
 
 			await InitializeAsync(exitGameCancellationToken);
 		}

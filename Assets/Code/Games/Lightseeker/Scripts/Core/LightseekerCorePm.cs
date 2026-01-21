@@ -32,7 +32,7 @@ namespace Lightseeker
         {
             _ctx = ctx;
             _poolManager = poolManager;
-            _diContainer = DiContainerFactory.CreateContainer();
+            _diContainer = DiContainerFactory.CreateLocalContainer();
             AddDisposable(_diContainer);
             
             // Создаем и регистрируем InputManager

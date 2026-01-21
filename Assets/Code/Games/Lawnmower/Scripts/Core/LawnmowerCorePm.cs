@@ -26,7 +26,7 @@ internal class LawnmowerCorePm : DisposableBase
 	public LawnmowerCorePm(Ctx ctx)
 	{
 		_ctx = ctx;
-		_diContainer = DiContainerFactory.CreateContainer();
+		_diContainer = DiContainerFactory.CreateLocalContainer();
 		AddDisposable(_diContainer);
 		_inputManager = new InputManager.InputManager();
 		_diContainer.RegisterAsSingleton<IInputManager>(_inputManager);

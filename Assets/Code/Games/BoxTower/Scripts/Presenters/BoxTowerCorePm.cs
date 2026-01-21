@@ -80,7 +80,7 @@ namespace Code.Core.ShortGamesCore.Game2
         {
             if (_diContainer == null)
             {
-                _diContainer = DiContainerFactory.CreateContainer();
+                _diContainer = DiContainerFactory.CreateLocalContainer();
                 AddDisposable(_diContainer);
             }
 
@@ -108,7 +108,7 @@ namespace Code.Core.ShortGamesCore.Game2
 
                 if (_diContainer == null)
                 {
-                    _diContainer = DiContainerFactory.CreateContainer();
+                    _diContainer = DiContainerFactory.CreateLocalContainer();
                     AddDisposable(_diContainer);
                 }
 

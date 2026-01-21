@@ -19,7 +19,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "40e7fd7a308ef9b00b247ae1767e194a54f63d5b"
+      "hash": "b5d0f92210cd530534b434b8094cde3f68252da2"
     },
     "com.azzazello.localsavesystem": {
       "version": "https://github.com/Azzazelloqq/LocalSave.git",

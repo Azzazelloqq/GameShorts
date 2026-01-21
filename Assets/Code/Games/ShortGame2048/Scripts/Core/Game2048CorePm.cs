@@ -29,7 +29,7 @@ namespace Code.Games
         {
             _ctx = ctx;
             _poolManager = poolManager;
-            _diContainer = DiContainerFactory.CreateContainer();
+            _diContainer = DiContainerFactory.CreateLocalContainer();
             
             AddDisposable(_diContainer);
             
