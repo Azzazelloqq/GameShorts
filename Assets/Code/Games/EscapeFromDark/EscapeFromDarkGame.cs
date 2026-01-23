@@ -5,6 +5,7 @@ using Disposable;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
 using Code.Core.ShortGamesCore.Source.GameCore;
+using Code.Core.Tools;
 using Code.Utils;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -29,8 +30,9 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 	private CancellationTokenSource _cancellationTokenSource;
 	private bool _isDisposed;
 	private RenderTexture _renderTexture;
+    private ReactiveTrigger _startGame;
 
-	public bool IsPreloaded { get; private set; }
+    public bool IsPreloaded { get; private set; }
 
 	public async UniTask PreloadGameAsync(CancellationToken cancellationToken = default)
 	{
@@ -97,6 +99,7 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 
 	public void EnableInput()
 	{
+        _startGame.Notify();
 		_graphicRaycaster.enabled = true;
 	}
 
@@ -148,11 +151,12 @@ public class EscapeFromDarkGame : MonoBehaviourDisposable, IShortGame2D
 	private void CreateRoot()
 	{
 		_cancellationTokenSource = new CancellationTokenSource();
+        _startGame = new ReactiveTrigger();
 		var rootCtx = new EscapeFromDarkCorePm.Ctx
 		{
 			sceneContextView = _sceneContextView,
 			cancellationToken = _cancellationTokenSource.Token,
-			restartGame = RestartGame
+            startGame = _startGame
 		};
 		_core = new EscapeFromDarkCorePm(rootCtx);
 	}

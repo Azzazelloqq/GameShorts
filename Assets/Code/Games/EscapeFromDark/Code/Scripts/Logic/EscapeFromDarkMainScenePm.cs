@@ -7,6 +7,7 @@ using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.UI;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Player;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Level;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Camera;
+using Code.Core.Tools;
 using LightDI.Runtime;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
         {
             public CancellationToken cancellationToken;
             public EscapeFromDarkSceneContextView sceneContextView;
-            public Action restartGame;
+            public IReadOnlyReactiveTrigger startGame;
         }
 
         private readonly Ctx _ctx;
@@ -36,20 +37,8 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
         {
             _ctx = ctx;
             _inputManager = inputManager;
-            
-            if (_ctx.sceneContextView.Joystick == null)
-            {
-                Debug.LogError("EscapeFromDarkMainScenePm: Joystick is null in SceneContextView!");
-            }
-            else
-            {
-                _inputManager.Initialize(_ctx.sceneContextView.Joystick);
-                Debug.Log("EscapeFromDarkMainScenePm: InputManager initialized with joystick");
-            }
-            
             _currentState = EscapeFromDarkGameState.WaitingToStart;
-            
-            ShowStartScreen();
+            AddDisposable(_ctx.startGame.SubscribeOnce(StartGame));
         }
 
         private void ShowStartScreen()
@@ -77,6 +66,16 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Logic
         {
             if (_currentState != EscapeFromDarkGameState.WaitingToStart)
                 return;
+            
+            if (_ctx.sceneContextView.Joystick == null)
+            {
+                Debug.LogError("EscapeFromDarkMainScenePm: Joystick is null in SceneContextView!");
+            }
+            else
+            {
+                _inputManager.Initialize(_ctx.sceneContextView.Joystick);
+                Debug.Log("EscapeFromDarkMainScenePm: InputManager initialized with joystick");
+            }
 
             _inputManager.SetJoystickOptions(AxisOptions.Both);
             _currentState = EscapeFromDarkGameState.Playing;

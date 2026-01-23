@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: LawnmowerCameraSettings
   m_EditorClassIdentifier: Lawnmower::LawnmowerCameraSettings
   followSpeed: 5
-  smoothFollow: 1
+  smoothFollow: 0
   smoothDamping: 0.3
   offset: {x: 0, y: 0, z: -10}
   dynamicOffset: 0
   dynamicOffsetStrength: 2
   useLevelBounds: 1
   boundsPadding: 2
-  defaultOrthographicSize: 30
-  adaptiveZoom: 0
-  minZoom: 5
-  maxZoom: 15
+  defaultOrthographicSize: 32
+  adaptiveZoom: 1
+  minZoom: 30
+  maxZoom: 45
   enableLookAhead: 1
   lookAheadDistance: 3
   lookAheadSpeed: 2

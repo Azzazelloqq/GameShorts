@@ -16,7 +16,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
         }
 
         [Header("Zone Settings")]
-        [SerializeField] private string zoneName = "Emptying Zone";
         [SerializeField] private Collider2D zoneCollider;
         
         [Header("Visual")]

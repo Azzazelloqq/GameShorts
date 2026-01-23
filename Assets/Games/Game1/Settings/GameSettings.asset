@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b93612e9a5931545b4a41dcaa0728ce, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  SpawnEnemyCooldown: 2
-  MaxCountEnemies: 14
+  SpawnEnemyCooldown: 1
+  MaxCountEnemies: 20

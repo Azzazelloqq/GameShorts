@@ -39,16 +39,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             _ctx = ctx;
             _inputManager = inputManager;
             
-            if (_ctx.sceneContextView.Joystick == null)
-            {
-                Debug.LogError("LawnmowerMainScenePm: Joystick is null in SceneContextView!");
-            }
-            else
-            {
-                _inputManager.Initialize(_ctx.sceneContextView.Joystick);
-                Debug.Log("LawnmowerMainScenePm: InputManager initialized with joystick");
-            }
-            
             _currentState = LawnmowerGameState.WaitingToStart;
             
             // Инициализируем менеджер уровней
@@ -60,7 +50,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             _levelManager = new LawnmowerLevelManager(levelManagerCtx);
             AddDisposable(_levelManager);
             
-            ShowStartScreen();
+            StartGame();
         }
 
         private void ShowStartScreen()
@@ -103,6 +93,16 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
         {
             if (_currentState != LawnmowerGameState.WaitingToStart)
                 return;
+            
+            if (_ctx.sceneContextView.Joystick == null)
+            {
+                Debug.LogError("LawnmowerMainScenePm: Joystick is null in SceneContextView!");
+            }
+            else
+            {
+                _inputManager.Initialize(_ctx.sceneContextView.Joystick);
+                Debug.Log("LawnmowerMainScenePm: InputManager initialized with joystick");
+            }
 
             _inputManager.SetJoystickOptions(AxisOptions.Both);
             _currentState = LawnmowerGameState.Playing;

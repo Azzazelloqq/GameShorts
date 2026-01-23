@@ -25,6 +25,9 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         private Vector3 _lookAheadOffset; // Текущий офсет "взгляда вперед"
         private Vector3 _targetPosition;
         private bool _adaptiveZoomApplied;
+        private Vector3 _lastPlayerWorldPosition;
+        private bool _hasLastPlayerWorldPosition;
+        private bool _initialClampApplied;
 
         public LawnmowerCameraController(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
@@ -71,17 +74,11 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             var playerModel = _ctx.playerPm.GetPlayerModel();
             if (playerModel != null)
             {
-                AddDisposable(playerModel.Position.Subscribe(OnPlayerPositionChanged));
                 AddDisposable(playerModel.MovementDirection.Subscribe(OnPlayerDirectionChanged));
             }
 
             // Подписываемся на обновления камеры
             _tickHandler.FrameUpdate += UpdateCamera;
-        }
-
-        private void OnPlayerPositionChanged(Vector2 newPlayerPosition)
-        {
-            UpdateTargetPosition(newPlayerPosition);
         }
 
         private void OnPlayerDirectionChanged(Vector2 movementDirection)
@@ -92,7 +89,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             }
         }
 
-        private void UpdateTargetPosition(Vector2 playerPosition)
+        private void UpdateTargetPosition(Vector2 playerPosition, bool forceClampToLevel = false)
         {
             Vector3 baseTargetPosition = new Vector3(playerPosition.x, playerPosition.y, 0f) + _ctx.settings.Offset;
             
@@ -114,10 +111,14 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
                 }
             }
             
-            // Ограничиваем границами уровня
+            // Ограничиваем границами уровня.
             if (_ctx.settings.UseLevelBounds)
             {
-                baseTargetPosition = ClampToBounds(baseTargetPosition);
+                var currentLevel = _ctx.levelManager?.GetCurrentLevel();
+                if (currentLevel != null && (forceClampToLevel || currentLevel.IsPositionInBounds(playerPosition)))
+                {
+                    baseTargetPosition = ClampToBounds(baseTargetPosition);
+                }
             }
             
             _targetPosition = baseTargetPosition;
@@ -142,6 +143,10 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             if (currentLevel?.LevelBounds == null) return position;
             
             var bounds = currentLevel.LevelBounds.bounds;
+            if (bounds.size.x < 0.1f || bounds.size.y < 0.1f)
+            {
+                return position;
+            }
             var cameraBounds = GetCameraBounds();
             
             // Учитываем размер камеры и отступы
@@ -151,7 +156,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             float maxY = bounds.max.y - cameraBounds.y - _ctx.settings.BoundsPadding;
             
             float clampedX = Mathf.Clamp(position.x, minX, maxX);
-            float clampedY = Mathf.Clamp(position.y, minY, maxY);
+            float clampedY = Mathf.Clamp(position.y, position.y, maxY);
             
             return new Vector3(clampedX, clampedY, position.z);
         }
@@ -177,8 +182,8 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             float levelWidth = bounds.size.x;
             float levelHeight = bounds.size.y;
             
-            float requiredHeight = levelHeight * 0.6f; // 60% от высоты уровня
-            float requiredWidth = levelWidth * 0.6f / _ctx.camera.aspect;
+            float requiredHeight = levelHeight * 0.7f; 
+            float requiredWidth = levelWidth * 0.7f / _ctx.camera.aspect;
             
             float optimalSize = Mathf.Max(requiredHeight, requiredWidth);
             optimalSize = Mathf.Clamp(optimalSize, _ctx.settings.MinZoom, _ctx.settings.MaxZoom);
@@ -196,8 +201,15 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         {
             if (_ctx.camera == null || _ctx.settings == null || _ctx.playerPm == null) return;
 
-            Vector3 playerPos3 = _ctx.playerPm.GetPlayerPosition();
-            UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y));
+            if (TryGetCurrentPlayerWorldPosition(out Vector3 playerPos3))
+            {
+                UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y), true);
+                _initialClampApplied = CanClampToLevelNow();
+            }
+            else
+            {
+                return;
+            }
 
             _ctx.camera.transform.position = _targetPosition;
             _currentVelocity = Vector3.zero;
@@ -211,8 +223,10 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             // Если игрок стоит, Position может не эмититься — поэтому пересчитываем цель каждый кадр.
             if (_ctx.playerPm != null)
             {
-                Vector3 playerPos3 = _ctx.playerPm.GetPlayerPosition();
-                UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y));
+                if (TryGetCurrentPlayerWorldPosition(out Vector3 playerPos3))
+                {
+                    UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y));
+                }
             }
 
             // Если adaptive zoom включен, но в момент инициализации bounds еще не было — применяем позже.
@@ -220,6 +234,15 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             {
                 AdaptZoomToLevel();
                 _adaptiveZoomApplied = true;
+            }
+
+            if (!_initialClampApplied && CanClampToLevelNow())
+            {
+                Vector3 playerPos3 = _lastPlayerWorldPosition;
+                UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y), true);
+                _ctx.camera.transform.position = _targetPosition;
+                _currentVelocity = Vector3.zero;
+                _initialClampApplied = true;
             }
 
             Vector3 currentPosition = _ctx.camera.transform.position;
@@ -275,6 +298,38 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         {
             _tickHandler.FrameUpdate -= UpdateCamera;
             base.OnDispose();
+        }
+
+        private bool TryGetCurrentPlayerWorldPosition(out Vector3 playerPos3)
+        {
+            var playerView = _ctx.playerPm?.GetPlayerView();
+            if (playerView != null)
+            {
+                playerPos3 = playerView.transform.position;
+                _lastPlayerWorldPosition = playerPos3;
+                _hasLastPlayerWorldPosition = true;
+                return true;
+            }
+
+            if (_hasLastPlayerWorldPosition)
+            {
+                playerPos3 = _lastPlayerWorldPosition;
+                return true;
+            }
+
+            playerPos3 = Vector3.zero;
+            return false;
+        }
+
+        private bool CanClampToLevelNow()
+        {
+            if (!_ctx.settings.UseLevelBounds) return false;
+
+            var currentLevel = _ctx.levelManager?.GetCurrentLevel();
+            if (currentLevel?.LevelBounds == null) return false;
+
+            var bounds = currentLevel.LevelBounds.bounds;
+            return bounds.size.x >= 0.1f && bounds.size.y >= 0.1f;
         }
 
 #if UNITY_EDITOR

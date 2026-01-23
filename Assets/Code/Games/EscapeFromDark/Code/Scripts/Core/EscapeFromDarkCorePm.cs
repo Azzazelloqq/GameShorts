@@ -3,6 +3,7 @@ using System.Threading;
 using Disposable;
 using Code.Core.InputManager;
 using Code.Core.ShortGamesCore.EscapeFromDark.Scripts.View;
+using Code.Core.Tools;
 using Code.Core.Tools.Pool;
 using LightDI.Runtime;
 using R3;
@@ -15,7 +16,7 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
         {
             public CancellationToken cancellationToken;
             public EscapeFromDarkSceneContextView sceneContextView;
-            public Action restartGame;
+            public IReadOnlyReactiveTrigger startGame;
         }
 
         private readonly Ctx _ctx;
@@ -30,13 +31,12 @@ namespace Code.Core.ShortGamesCore.EscapeFromDark.Scripts.Core
             AddDisposable(_diContainer);
             _inputManager = new InputManager.InputManager();
             _diContainer.RegisterAsSingleton<IInputManager>(_inputManager);
-            _inputManager?.SetJoystickOptions(AxisOptions.None);
             
             EscapeFromDarkScenePm.Ctx sceneCtx = new EscapeFromDarkScenePm.Ctx
             {
                 sceneContextView = _ctx.sceneContextView,
                 cancellationToken = _ctx.cancellationToken,
-                restartGame = _ctx.restartGame
+                startGame = _ctx.startGame
             };
             _scene = new EscapeFromDarkScenePm(sceneCtx);
             AddDisposable(_scene);

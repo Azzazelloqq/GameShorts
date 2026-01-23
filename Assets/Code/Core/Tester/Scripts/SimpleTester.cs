@@ -74,7 +74,7 @@ namespace Code.Core.Tester
                 _gamesParent = transform;
             }
 
-            _globalGameDiContainer = DiContainerFactory.CreateLocalContainer();
+            _globalGameDiContainer = DiContainerFactory.CreateGlobalContainer();
             Initialize();
         }
 

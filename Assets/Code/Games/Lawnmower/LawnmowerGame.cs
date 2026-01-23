@@ -132,7 +132,7 @@ public class LawnmowerGame : MonoBehaviourDisposable, IShortGame2D
 		_graphicRaycaster.enabled = false;
 	}
 
-	public void Dispose()
+	public override void Dispose()
 	{
 		if (_isDisposed)
 		{

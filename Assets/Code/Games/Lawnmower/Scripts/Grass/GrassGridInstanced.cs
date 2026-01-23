@@ -24,7 +24,6 @@ namespace Code.Games.Lawnmower.Scripts.Grass
         [SerializeField] private float widthVariation = 2f;
 
         [Header("Input")] [SerializeField] private Camera mainCamera;
-        [SerializeField] private bool enableInput = true;
 
         [Header("Performance")] [SerializeField]
         private int maxInstancesPerBatch = 1023; // Unity limit

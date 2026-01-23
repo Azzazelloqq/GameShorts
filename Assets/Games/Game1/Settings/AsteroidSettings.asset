@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e18dcf80a3f8f43b094717a93f302c, type: 3}
   m_Name: AsteroidSettings
   m_EditorClassIdentifier: 
-  MaxSpeed: 20
-  MinSpeed: 10
+  MaxSpeed: 25
+  MinSpeed: 15
   MaxRotateSpeed: 50
   MinRotateSpeed: 30
-  MaxSpeedSmall: 25
-  MinSpeedSmall: 15
+  MaxSpeedSmall: 30
+  MinSpeedSmall: 20
   MaxRotateSpeedSmall: 60
   MinRotateSpeedSmall: 40

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 785d392b57cb8a0428182649604f8e32, type: 3}
   m_Name: UFOSettings
   m_EditorClassIdentifier: 
-  MaxSpeed: 7
+  MaxSpeed: 9
   Acceleration: 15
-  MinSpeed: 3
+  MinSpeed: 5
   MaxRotateSpeed: 150
   RotationAcceleration: 125
   MinRotateSpeed: 120

@@ -33,7 +33,6 @@ namespace GameShorts.CubeRunner.Level
         private readonly List<TileView> _levelTiles;
         private readonly List<TileView> _exitCells = new List<TileView>();
 
-        private int _currentDifficultyIndex = -1;
         private int _consecutiveGapRows;
         private int _consecutiveSolidRows;
 
