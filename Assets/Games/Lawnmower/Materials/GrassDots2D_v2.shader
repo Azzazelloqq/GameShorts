@@ -20,6 +20,9 @@ Shader "Custom/GrassDots2D_V2"
         _Seed ("Seed", Float) = 1.0
         
         _TopCutoffHeight ("Top Cutoff Height", Range(0, 1)) = 0.25
+        _Quality ("Quality", Range(0, 1)) = 1.0
+        _UseAlphaGradient ("Use Alpha Gradient", Range(0, 1)) = 1.0
+        _Simplify ("Simplify", Range(0, 1)) = 0.0
     }
 
     SubShader
@@ -62,21 +65,27 @@ Shader "Custom/GrassDots2D_V2"
             };
 
             sampler2D _MainTex;
-            fixed4 _Color;
-            fixed4 _BgColor;
-            fixed4 _GrassColor;
-            
-            float _GrassCount;
-            float _DotSize;
-            float _SwayAmount;
-            float _SwaySpeed;
-            float _TopCutoffHeight;
-            
-            // Обычные переменные (всегда доступны)
-            float _Seed;
-            float _Shrink;
-            float _GrassLength;
-            float _GrassWidth;
+
+            CBUFFER_START(UnityPerMaterial)
+                fixed4 _Color;
+                fixed4 _BgColor;
+                fixed4 _GrassColor;
+                
+                float _GrassCount;
+                float _DotSize;
+                float _SwayAmount;
+                float _SwaySpeed;
+                float _TopCutoffHeight;
+                float _Quality;
+                float _UseAlphaGradient;
+                float _Simplify;
+                
+                // Обычные переменные (всегда доступны)
+                float _Seed;
+                float _Shrink;
+                float _GrassLength;
+                float _GrassWidth;
+            CBUFFER_END
 
             // GPU Instancing support
             UNITY_INSTANCING_BUFFER_START(Props)
@@ -150,7 +159,7 @@ Shader "Custom/GrassDots2D_V2"
                 
                 // Координаты в пикселях (32x32 квадрат)
                 float2 pixelPos = IN.texcoord * 32.0;
-                float time = _Time.y * _SwaySpeed;
+                half time = (half)_Time.y * (half)_SwaySpeed;
                 
                 // Базовый цвет фона с учетом обрезания
                 float cutoffLine = 1.0 - _TopCutoffHeight;
@@ -162,7 +171,10 @@ Shader "Custom/GrassDots2D_V2"
                 fixed4 finalColor = backgroundColor;
                 
                 // Количество травинок
+                half quality = saturate((half)_Quality);
                 int grassCount = (int)_GrassCount;
+                int minGrassCount = max(1, grassCount / 2);
+                grassCount = (int)lerp((float)minGrassCount, (float)grassCount, quality);
                 
                 // Рисуем каждую травинку
                 for(int i = 0; i < 10; i++)
@@ -194,43 +206,62 @@ Shader "Custom/GrassDots2D_V2"
                         float2 dotDist = pixelPos - basePos;
                         float maxDotSize = min(_DotSize, instanceGrassWidth);
                         float dotRadius = max(maxDotSize, 0.2); // Минимум 0.2
-                        if(length(dotDist) < dotRadius)
+                        if(dot(dotDist, dotDist) < dotRadius * dotRadius)
                         {
                             finalColor = _GrassColor;
                         }
                     }
-                    
-                    // Рисуем стебель только если есть длина
-                    if(currentLength > 0.1)
+                    else
                     {
+                        half swayPhase = (half)random(float2(grassSeed, 4.0)) * (half)6.2831853;
+                        half swayBase = sin(time + swayPhase) * (half)_SwayAmount;
+                        float invLength = 1.0 / max(currentLength, 0.1);
+                        half stemWidthBase = (half)instanceGrassWidth;
                         // Проходим по высоте стебля
-                        for(float y = 0.0; y <= currentLength; y += 0.2)
+                        float stepSize = max(0.3, instanceGrassWidth * 0.6);
+                        int maxSteps = (int)lerp(12.0, 24.0, quality);
+                        int steps = (int)min(ceil(currentLength / stepSize), (float)maxSteps);
+                        steps = max(steps, 1);
+                        bool allowOpaqueEarlyExit = (_UseAlphaGradient < 0.5);
+                        for(int s = 0; s <= steps; s++)
                         {
+                            float y = min(currentLength, s * stepSize);
                             // Параметр от 0 до 1 по высоте стебля
-                            float t = y / max(currentLength, 0.1);
+                            half t = (half)(y * invLength);
                             
                             // Покачивание усиливается к верху
-                            float swayPhase = random(float2(grassSeed, 4.0)) * 6.28;
-                            float sway = sin(time + swayPhase) * _SwayAmount * t;
+                            half sway = swayBase * t;
                             
                             // Позиция точки на стебле
                             float2 stemPos = basePos + float2(sway, y);
                             
                             // Проверяем расстояние до текущего пикселя
                             float2 stemDist = pixelPos - stemPos;
-                            float stemWidth = instanceGrassWidth * (1.0 - t * 0.3); // Сужается к верху
-                            
-                            if(length(stemDist) < stemWidth)
+                            half stemWidth = stemWidthBase;
+                            if(_Simplify < 0.5)
                             {
-                                // Градиент прозрачности: снизу прозрачно, сверху непрозрачно
-                                float alpha = t * 2.0; // t от 0 до 0.5 дает alpha от 0 до 1
-                                alpha = saturate(alpha); // Ограничиваем от 0 до 1
-                                
-                                fixed4 grassWithAlpha = _GrassColor;
-                                grassWithAlpha.a *= alpha;
-                                
-                                // Смешиваем с учетом альфы
-                                finalColor = lerp(finalColor, grassWithAlpha, alpha);
+                                stemWidth = stemWidthBase * (half)(1.0 - t * 0.3); // Сужается к верху
+                            }
+                            
+                            if(dot(stemDist, stemDist) < stemWidth * stemWidth)
+                            {
+                                if(_UseAlphaGradient >= 0.5)
+                                {
+                                    // Градиент прозрачности: снизу прозрачно, сверху непрозрачно
+                                    half alpha = saturate(t * 2.0); // t от 0 до 0.5 дает alpha от 0 до 1
+                                    fixed4 grassWithAlpha = _GrassColor;
+                                    grassWithAlpha.a *= alpha;
+                                    // Смешиваем с учетом альфы
+                                    finalColor = lerp(finalColor, grassWithAlpha, alpha);
+                                }
+                                else
+                                {
+                                    finalColor = _GrassColor;
+                                    if(allowOpaqueEarlyExit)
+                                    {
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
