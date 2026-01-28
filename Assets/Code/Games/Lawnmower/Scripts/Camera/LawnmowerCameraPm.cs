@@ -53,10 +53,5 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         {
             _cameraController?.SetTarget(newPlayerPm);
         }
-
-        public void UpdateSettings(LawnmowerCameraSettings newSettings)
-        {
-            _cameraController?.SetCameraSettings(newSettings);
-        }
     }
 }

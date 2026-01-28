@@ -32,6 +32,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
         private LawnmowerLevelManager _levelManager;
         private LawnmowerCameraPm _cameraPm;
         private LawnmowerGameState _currentState;
+        private MainGameUIPm _mainGameUIPm;
 
         public LawnmowerMainScenePm(Ctx ctx,
             [Inject] IInputManager inputManager)
@@ -118,7 +119,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             {
                 sceneContextView = _ctx.sceneContextView,
                 levelManager = _levelManager,
-                onLevelCompleted = OnLevelCompleted,
                 cancellationToken = _ctx.cancellationToken
             };
             
@@ -127,9 +127,25 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             
             // Создаем камеру
             InitializeCamera();
+
+            InitializeMainGameUI();
             
             // Начинаем первый уровень
             _levelManager.StartCurrentLevel();
+        }
+        
+        
+        private void InitializeMainGameUI()
+        {
+            var mainGameUICtx = new MainGameUIPm.Ctx
+            {
+                view = _ctx.sceneContextView.MainUi,
+                levelManager = _levelManager,
+                onLevelCompleted = OnLevelCompleted
+            };
+                
+            _mainGameUIPm = new MainGameUIPm(mainGameUICtx);
+            AddDisposable(_mainGameUIPm);
         }
 
         private void OnLevelCompleted()

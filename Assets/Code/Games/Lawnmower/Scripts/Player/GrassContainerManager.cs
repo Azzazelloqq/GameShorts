@@ -75,8 +75,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             {
                 _ctx.playerModel.GrassContainerCurrentAmount.Value = newAmount;
                 OnGrassAdded?.Invoke(grassTilesCount);
-                
-                Debug.Log($"Added {actuallyAdded} grass to container. Current: {newAmount}/{maxCapacity}");
             }
         }
 
@@ -107,7 +105,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             if (actuallyEmptied > 0)
             {
                 OnContainerEmptied?.Invoke(actuallyEmptied);
-                Debug.Log($"Container emptying: {actuallyEmptied:F2} grass removed. Current: {newAmount:F2}");
             }
         }
 

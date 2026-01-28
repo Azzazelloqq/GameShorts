@@ -22,9 +22,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         private readonly ITickHandler _tickHandler;
         
         private Vector3 _currentVelocity; // Для SmoothDamp
-        private Vector3 _lookAheadOffset; // Текущий офсет "взгляда вперед"
         private Vector3 _targetPosition;
-        private bool _adaptiveZoomApplied;
         private Vector3 _lastPlayerWorldPosition;
         private bool _hasLastPlayerWorldPosition;
         private bool _initialClampApplied;
@@ -52,15 +50,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
                 return;
             }
 
-            // Устанавливаем начальные параметры камеры
-            _ctx.camera.orthographicSize = _ctx.settings.DefaultOrthographicSize;
-            _adaptiveZoomApplied = false;
-            if (_ctx.settings.AdaptiveZoom && CanAdaptZoomToLevelNow())
-            {
-                AdaptZoomToLevel();
-                _adaptiveZoomApplied = true;
-            }
-            
             // Ставим камеру сразу в корректную целевую позицию (с учетом bounds),
             // чтобы не ждать первого движения игрока/первого эмита позиции.
             SyncToPlayerImmediate();
@@ -69,91 +58,41 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
         private void StartFollowing()
         {
             if (_ctx.playerPm == null) return;
-
-            // Подписываемся на обновления позиции игрока
-            var playerModel = _ctx.playerPm.GetPlayerModel();
-            if (playerModel != null)
-            {
-                AddDisposable(playerModel.MovementDirection.Subscribe(OnPlayerDirectionChanged));
-            }
-
+            
             // Подписываемся на обновления камеры
-            _tickHandler.FrameUpdate += UpdateCamera;
-        }
-
-        private void OnPlayerDirectionChanged(Vector2 movementDirection)
-        {
-            if (_ctx.settings?.EnableLookAhead == true)
-            {
-                UpdateLookAheadOffset(movementDirection);
-            }
+            _tickHandler.FrameLateUpdate += UpdateCamera;
         }
 
         private void UpdateTargetPosition(Vector2 playerPosition, bool forceClampToLevel = false)
         {
             Vector3 baseTargetPosition = new Vector3(playerPosition.x, playerPosition.y, 0f) + _ctx.settings.Offset;
             
-            // Добавляем "взгляд вперед"
-            if (_ctx.settings.EnableLookAhead)
+            // Ограничиваем границами уровня (по новым правилам – через точки / грид).
+            if ( (forceClampToLevel || CanClampToLevelNow()))
             {
-                baseTargetPosition += _lookAheadOffset;
-            }
-            
-            // Добавляем динамическое смещение
-            if (_ctx.settings.DynamicOffset)
-            {
-                var playerModel = _ctx.playerPm.GetPlayerModel();
-                if (playerModel != null)
-                {
-                    Vector2 direction = playerModel.MovementDirection.Value;
-                    Vector3 dynamicOffset = new Vector3(direction.x, direction.y, 0f) * _ctx.settings.DynamicOffsetStrength;
-                    baseTargetPosition += dynamicOffset;
-                }
-            }
-            
-            // Ограничиваем границами уровня.
-            if (_ctx.settings.UseLevelBounds)
-            {
-                var currentLevel = _ctx.levelManager?.GetCurrentLevel();
-                if (currentLevel != null && (forceClampToLevel || currentLevel.IsPositionInBounds(playerPosition)))
-                {
-                    baseTargetPosition = ClampToBounds(baseTargetPosition);
-                }
+                baseTargetPosition = ClampToBounds(baseTargetPosition);
             }
             
             _targetPosition = baseTargetPosition;
         }
 
-        private void UpdateLookAheadOffset(Vector2 movementDirection)
-        {
-            Vector3 targetLookAhead = Vector3.zero;
-            
-            if (movementDirection.magnitude > 0.1f)
-            {
-                targetLookAhead = new Vector3(movementDirection.x, movementDirection.y, 0f) * _ctx.settings.LookAheadDistance;
-            }
-            
-            // Плавно обновляем офсет взгляда вперед
-            _lookAheadOffset = Vector3.Lerp(_lookAheadOffset, targetLookAhead, _ctx.settings.LookAheadSpeed * Time.deltaTime);
-        }
 
         private Vector3 ClampToBounds(Vector3 position)
         {
             var currentLevel = _ctx.levelManager?.GetCurrentLevel();
-            if (currentLevel?.LevelBounds == null) return position;
-            
-            var bounds = currentLevel.LevelBounds.bounds;
-            if (bounds.size.x < 0.1f || bounds.size.y < 0.1f)
+            if (currentLevel == null) return position;
+
+            if (!currentLevel.TryGetCameraBounds(out Vector2 levelMin, out Vector2 levelMax))
             {
                 return position;
             }
+
             var cameraBounds = GetCameraBounds();
-            
+
             // Учитываем размер камеры и отступы
-            float minX = bounds.min.x + cameraBounds.x + _ctx.settings.BoundsPadding;
-            float maxX = bounds.max.x - cameraBounds.x - _ctx.settings.BoundsPadding;
-            float minY = bounds.min.y + cameraBounds.y + _ctx.settings.BoundsPadding;
-            float maxY = bounds.max.y - cameraBounds.y - _ctx.settings.BoundsPadding;
+            float minX = levelMin.x + cameraBounds.x ;
+            float maxX = levelMax.x - cameraBounds.x ;
+            float maxY = levelMax.y - cameraBounds.y ;
             
             float clampedX = Mathf.Clamp(position.x, minX, maxX);
             float clampedY = Mathf.Clamp(position.y, position.y, maxY);
@@ -169,32 +108,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             float halfWidth = halfHeight * _ctx.camera.aspect;
             
             return new Vector2(halfWidth, halfHeight);
-        }
-
-        private void AdaptZoomToLevel()
-        {
-            var currentLevel = _ctx.levelManager?.GetCurrentLevel();
-            if (currentLevel?.LevelBounds == null) return;
-            
-            var bounds = currentLevel.LevelBounds.bounds;
-            
-            // Вычисляем оптимальный зум для показа всего уровня
-            float levelWidth = bounds.size.x;
-            float levelHeight = bounds.size.y;
-            
-            float requiredHeight = levelHeight * 0.7f; 
-            float requiredWidth = levelWidth * 0.7f / _ctx.camera.aspect;
-            
-            float optimalSize = Mathf.Max(requiredHeight, requiredWidth);
-            optimalSize = Mathf.Clamp(optimalSize, _ctx.settings.MinZoom, _ctx.settings.MaxZoom);
-            
-            _ctx.camera.orthographicSize = optimalSize;
-        }
-
-        private bool CanAdaptZoomToLevelNow()
-        {
-            var currentLevel = _ctx.levelManager?.GetCurrentLevel();
-            return currentLevel?.LevelBounds != null;
         }
 
         private void SyncToPlayerImmediate()
@@ -227,13 +140,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
                 {
                     UpdateTargetPosition(new Vector2(playerPos3.x, playerPos3.y));
                 }
-            }
-
-            // Если adaptive zoom включен, но в момент инициализации bounds еще не было — применяем позже.
-            if (_ctx.settings.AdaptiveZoom && !_adaptiveZoomApplied && CanAdaptZoomToLevelNow())
-            {
-                AdaptZoomToLevel();
-                _adaptiveZoomApplied = true;
             }
 
             if (!_initialClampApplied && CanClampToLevelNow())
@@ -280,23 +186,9 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             }
         }
 
-        public void SetCameraSettings(LawnmowerCameraSettings newSettings)
-        {
-            // Обновляем настройки камеры во время игры
-            if (newSettings != null)
-            {
-                _ctx.camera.orthographicSize = newSettings.DefaultOrthographicSize;
-                
-                if (newSettings.AdaptiveZoom)
-                {
-                    AdaptZoomToLevel();
-                }
-            }
-        }
-
         protected override void OnDispose()
         {
-            _tickHandler.FrameUpdate -= UpdateCamera;
+            _tickHandler.FrameLateUpdate -= UpdateCamera;
             base.OnDispose();
         }
 
@@ -323,13 +215,16 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
 
         private bool CanClampToLevelNow()
         {
-            if (!_ctx.settings.UseLevelBounds) return false;
-
             var currentLevel = _ctx.levelManager?.GetCurrentLevel();
-            if (currentLevel?.LevelBounds == null) return false;
+            if (currentLevel == null) return false;
 
-            var bounds = currentLevel.LevelBounds.bounds;
-            return bounds.size.x >= 0.1f && bounds.size.y >= 0.1f;
+            if (!currentLevel.TryGetCameraBounds(out Vector2 levelMin, out Vector2 levelMax))
+            {
+                return false;
+            }
+
+            var size = levelMax - levelMin;
+            return size.x >= 0.1f && size.y >= 0.1f;
         }
 
 #if UNITY_EDITOR
@@ -347,13 +242,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Camera
             // Отрисовываем целевую позицию
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(_targetPosition, 0.5f);
-            
-            // Отрисовываем офсет взгляда вперед
-            if (_ctx.settings.EnableLookAhead && _lookAheadOffset.magnitude > 0.1f)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(cameraPos, cameraPos + _lookAheadOffset);
-            }
         }
 #endif
     }

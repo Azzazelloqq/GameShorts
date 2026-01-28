@@ -64,10 +64,10 @@ namespace Code.Games.Lawnmower.Scripts.Grass
         private Material grassMaterial;
         private Mesh grassMesh;
 
-        private void Start()
-        {
-            EnsureInitialized();
-        }
+        // Публичные аксессоры для расчёта границ уровня/камеры
+        public int GridWidth => gridWidth;
+        public int GridHeight => gridHeight;
+        public Vector2 GridOffset => gridOffset;
 
         public void EnsureInitialized()
         {
@@ -289,7 +289,7 @@ namespace Code.Games.Lawnmower.Scripts.Grass
                 lengthArrays.Add(batchLengths);
                 widthArrays.Add(batchWidths);
             }
-
+//kk
             isInitialized = true;
             Debug.Log(
                 $"GrassGridInstanced: Initialized {gridWidth}x{gridHeight} grid with {totalTiles} tiles in {batchCount} batches");

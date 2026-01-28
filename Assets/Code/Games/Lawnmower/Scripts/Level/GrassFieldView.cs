@@ -15,7 +15,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
         private bool _isCompleted = false;
         private float _lastCompletionCheck = 0f;
         private const float CHECK_INTERVAL = 0.5f; // Проверяем завершенность каждые 0.5 секунды
-        private bool _pendingRestore = false;
         
         // Events
         public System.Action<GrassFieldView> OnFieldCompleted;
@@ -33,15 +32,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
                 CheckCompletion();
             }
         }
-
-        private void OnEnable()
-        {
-            if (_pendingRestore)
-            {
-                _pendingRestore = false;
-                StartCoroutine(WaitForInitializationAndRestore());
-            }
-        }
         
         public void ResetField()
         {
@@ -50,34 +40,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
             if (grassGrid != null && grassGrid.IsInitialized())
             {
                 grassGrid.RestoreAllGrass();
-            }
-            else if (grassGrid != null)
-            {
-                // Если GrassGrid не инициализирован, попробуем инициализировать его принудительно
-                Debug.LogWarning($"GrassField '{fieldName}': GrassGrid not initialized, forcing initialization");
-                if (!isActiveAndEnabled)
-                {
-                    _pendingRestore = true;
-                    return;
-                }
-
-                StartCoroutine(WaitForInitializationAndRestore());
-            }
-        }
-        
-        private System.Collections.IEnumerator WaitForInitializationAndRestore()
-        {
-            // Ждем несколько кадров, чтобы дать время GrassGrid инициализироваться
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
-            
-            if (grassGrid != null && grassGrid.IsInitialized())
-            {
-                grassGrid.RestoreAllGrass();
-            }
-            else
-            {
-                Debug.LogError($"GrassField '{fieldName}': Failed to initialize GrassGrid");
             }
         }
         

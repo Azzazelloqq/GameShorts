@@ -18,7 +18,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
         {
             public LawnmowerSceneContextView sceneContextView;
             public LawnmowerLevelManager levelManager;
-            public Action onLevelCompleted;
             public CancellationToken cancellationToken;
         }
 
@@ -44,13 +43,17 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             _ctx = ctx;
             _inputManager = inputManager;
             _tickHandler = tickHandler;
-            
+
+            _ctx.levelManager.OnLevelStarted += OnLevelStarted;
+        }
+
+        private void OnLevelStarted(LevelView _)
+        {
             InitializePlayerModel();
             SpawnPlayer();
             InitializePlayerMover();
             InitializeContainerManager();
             InitializeFarmerUI();
-            InitializeMainGameUI();
             StartInputHandling();
         }
 
@@ -154,18 +157,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             Debug.Log("Farmer UI MVP initialized");
         }
 
-        private void InitializeMainGameUI()
-        {
-            var mainGameUICtx = new MainGameUIPm.Ctx
-            {
-                view = _ctx.sceneContextView.MainUi,
-                levelManager = _ctx.levelManager,
-                onLevelCompleted = HandleLevelCompleted
-            };
-                
-            _mainGameUIPm = new MainGameUIPm(mainGameUICtx);
-            AddDisposable(_mainGameUIPm);
-        }
 
         private void StartInputHandling()
         {
@@ -265,12 +256,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             }
         }
 
-        private void HandleLevelCompleted()
-        {
-            Debug.Log("Level completed! Calling onLevelCompleted callback...");
-            _ctx.onLevelCompleted?.Invoke();
-        }
-
         /// <summary>
         /// Переинициализация контейнера для нового уровня
         /// </summary>
@@ -331,6 +316,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 
         protected override void OnDispose()
         {
+            _ctx.levelManager.OnLevelStarted -= OnLevelStarted;
             _tickHandler.PhysicUpdate -= HandleGrassCutting;
             
             if (_playerView != null)
