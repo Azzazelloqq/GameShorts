@@ -13,7 +13,10 @@ namespace Code.Generated.Addressables
         public static readonly AssetsCommonCharactersLowpoly AssetsCommonCharactersLowpoly = new AssetsCommonCharactersLowpoly();
         public static readonly GameAngryHumans GameAngryHumans = new GameAngryHumans();
         public static readonly GroupGame2048 GroupGame2048 = new GroupGame2048();
+        public static readonly Intro Intro = new Intro();
+        public static readonly DuplicateAssetIsolation DuplicateAssetIsolation = new DuplicateAssetIsolation();
         public static readonly GameGardneer GameGardneer = new GameGardneer();
+        public static readonly Unifiedraytracing Unifiedraytracing = new Unifiedraytracing();
         public static readonly GameLightseeker GameLightseeker = new GameLightseeker();
         public static readonly TestGames TestGames = new TestGames();
         public static readonly GameLawnmover GameLawnmover = new GameLawnmover();

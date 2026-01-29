@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -266,18 +266,22 @@ namespace Code.EditorTools
 
         private static string ReplaceDelimitersWithSpace(string input)
         {
-            // All delimiters including brackets are replaced with spaces for valid C# identifiers
-            char[] delimiters = { ' ', '_', '-', '.', '/', '\\', '(', ')', '[', ']', '{', '}' };
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+
+            // Replace any non-alphanumeric character with space for valid identifiers
             var sb = new StringBuilder(input.Length);
             foreach (var c in input)
             {
-                if (delimiters.Contains(c))
+                if (char.IsLetterOrDigit(c))
                 {
-                    sb.Append(' ');
+                    sb.Append(c);
                 }
                 else
                 {
-                    sb.Append(c);
+                    sb.Append(' ');
                 }
             }
 
