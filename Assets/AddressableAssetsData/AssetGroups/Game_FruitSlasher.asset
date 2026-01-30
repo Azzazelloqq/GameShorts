@@ -14,12 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Game_FruitSlasher
   m_GUID: 90d695a550442b341ab6d2ebc14b8fc0
-  m_SerializeEntries:
-  - m_GUID: a9a932f9d83431f4db52a6ea4c083b43
-    m_Address: FruitSlasherGame
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: bd422f85d6c28e54193001957bd38417, type: 2}
   m_SchemaSet:
