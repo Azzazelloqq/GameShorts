@@ -1,0 +1,23 @@
+{
+    "name": "FruitSlasher",
+    "rootNamespace": "",
+    "references": [
+        "Core.ShortGame",
+        "Utils",
+        "UniTask",
+        "Disposable",
+        "Tools",
+        "LightDI",
+        "TickHandler",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -15,9 +15,11 @@ using Code.Core.ShortGamesCore.Source.Pool;
 using Code.Core.Tools.Pool;
 using Code.Games;
 using Code.Games.AngryHumans;
+using Code.Games.FruitSlasher;
 using Code.Games.TestGames;
 using Code.Generated.Addressables;
 using GameShorts.CubeRunner;
+using GameShorts.FlyHumans;
 using GameShorts.Gardener;
 using InGameLogger;
 using LightDI.Runtime;
@@ -159,6 +161,7 @@ public sealed class GameEntryPoint : MonoBehaviour
 	{
 		return new Dictionary<Type, string>
 		{
+			{ typeof(FruitSlasherGame), ResourceIdsContainer.GameFruilSlasher.FruitSlasherGame },
 			{ typeof(GardenerGame), ResourceIdsContainer.GameGardneer.GardenerGame },
 			{ typeof(AngryHumansShortGame), ResourceIdsContainer.GameAngryHumans.MainGame },
 			{ typeof(BoxTower), ResourceIdsContainer.GameBoxTower.BoxTower },
@@ -167,6 +170,7 @@ public sealed class GameEntryPoint : MonoBehaviour
 			{ typeof(Game2048), ResourceIdsContainer.GroupGame2048.Id2048Main },
 			{ typeof(AsteroidsGame), ResourceIdsContainer.GameAsteroids.AsteroidGame },
 			{ typeof(CubeRunnerGame), ResourceIdsContainer.GameCubeRunner.CubeRunnerGame },
+			{ typeof(FlyHumansGame), ResourceIdsContainer.GameFlyHumans.FlyHumansMain },
 		};
 	}
 
@@ -174,6 +178,7 @@ public sealed class GameEntryPoint : MonoBehaviour
 	{
 		return new[]
 		{
+			typeof(FruitSlasherGame),
 			typeof(CubeRunnerGame),
 			typeof(GardenerGame),
 			typeof(BoxTower),
@@ -182,6 +187,7 @@ public sealed class GameEntryPoint : MonoBehaviour
 			typeof(Game2048),
 			typeof(AngryHumansShortGame),
 			typeof(AsteroidsGame),
+			typeof(FlyHumansGame),
 		};
 	}
 
