@@ -30,6 +30,7 @@ namespace GameShorts.FlyHumans.Gameplay
         private IDisposable _inputSubscription;
         private IDisposable _resetDelaySubscription;
         private bool _collided;
+        private bool _gravityInitialized;
 
         public FlyHumansGameplayPm(Ctx ctx)
         {
@@ -111,19 +112,26 @@ namespace GameShorts.FlyHumans.Gameplay
         public void StartGame()
         {
             _collided = false;
+            _gravityInitialized = false;
             if (_character == null)
             {
                 Debug.LogError("Character is null!");
                 return;
             }
-            
-            
+
+            // Сразу включаем движение мира и активацию персонажа (fallback без ожидания триггера анимации)
+            InitGravity();
+
             // Запускаем анимацию старта персонажа
             _character.StartJumpAnimation();
         }
 
         private void InitGravity()
         {
+            if (_gravityInitialized)
+                return;
+            _gravityInitialized = true;
+
             _character.CurrentGravity = _character.Gravity;
             _character.IsActive = true;
             

@@ -93,10 +93,6 @@ namespace GameShorts.FlyHumans.Presenters
                 // Удаляем блоки, которые ушли за персонажа
                 RemoveOldBlocks();
             }
-            else
-            {
-                Debug.LogWarning($"World not moving! IsMoving={_isMoving}");
-            }
             
             // Обновляем трафик на всех блоках ВСЕГДА (независимо от движения мира)
             UpdateAllBlocksTraffic(deltaTime);
@@ -113,7 +109,6 @@ namespace GameShorts.FlyHumans.Presenters
         private void MoveBlocks(float deltaTime)
         {
             Vector3 movement = _movementDirection * _currentSpeed * deltaTime;
-            Debug.Log($"MoveBlocks: Speed={_currentSpeed:F2}, Movement={movement}, BlockCount={_ctx.worldBlocksView.ActiveBlocks.Count}");
             
             foreach (var block in _ctx.worldBlocksView.ActiveBlocks)
             {

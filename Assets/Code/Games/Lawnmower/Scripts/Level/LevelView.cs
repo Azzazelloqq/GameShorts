@@ -46,6 +46,8 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Level
             foreach (var field in grassFields)
             {
                 field.OnFieldCompleted += OnFieldCompleted;
+                if (field.GrassGrid != null)
+                    field.GrassGrid.EnsureInitialized();
                 field.ResetField();
             }
             

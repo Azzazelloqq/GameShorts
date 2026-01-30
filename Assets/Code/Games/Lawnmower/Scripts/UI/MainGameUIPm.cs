@@ -2,7 +2,9 @@ using System;
 using UnityEngine;
 using Disposable;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
+using LightDI.Runtime;
 using R3;
+using TickHandler;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 {
@@ -20,19 +22,28 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.UI
 
         private readonly Ctx _ctx;
         private float _lastProgressCheck = 0f;
+        private readonly ITickHandler _tickHandler;
         private const float PROGRESS_CHECK_INTERVAL = 0.1f; // Проверяем прогресс каждые 0.1 секунды
 
-        public MainGameUIPm(Ctx ctx)
+        public MainGameUIPm(Ctx ctx, [Inject] ITickHandler tickHandler)
         {
             _ctx = ctx;
+            _tickHandler = tickHandler;
             
             // Инициализируем View
             _ctx.view.SetCtx(new MainGameUIView.Ctx());
             
             // Обновляем UI с текущим уровнем
             UpdateLevelUI();
-            
+
+            _tickHandler.FrameUpdate += UpdateLevelProgress;
             Debug.Log("MainGameUIPm initialized");
+        }
+
+        protected override void OnDispose()
+        {
+            _tickHandler.FrameUpdate -= UpdateLevelProgress;
+            base.OnDispose();
         }
 
         /// <summary>

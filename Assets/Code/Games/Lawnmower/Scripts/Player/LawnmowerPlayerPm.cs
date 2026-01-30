@@ -28,9 +28,14 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
         private LawnmowerPlayerModel _playerModel;
         private LawnmowerPlayerMoverPm _playerMover;
         private GrassContainerManager _containerManager;
+        private EmptyingZonePm _emptyingZonePm;
         private FarmerUIPm _farmerUIPm;
         private MainGameUIPm _mainGameUIPm;
         private Vector3 _spawnPosition;
+        
+        private IDisposable _positionSub;
+        private IDisposable _movingSub;
+        private IDisposable _rotationSub;
         
         // Grass cutting tracking
         private float _lastGrassCutTime = 0f;
@@ -49,12 +54,38 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 
         private void OnLevelStarted(LevelView _)
         {
+            CleanupLevelScope();
             InitializePlayerModel();
             SpawnPlayer();
             InitializePlayerMover();
             InitializeContainerManager();
             InitializeFarmerUI();
             StartInputHandling();
+        }
+        
+        private void CleanupLevelScope()
+        {
+            if (_playerView != null)
+            {
+                UnityEngine.Object.Destroy(_playerView.gameObject);
+                _playerView = null;
+            }
+            _playerMover?.Dispose();
+            _playerMover = null;
+            _containerManager?.Dispose();
+            _containerManager = null;
+            _emptyingZonePm?.Dispose();
+            _emptyingZonePm = null;
+            _farmerUIPm?.Dispose();
+            _farmerUIPm = null;
+            _positionSub?.Dispose();
+            _positionSub = null;
+            _movingSub?.Dispose();
+            _movingSub = null;
+            _rotationSub?.Dispose();
+            _rotationSub = null;
+            _tickHandler.PhysicUpdate -= HandleGrassCutting;
+            _tickHandler.FrameUpdate -= HandleContainerEmptying;
         }
 
         private void InitializePlayerModel()
@@ -105,7 +136,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             };
             
             _playerMover = LawnmowerPlayerMoverPmFactory.CreateLawnmowerPlayerMoverPm(moverCtx);
-            AddDisposable(_playerMover);
         }
 
         private void InitializeContainerManager()
@@ -113,7 +143,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             // Находим зону опустошения на текущем уровне
             LevelView currentLevel = _ctx.levelManager.GetCurrentLevel();
             EmptyingZoneView emptyingZoneView = currentLevel.EmptyingZone;
-            EmptyingZonePm emptyingZonePm = null;
             if (emptyingZoneView != null)
             {
                 var emptyingZoneCtx = new EmptyingZonePm.Ctx
@@ -123,19 +152,21 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
                     normalColor = Color.yellow,
                     activeColor = Color.green
                 };
-                emptyingZonePm = new EmptyingZonePm(emptyingZoneCtx);
-                AddDisposable(emptyingZonePm);
+                _emptyingZonePm = new EmptyingZonePm(emptyingZoneCtx);
+            }
+            else
+            {
+                _emptyingZonePm = null;
             }
             
             var containerCtx = new GrassContainerManager.Ctx
             {
                 playerModel = _playerModel,
                 settings = _ctx.sceneContextView.PlayerSettingsAsset,
-                emptyingZonePm = emptyingZonePm
+                emptyingZonePm = _emptyingZonePm
             };
             
             _containerManager = new GrassContainerManager(containerCtx);
-            AddDisposable(_containerManager);
             
             Debug.Log($"Container manager initialized with emptying zone: {emptyingZoneView?.name ?? "None"}");
         }
@@ -152,7 +183,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             };
             
             _farmerUIPm = new FarmerUIPm(farmerUICtx);
-            AddDisposable(_farmerUIPm);
             
             Debug.Log("Farmer UI MVP initialized");
         }
@@ -160,14 +190,11 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
 
         private void StartInputHandling()
         {
-            // Подписываемся на изменения позиции модели для синхронизации с визуальным представлением
-            AddDisposable(_playerModel.Position.Subscribe(OnPositionChanged));
-            AddDisposable(_playerModel.IsMoving.Subscribe(OnMovingStateChanged));
-            AddDisposable(_playerModel.CurrentRotation.Subscribe(OnRotationChanged));
-            
+            _positionSub = _playerModel.Position.Subscribe(OnPositionChanged);
+            _movingSub = _playerModel.IsMoving.Subscribe(OnMovingStateChanged);
+            _rotationSub = _playerModel.CurrentRotation.Subscribe(OnRotationChanged);
             _tickHandler.PhysicUpdate += HandleGrassCutting;
             _tickHandler.FrameUpdate += HandleContainerEmptying;
-            _tickHandler.FrameUpdate += HandleMainGameUI;
         }
 
         private void OnPositionChanged(Vector2 newPosition)
@@ -248,13 +275,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
             }
         }
 
-        private void HandleMainGameUI(float deltaTime)
-        {
-            if (_mainGameUIPm != null)
-            {
-                _mainGameUIPm.UpdateLevelProgress(deltaTime);
-            }
-        }
 
         /// <summary>
         /// Переинициализация контейнера для нового уровня
@@ -317,14 +337,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Player
         protected override void OnDispose()
         {
             _ctx.levelManager.OnLevelStarted -= OnLevelStarted;
-            _tickHandler.PhysicUpdate -= HandleGrassCutting;
-            
-            if (_playerView != null)
-            {
-                UnityEngine.Object.Destroy(_playerView.gameObject);
-                _playerView = null;
-            }
-            
+            CleanupLevelScope();
             base.OnDispose();
         }
     }

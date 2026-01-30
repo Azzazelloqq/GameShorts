@@ -2,6 +2,7 @@ using UnityEngine;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Player;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.Level;
 using Code.Core.ShortGamesCore.Lawnmower.Scripts.UI;
+using Code.Games.Lawnmower.Scripts.Grass;
 using UnityEngine.Serialization;
 
 namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
@@ -60,6 +61,19 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.View
                 
                 // Активируем новый уровень
                 levels[currentLevelIndex].gameObject.SetActive(true);
+                
+                // Прогреваем гриды травы нового уровня, чтобы трава рисовалась
+                WarmUpLevelGrass(levels[currentLevelIndex]);
+            }
+        }
+        
+        private void WarmUpLevelGrass(LevelView level)
+        {
+            if (level == null || level.GrassFields == null) return;
+            foreach (var field in level.GrassFields)
+            {
+                if (field == null || field.GrassGrid == null) continue;
+                field.GrassGrid.EnsureInitialized();
             }
         }
         

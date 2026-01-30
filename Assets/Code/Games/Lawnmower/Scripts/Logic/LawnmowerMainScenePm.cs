@@ -144,7 +144,7 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
                 onLevelCompleted = OnLevelCompleted
             };
                 
-            _mainGameUIPm = new MainGameUIPm(mainGameUICtx);
+            _mainGameUIPm = MainGameUIPmFactory.CreateMainGameUIPm(mainGameUICtx);
             AddDisposable(_mainGameUIPm);
         }
 
@@ -158,8 +158,6 @@ namespace Code.Core.ShortGamesCore.Lawnmower.Scripts.Logic
             {
                 _levelManager.NextLevel();
                 _levelManager.StartCurrentLevel();
-                _playerPm.ReinitializeForNewLevel(); // Переинициализируем контейнер для нового уровня
-                _playerPm.ResetToSpawn();
             }
             else
             {
