@@ -26,11 +26,12 @@ namespace Code.Games.FruitSlasher.Scripts.Logic
         {
             _ctx = ctx;
             
-            _blade = new BladePm(new BladePm.Ctx()
+            _blade =  BladePmFactory.CreateBladePm(new BladePm.Ctx()
             {
                 sceneContextView = _ctx.sceneContextView,
                 isPaused = _ctx.isPaused,
-                restartGame = _ctx.restartGame,
+                restartGame = _ctx.restartGame
+                
             });
             AddDisposable(_blade);
             
